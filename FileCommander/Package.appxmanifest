@@ -9,15 +9,15 @@
   IgnorableNamespaces="uap rescap systemai">
 
   <Identity
-    Name="32a8329e-9d82-4db5-b146-266463c71cfd"
-    Publisher="CN=urieg"
-    Version="1.0.0.0" />
+    Name="UweRiegel.WindowsFileCommander"
+    Publisher="CN=AC5F1014-0452-4688-B961-1BDC221C7B87"
+    Version="0.1.0.0" />
 
-  <mp:PhoneIdentity PhoneProductId="32a8329e-9d82-4db5-b146-266463c71cfd" PhonePublisherId="00000000-0000-0000-0000-000000000000"/>
+  <mp:PhoneIdentity PhoneProductId="b652c56a-e4f2-46d0-ab76-e49a966eeff5" PhonePublisherId="00000000-0000-0000-0000-000000000000"/>
 
   <Properties>
-    <DisplayName>FileCommander</DisplayName>
-    <PublisherDisplayName>urieg</PublisherDisplayName>
+    <DisplayName>Windows File Commander</DisplayName>
+    <PublisherDisplayName>Uwe Riegel</PublisherDisplayName>
     <Logo>Assets\StoreLogo.png</Logo>
   </Properties>
 
@@ -35,7 +35,7 @@
       Executable="$targetnametoken$.exe"
       EntryPoint="$targetentrypoint$">
       <uap:VisualElements
-        DisplayName="FileCommander"
+        DisplayName="Windows File Commander"
         Description="FileCommander"
         BackgroundColor="transparent"
         Square150x150Logo="Assets\Square150x150Logo.png"
