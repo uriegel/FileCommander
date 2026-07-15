@@ -18,30 +18,24 @@ using Microsoft.UI.Xaml.Navigation;
 
 namespace FileCommander.Controls;
 
-public sealed partial class FolderView : UserControl
+public sealed partial class ColumnView : UserControl
 {
-    public FolderView()
+    public ColumnView()
     {
         InitializeComponent();
     }
 
-    //public void SetItemsSource(IEnumerable<Item> items)
-    //{
-    //    //var oldView = CollectionViewSource.GetDefaultView(ColumnView.ListView.ItemsSource) as ListCollectionView;
-    //    //var view = new ListCollectionView(items.ToList())
-    //    //{
-    //    //    CustomSort = oldView?.CustomSort,
-    //    //    Filter = i => FilterHidden(i) && FilterRestriction(i),
-    //    //};
-    //    //ColumnView.ListView.ItemsSource = view;
-    //}
-
-    void TextBox_GotFocus(object sender, RoutedEventArgs e)
+    void ListView_KeyDown(object sender, KeyRoutedEventArgs e)
     {
 
     }
 
-    void TextBox_KeyDown(object sender, KeyRoutedEventArgs e)
+    void ListView_GotFocus(object sender, RoutedEventArgs e)
+    {
+
+    }
+
+    void ListView_SelectionChanged(object sender, SelectionChangedEventArgs e)
     {
 
     }
