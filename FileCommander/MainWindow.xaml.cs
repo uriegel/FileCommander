@@ -114,4 +114,14 @@ public sealed partial class MainWindow : Window
     {
         
     }
+
+    void RightView_GotFocus(object sender, RoutedEventArgs e)
+    {
+
+    }
+
+    void LeftView_GotFocus(object sender, RoutedEventArgs e)
+    {
+
+    }
 }
