@@ -12,12 +12,6 @@ namespace Explorer.Controls;
 
 internal static class ShellIconInterop
 {
-    private const uint SHGFI_USEFILEATTRIBUTES = 0x000000010;
-    private const uint SHGFI_SYSICONINDEX = 0x000004000;
-    private const uint SHGFI_TYPENAME = 0x000000400;
-
-    private const uint FILE_ATTRIBUTE_NORMAL = 0x00000080;
-
     private const int SHIL_SMALL = 0x1;
     private const int SHIL_LARGE = 0x0;
     private const int SHIL_EXTRALARGE = 0x2;
