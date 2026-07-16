@@ -18,6 +18,10 @@ using FileCommander.DataStore;
 // To learn more about WinUI, the WinUI project structure,
 // and more about our project templates, see: http://aka.ms/winui-project-info.
 
+// TODO TemplateSelector in Resource: https://learn.microsoft.com/en-us/windows/apps/develop/ui/controls/data-template-selector
+// TODO TemplateSelector: move it to folderview, so that ColumnView is more generic 
+// TODO ListItemTempate (hidden)
+
 namespace FileCommander.Controls;
 
 public sealed partial class ColumnView : UserControl

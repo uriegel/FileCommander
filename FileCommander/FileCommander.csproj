@@ -10,8 +10,15 @@
     <PublishProfile>win-$(Platform).pubxml</PublishProfile>
     <UseWinUI>true</UseWinUI>
     <WinUISDKReferences>false</WinUISDKReferences>
+	<UseSystemDrawing>true</UseSystemDrawing>
     <EnableMsixTooling>true</EnableMsixTooling>
     <Nullable>enable</Nullable>
+
+
+	  <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
+
+
+
   </PropertyGroup>
   <ItemGroup>
     <Content Remove="Assets\FolderView.xaml" />
@@ -21,9 +28,27 @@
     <None Remove="Assets\FolderView.xaml" />
     <None Remove="Controls\ColumnView.xaml" />
     <None Remove="Controls\ColumnViewHeader\ColumnViewHeaders.xaml" />
+    <None Remove="DataTemplates\DirectoryItemDataTemplate.xaml" />
   </ItemGroup>
+	<ItemGroup>
+		<None Remove="Resources\Drive.ico" />
+		<None Remove="Resources\Error.ico" />
+		<None Remove="Resources\Folder.ico" />
+		<None Remove="Resources\Info.ico" />
+		<None Remove="Resources\NetworkShare.ico" />
+		<None Remove="Resources\QuestionMark.ico" />
+		<None Remove="Resources\RemovableDrive.ico" />
+		<None Remove="Resources\Warning.ico" />
+		<None Remove="Resources\WindowsDrive.ico" />
+	</ItemGroup>
+	<ItemGroup>
+		<Resource Include="Resources\Drive.ico" />
+		<Resource Include="Resources\Folder.ico" />
+		<Resource Include="Resources\NetworkShare.ico" />
+		<Resource Include="Resources\RemovableDrive.ico" />
+	</ItemGroup>
 
-  <ItemGroup>
+	<ItemGroup>
     <Content Include="Assets\SplashScreen.scale-200.png" />
     <Content Include="Assets\LockScreenLogo.scale-200.png" />
     <Content Include="Assets\Square150x150Logo.scale-200.png" />
@@ -49,6 +74,7 @@
     <PackageReference Include="CommunityToolkit.WinUI.Controls.Primitives" Version="8.2.251219" />
     <PackageReference Include="Microsoft.Windows.SDK.BuildTools" Version="10.0.28000.2270" />
     <PackageReference Include="Microsoft.WindowsAppSDK" Version="2.2.0" />
+	  <PackageReference Include="System.Drawing.Common" Version="10.0.0" />
   </ItemGroup>
   <ItemGroup>
     <Page Update="Controls\ColumnView.xaml">
@@ -64,6 +90,14 @@
     <Page Update="Controls\ColumnViewHeader\ColumnViewHeaders.xaml">
       <Generator>MSBuild:Compile</Generator>
     </Page>
+  </ItemGroup>
+  <ItemGroup>
+    <Page Update="DataTemplate\DirectoryItemDataTemplate.xaml">
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+  </ItemGroup>
+  <ItemGroup>
+    <Folder Include="Resources\" />
   </ItemGroup>
 
   <!--

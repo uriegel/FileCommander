@@ -1,8 +1,11 @@
-﻿using FileCommander.Data;
+﻿using Explorer.Controls;
+
+using FileCommander.Data;
 using FileCommander.DataStore;
 
 using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.IO;
 using System.Linq;
 using System.Text;
@@ -17,8 +20,8 @@ class DirectoryController
     public async Task ChangePathAsync(string path)
     {
         //var folderToSelect = path.EndsWith("..") ? context.CurrentPath.SubstringAfterLast('/') : null;
-//        cancellation.Cancel();
-//        cancellation = new();
+        //        cancellation.Cancel();
+        //        cancellation = new();
         var items = await Get(path);
         //var enableEvents = watcher.Path == "";
         //watcher.Path = context.CurrentPath;
@@ -49,7 +52,7 @@ class DirectoryController
         var dirInfo = new DirectoryInfo(path);
         var dirs = dirInfo
                         .GetDirectories()
-                        .Select(DirectoryItem.CreateDirItem)
+                        .Select(DirectoryItem.Create)
                         .OrderBy(n => n.Name)
                         .ToArray();
         var files = dirInfo
@@ -59,7 +62,10 @@ class DirectoryController
         //context.CurrentPath = dirInfo.FullName;
         //Application.Settings.SetString($"path-{Id}", dirInfo.FullName);
         return [
-            new DirectoryItem("..", DirectoryItemType.Parent, false),
+            new DirectoryItem
+            {
+                Name = "..", Icon = null, IsHidden = false
+            },
             .. dirs,
             .. files
         ];

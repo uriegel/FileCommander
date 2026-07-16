@@ -1,75 +1,76 @@
-﻿using System;
-using System.ComponentModel;
+﻿using Explorer.Controls;
+
+using FileCommander.Extensions;
+
+using Microsoft.UI.Xaml.Media;
+
+using System;
 using System.IO;
+using System.Threading.Tasks;
 
 namespace FileCommander.Data;
 
-record DirectoryItem(
-    string Name,
-    DirectoryItemType Type,
-    bool IsHidden,
-    string? IconPath = null
-) : Item(Name), INotifyPropertyChanged
+public record DirectoryItem : Item
 {
-    public DateTime? DateTime
+    public ImageSource? Icon { get; set; }
+
+    public DateTime DateTime
     {
-        get;
+        get => field;
         set
         {
             field = value;
             OnChanged(nameof(DateTime));
         }
     }
-    public long? Size
+
+
+
+    public static DirectoryItem Create(DirectoryInfo info)
     {
-        get;
-        set
+        var item = new DirectoryItem()
         {
-            field = value;
-            OnChanged(nameof(Size));
-        }
-    }
-
-    //public ExifData? ExifData
-    //{
-    //    get;
-    //    set
-    //    {
-    //        field = value;
-    //        OnChanged(nameof(ExifData));
-    //    }
-    //}
-
-    public bool IsSelected
-    {
-        get;
-        set
-        {
-            field = value;
-            OnChanged(nameof(IsSelected));
-        }
-    }
-
-    public static DirectoryItem CreateDirItem(DirectoryInfo info)
-        => new(info.Name, DirectoryItemType.Directory, (info.Attributes & FileAttributes.Hidden) == FileAttributes.Hidden || info.Name.StartsWith('.'))
-        {
+            Icon = "Resources/Folder.ico".IconFromResource(),
+            IsHidden = info.Attributes.HasFlag(FileAttributes.Hidden),
+            Name = info.Name ?? "",
             DateTime = info.LastWriteTime
         };
 
-    public static DirectoryItem CreateFileItem(FileInfo info)
-        => new(info.Name, DirectoryItemType.File, (info.Attributes & FileAttributes.Hidden) == FileAttributes.Hidden || info.Name.StartsWith('.'))
+        var _ = Test();
+
+        async Task Test()
         {
-            Size = info.Length,
-            DateTime = info.LastWriteTime,
+            var t = await ShellIconCache.GetAsync(".folder", 16);
+            item.Icon = t;
+        }
+
+
+        return item;
+    }
+
+
+
+    public static DirectoryItem CreateFileItem(FileInfo info)
+    {
+        var item = new DirectoryItem()
+        {
+            Icon = "Resources/Folder.ico".IconFromResource(),
+            IsHidden = info.Attributes.HasFlag(FileAttributes.Hidden),
+            Name = info.Name ?? "",
+            DateTime = info.LastWriteTime
         };
-    public event PropertyChangedEventHandler? PropertyChanged;
 
-    void OnChanged(string name) => PropertyChanged?.Invoke(this, new(name));
+        var _ = Test();
+
+        async Task Test()
+        {
+            var t = await ShellIconCache.GetAsync(".folder", 16);
+            item.Icon = t;
+        }
+
+
+        return item;
+    }
 }
 
-enum DirectoryItemType
-{
-    Parent,
-    Directory,
-    File
-}
+
