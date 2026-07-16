@@ -1,7 +1,14 @@
 ﻿using System;
 using System.Runtime.InteropServices;
 
+using ClrWinApi;
+
+using static ClrWinApi.Api;
+
 namespace Explorer.Controls;
+
+
+// TODO to ClrWinApi
 
 internal static class ShellIconInterop
 {
@@ -22,21 +29,13 @@ internal static class ShellIconInterop
         new("46EB5926-582E-4017-9FDF-E8998DAA0950");
 
 
-    internal static IntPtr GetIconHandle(string pathOrExtension, int size)
+    internal static nint GetIconHandle(string pathOrExtension, int size)
     {
-        var info = new SHFILEINFO();
-
-        IntPtr result = SHGetFileInfo(
-            pathOrExtension,
-            FILE_ATTRIBUTE_NORMAL,
-            ref info,
-            Marshal.SizeOf<SHFILEINFO>(),
-            SHGFI_SYSICONINDEX |
-            SHGFI_USEFILEATTRIBUTES |
-            SHGFI_TYPENAME);
-
-        if (result == IntPtr.Zero)
-            return IntPtr.Zero;
+        var info = new ShFileInfo();
+        var result = SHGetFileInfo(pathOrExtension, FileAttributes.Normal, ref info, Marshal.SizeOf<ShFileInfo>(), 
+            SHGetFileInfoConstants.SYSICONINDEX | SHGetFileInfoConstants.USEFILEATTRIBUTES| SHGetFileInfoConstants.TYPENAME);
+        if (result == 0)
+            return 0;
 
 
         int imageListSize = size switch
@@ -48,62 +47,16 @@ internal static class ShellIconInterop
         };
 
         var guid = IID_IImageList;
-        SHGetImageList(
-            imageListSize,
-            ref guid,
-            out IImageList? imageList);
-
-
+        SHGetImageList(imageListSize, ref guid, out IImageList? imageList);
         if (imageList == null)
-            return IntPtr.Zero;
+            return 0;
 
-
-        imageList.GetIcon(
-            info.iIcon,
-            ILD_TRANSPARENT,
-            out IntPtr hIcon);
-
-
+        imageList.GetIcon(info.Icon, ILD_TRANSPARENT, out IntPtr hIcon);
         return hIcon;
     }
 
-    [DllImport("user32.dll", SetLastError = true)]
-    internal static extern bool DestroyIcon(IntPtr hIcon);
-
-
-    [DllImport("shell32.dll", CharSet = CharSet.Unicode)]
-    private static extern IntPtr SHGetFileInfo(
-        string pszPath,
-        uint dwFileAttributes,
-        ref SHFILEINFO psfi,
-        int cbFileInfo,
-        uint uFlags);
-
-
     [DllImport("shell32.dll")]
-    private static extern int SHGetImageList(
-        int iImageList,
-        ref Guid riid,
-        [MarshalAs(UnmanagedType.Interface)]
-        out IImageList? ppv);
-
-
-    [StructLayout(LayoutKind.Sequential, CharSet = CharSet.Unicode)]
-    private struct SHFILEINFO
-    {
-        public IntPtr hIcon;
-
-        public int iIcon;
-
-        public uint dwAttributes;
-
-        [MarshalAs(UnmanagedType.ByValTStr, SizeConst = 260)]
-        public string szDisplayName;
-
-        [MarshalAs(UnmanagedType.ByValTStr, SizeConst = 80)]
-        public string szTypeName;
-    }
-
+    private static extern int SHGetImageList(int iImageList, ref Guid riid, [MarshalAs(UnmanagedType.Interface)] out IImageList? ppv);
 
     [ComImport]
     [Guid("46EB5926-582E-4017-9FDF-E8998DAA0950")]

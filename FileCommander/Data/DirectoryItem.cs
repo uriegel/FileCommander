@@ -1,4 +1,4 @@
-﻿using Explorer.Controls;
+﻿using CsTools.Extensions;
 
 using FileCommander.Extensions;
 
@@ -12,11 +12,19 @@ namespace FileCommander.Data;
 
 public record DirectoryItem : Item
 {
-    public ImageSource? Icon { get; set; }
+    public string? IconIndex 
+    {
+        get;
+        set
+        {
+            field = value;
+            OnChanged(nameof(IconIndex));
+        }
+    }
 
     public DateTime DateTime
     {
-        get => field;
+        get;
         set
         {
             field = value;
@@ -24,27 +32,15 @@ public record DirectoryItem : Item
         }
     }
 
-
-
     public static DirectoryItem Create(DirectoryInfo info)
     {
         var item = new DirectoryItem()
         {
-            Icon = "Resources/Folder.ico".IconFromResource(),
+            //Icon = "Resources/Folder.ico".IconFromResource(),
             IsHidden = info.Attributes.HasFlag(FileAttributes.Hidden),
             Name = info.Name ?? "",
             DateTime = info.LastWriteTime
         };
-
-        var _ = Test();
-
-        async Task Test()
-        {
-            var t = await ShellIconCache.GetAsync(".folder", 16);
-            item.Icon = t;
-        }
-
-
         return item;
     }
 
@@ -54,22 +50,23 @@ public record DirectoryItem : Item
     {
         var item = new DirectoryItem()
         {
-            Icon = "Resources/Folder.ico".IconFromResource(),
             IsHidden = info.Attributes.HasFlag(FileAttributes.Hidden),
             Name = info.Name ?? "",
             DateTime = info.LastWriteTime
         };
 
-        var _ = Test();
-
-        async Task Test()
-        {
-            var t = await ShellIconCache.GetAsync(".folder", 16);
-            item.Icon = t;
-        }
-
-
+        var _ = GetIcon();
         return item;
+
+        async Task GetIcon()
+        {
+
+            var ext = item.Name.EndsWith(".exe", StringComparison.OrdinalIgnoreCase) 
+                    ? info.FullName
+                    : item.Name.GetFileExtension();
+            var _ = await ShellIconCache.GetAsync(ext);
+            item.IconIndex = ext;
+        }
     }
 }
 

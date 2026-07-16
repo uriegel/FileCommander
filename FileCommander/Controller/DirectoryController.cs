@@ -64,7 +64,7 @@ class DirectoryController
         return [
             new DirectoryItem
             {
-                Name = "..", Icon = null, IsHidden = false
+                Name = "..", IsHidden = false
             },
             .. dirs,
             .. files
