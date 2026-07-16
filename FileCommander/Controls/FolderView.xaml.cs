@@ -13,6 +13,11 @@ using Microsoft.UI.Xaml.Input;
 using Microsoft.UI.Xaml.Media;
 using Microsoft.UI.Xaml.Navigation;
 
+using FileCommander.Controller;
+using System.Threading.Tasks;
+
+using FileCommander.DataStore;
+
 // To learn more about WinUI, the WinUI project structure,
 // and more about our project templates, see: http://aka.ms/winui-project-info.
 
@@ -23,6 +28,14 @@ public sealed partial class FolderView : UserControl
     public FolderView()
     {
         InitializeComponent();
+        ColumnView.SetStore(store);
+
+        var _ = Test();
+        
+        async Task Test()
+        {
+            await (new DirectoryController(store)).ChangePathAsync(@"C:\windows");
+        }
     }
 
     //public void SetItemsSource(IEnumerable<Item> items)
@@ -35,6 +48,8 @@ public sealed partial class FolderView : UserControl
     //    //};
     //    //ColumnView.ListView.ItemsSource = view;
     //}
+
+    Store store = new();
 
     void TextBox_GotFocus(object sender, RoutedEventArgs e)
     {

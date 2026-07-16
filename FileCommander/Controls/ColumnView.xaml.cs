@@ -12,6 +12,8 @@ using Microsoft.UI.Xaml.Data;
 using Microsoft.UI.Xaml.Input;
 using Microsoft.UI.Xaml.Media;
 using Microsoft.UI.Xaml.Navigation;
+using System.Text.Json.Serialization;
+using FileCommander.DataStore;
 
 // To learn more about WinUI, the WinUI project structure,
 // and more about our project templates, see: http://aka.ms/winui-project-info.
@@ -24,6 +26,8 @@ public sealed partial class ColumnView : UserControl
     {
         InitializeComponent();
     }
+
+    internal void SetStore(Store store) => ListView.ItemsSource = store.Items;
 
     void ListView_KeyDown(object sender, KeyRoutedEventArgs e)
     {
