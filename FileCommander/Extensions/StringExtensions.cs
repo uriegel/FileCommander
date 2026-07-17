@@ -1,12 +1,7 @@
-﻿using Explorer.Controls;
-
-using Microsoft.UI.Xaml.Media.Imaging;
+﻿using Microsoft.UI.Xaml.Media.Imaging;
 
 using System;
-using System.Collections.Concurrent;
 using System.Collections.Generic;
-using System.IO;
-using System.Threading.Tasks;
 
 namespace FileCommander.Extensions;
 
