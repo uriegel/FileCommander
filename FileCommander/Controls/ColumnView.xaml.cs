@@ -18,9 +18,17 @@ using FileCommander.DataStore;
 // To learn more about WinUI, the WinUI project structure,
 // and more about our project templates, see: http://aka.ms/winui-project-info.
 
-// TODO TemplateSelector in Resource: https://learn.microsoft.com/en-us/windows/apps/develop/ui/controls/data-template-selector
+// TODO ColumnViewHeaders: 3 fixed
+// TODO ColumnViewHeaders: column width adaption
+// TODO ColumnViewHeaders: column width adaption to column view
+// TODO ColumnViewHeaders: Binding to date and size
+// TODO ColumnViewHeaders: FileSystemWatcher for date and size
+// TODO ColumnViewHeaders: FileSystemWatcher binding to list content
+// TODO Key control: tab left right
+// TODO Key control: up and down home/end selected item
+
 // TODO TemplateSelector: move it to folderview, so that ColumnView is more generic 
-// TODO ListItemTempate (hidden)
+// TODO ListItemTemplate (hidden)
 
 namespace FileCommander.Controls;
 
