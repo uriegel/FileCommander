@@ -29,6 +29,11 @@ public sealed partial class ColumnView : UserControl
     public ColumnView()
     {
         InitializeComponent();
+
+        Headers.HeaderItems = [
+            new ColumnViewHeader.HeaderItem {  Name = "Spalte1" },
+            new ColumnViewHeader.HeaderItem {  Name = "Spalte2" }
+        ];
     }
 
     internal void SetStore(Store store) => ListView.ItemsSource = store.Items;
