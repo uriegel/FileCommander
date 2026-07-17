@@ -1,44 +1,58 @@
 ﻿using FileCommander.Controls;
 
 using Microsoft.UI.Xaml;
-using Microsoft.UI.Xaml.Controls;
 
 using System;
 using System.Collections.Generic;
-using System.Text;
-
-using Windows.Networking.Connectivity;
-using Windows.Storage;
+using System.Collections.ObjectModel;
 
 namespace FileCommander.DataTemplates;
 
 public class TemplateSelector : IElementFactory
 {
-    public DataTemplate? Normal { get; set; }
+    public ObservableCollection<NamedTemplate> Templates { get; } = [];
 
     public UIElement GetElement(ElementFactoryGetArgs args)
     {
+        var type = args.Data.GetType();
         ItemGrid row;
+        var pool = pools.TryGetValue(type, out var p) 
+            ? p 
+            : (pools[type] = new Stack<ItemGrid>());
         if (pool.Count > 0)
-        {
-            row = (ItemGrid)pool.Pop();
-        }
+            row = pool.Pop();
         else
-        {
-            row = (ItemGrid)Normal!.LoadContent();
-            row.TypeName = "Uwe Riegel";
-        }
+            row = (ItemGrid)lookup[type.Name].LoadContent();
+        row.Type = type;
         return row;
+    }
+
+    public TemplateSelector()
+    {
+        Templates.CollectionChanged += (_, __) => RebuildLookup();
     }
 
     void IElementFactory.RecycleElement(ElementFactoryRecycleArgs args) 
     {
-        if (args.Element is ItemGrid row)
-        {
+        if (args.Element is ItemGrid row && pools.TryGetValue(row.Type, out var pool))
             pool.Push(row);
-        }
     }
 
-    readonly Stack<UIElement> pool = new();
+    void RebuildLookup()
+    {
+        lookup.Clear();
+        foreach (var t in Templates)
+            if (t.ItemDataTemplate != null)
+                lookup[t.ItemName] = t.ItemDataTemplate;
+    }
+
+    readonly Dictionary<string, DataTemplate> lookup = [];
+    readonly Dictionary<Type, Stack<ItemGrid>> pools = [];
 }
 
+public class NamedTemplate 
+{
+    public DataTemplate? ItemDataTemplate { get; set; }
+    public NamedTemplate() { }
+    public string ItemName { get; set; } = string.Empty;
+}

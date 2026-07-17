@@ -11,10 +11,18 @@
     <UserControl.Resources>
         <ResourceDictionary>
             <ResourceDictionary.MergedDictionaries>
+                <ResourceDictionary Source="/DataTemplates/ParentItemDataTemplate.xaml" />
                 <ResourceDictionary Source="/DataTemplates/DirectoryItemDataTemplate.xaml" />
+                <ResourceDictionary Source="/DataTemplates/FileItemDataTemplate.xaml" />
             </ResourceDictionary.MergedDictionaries>
 
-            <template:TemplateSelector x:Key="TemplateSelector" Normal="{StaticResource DirectoryItemDataTemplate}"/>
+            <template:TemplateSelector x:Key="TemplateSelector">
+                <template:TemplateSelector.Templates>
+                    <template:NamedTemplate ItemName="ParentItem" ItemDataTemplate="{StaticResource ParentItemDataTemplate}"/>
+                    <template:NamedTemplate ItemName="DirectoryItem" ItemDataTemplate="{StaticResource DirectoryItemDataTemplate}"/>
+                    <template:NamedTemplate ItemName="FileItem" ItemDataTemplate="{StaticResource FileItemDataTemplate}"/>
+                </template:TemplateSelector.Templates>
+            </template:TemplateSelector>
         </ResourceDictionary>
     </UserControl.Resources>
 

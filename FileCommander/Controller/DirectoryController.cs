@@ -41,7 +41,7 @@ class DirectoryController
         //MainContext.Instance.PropertyChanged += OnPropertyChanged;
     }
 
-    async Task<DirectoryItem[]> Get(string path)
+    async Task<Item[]> Get(string path)
     {
         var dirInfo = new DirectoryInfo(path);
         var dirs = dirInfo
@@ -51,15 +51,12 @@ class DirectoryController
                         .ToArray();
         var files = dirInfo
                         .GetFiles()
-                        .Select(DirectoryItem.CreateFileItem)
+                        .Select(FileItem.Create)
                         .ToArray();
         //context.CurrentPath = dirInfo.FullName;
         //Application.Settings.SetString($"path-{Id}", dirInfo.FullName);
         return [
-            new DirectoryItem
-            {
-                Name = "..", IsHidden = false
-            },
+            new ParentItem(),
             .. dirs,
             .. files
         ];

@@ -1,9 +1,12 @@
-﻿using System;
+﻿using CsTools.Extensions;
+
+using System;
 using System.IO;
+using System.Threading.Tasks;
 
 namespace FileCommander.Data;
 
-public record DirectoryItem : Item
+public record FileItem : Item
 {
     public string? IconIndex
     {
@@ -25,18 +28,29 @@ public record DirectoryItem : Item
         }
     }
 
-    public static DirectoryItem Create(DirectoryInfo info)
+    public static FileItem Create(FileInfo info)
     {
-        var item = new DirectoryItem()
+        var item = new FileItem()
         {
-            //Icon = "Resources/Folder.ico".IconFromResource(),
             IsHidden = info.Attributes.HasFlag(FileAttributes.Hidden),
             Name = info.Name ?? "",
             DateTime = info.LastWriteTime
         };
-        return item;
-    }
 
+        var _ = GetIcon();
+        return item;
+
+        async Task GetIcon()
+        {
+
+            var ext = item.Name.EndsWith(".exe", StringComparison.OrdinalIgnoreCase)
+                    ? info.FullName
+                    : item.Name.GetFileExtension();
+            var _ = await ShellIconCache.GetAsync(ext);
+            item.IconIndex = ext;
+        }
+    }
 }
+
 
 

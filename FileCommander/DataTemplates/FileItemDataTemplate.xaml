@@ -5,7 +5,9 @@
     xmlns:converter="using:FileCommander.ValueConverter"
     xmlns:controls="using:FileCommander.Controls">
 
-    <DataTemplate x:Key="DirectoryItemDataTemplate">
+    <converter:IconImageConverter x:Key="IconImageConverter" />
+
+    <DataTemplate x:Key="FileItemDataTemplate">
         <controls:ItemGrid>
             <Grid.ColumnDefinitions>
                 <ColumnDefinition Width="*" />
@@ -18,7 +20,7 @@
                     <ColumnDefinition Width="Auto" />
                     <ColumnDefinition Width="*" />
                 </Grid.ColumnDefinitions>
-                <Image Source="/Assets/Folder.png" Width="16" Height="16" Margin="0,0,5,0"/>
+                <Image Source="{Binding IconIndex, Converter={StaticResource IconImageConverter}}" Width="16" Height="16" Margin="0,0,5,0"/>
                 <TextBlock Grid.Column="1" Text="{Binding Name}" VerticalAlignment="Center" TextTrimming="CharacterEllipsis"/>
             </Grid>
             <!--<TextBlock Margin="0, 0, 5, 0" Grid.Column="1" Text="{Binding Name}" />-->

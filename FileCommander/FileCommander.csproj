@@ -31,21 +31,11 @@
     <None Remove="DataTemplates\DirectoryItemDataTemplate.xaml" />
   </ItemGroup>
 	<ItemGroup>
-		<None Remove="Resources\Drive.ico" />
 		<None Remove="Resources\Error.ico" />
-		<None Remove="Resources\Folder.ico" />
 		<None Remove="Resources\Info.ico" />
-		<None Remove="Resources\NetworkShare.ico" />
 		<None Remove="Resources\QuestionMark.ico" />
-		<None Remove="Resources\RemovableDrive.ico" />
 		<None Remove="Resources\Warning.ico" />
 		<None Remove="Resources\WindowsDrive.ico" />
-	</ItemGroup>
-	<ItemGroup>
-		<Resource Include="Resources\Drive.ico" />
-		<Resource Include="Resources\Folder.ico" />
-		<Resource Include="Resources\NetworkShare.ico" />
-		<Resource Include="Resources\RemovableDrive.ico" />
 	</ItemGroup>
 
 	<ItemGroup>
@@ -97,9 +87,6 @@
     <Page Update="DataTemplate\DirectoryItemDataTemplate.xaml">
       <Generator>MSBuild:Compile</Generator>
     </Page>
-  </ItemGroup>
-  <ItemGroup>
-    <Folder Include="Resources\" />
   </ItemGroup>
 
   <!--

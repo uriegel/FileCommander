@@ -14,7 +14,7 @@ namespace FileCommander.Controls;
 
 public class ItemGrid : Grid
 {
-    public string TypeName { get; set; } = "";
+    public Type Type { get; set; } = typeof(ItemGrid);
 
     public ItemGrid() => Loaded += OnLoaded;
 
