@@ -35,7 +35,10 @@ public class TemplateSelector : IElementFactory
     void IElementFactory.RecycleElement(ElementFactoryRecycleArgs args) 
     {
         if (args.Element is ItemGrid row && pools.TryGetValue(row.Type, out var pool))
+        {
+            row.Reset();
             pool.Push(row);
+        }
     }
 
     void RebuildLookup()

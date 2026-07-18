@@ -18,6 +18,8 @@ public class ItemGrid : Grid
 
     public ItemGrid() => Loaded += OnLoaded;
 
+    public void Reset() { }
+
     void OnLoaded(object sender, RoutedEventArgs e)
     {
         var explorer = FindAncestor<ListView>(this);

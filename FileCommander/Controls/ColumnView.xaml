@@ -42,7 +42,7 @@
                            ScrollViewer.VerticalScrollBarVisibility="Visible"
                IsTabStop="False"
                KeyDown="ListView_KeyDown"
-                           ItemTemplate="{StaticResource TemplateSelector}"
+               ItemTemplate="{StaticResource TemplateSelector}"
                GotFocus="ListView_GotFocus">
             </ItemsRepeater>
         </ScrollViewer>
