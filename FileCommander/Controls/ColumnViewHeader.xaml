@@ -11,7 +11,23 @@
     <Grid Name="MainGrid" PointerPressed="Grid_PointerPressed">
         <Grid.ColumnDefinitions>
             <ColumnDefinition Width="*" />
+            <ColumnDefinition Width="*" />
+            <ColumnDefinition Width="*" />
         </Grid.ColumnDefinitions>
-        <TextBlock Text="Hello, World!" />
+        <StackPanel Orientation="Horizontal" Grid.Column="0" HorizontalAlignment="Stretch">
+            <TextBlock Text="Name" HorizontalAlignment="Stretch" />
+            <local:BorderGrid Width="5px" Background="Transparent" BorderBrush="DarkGray" BorderThickness="0, 0, 1, 0" 
+                    PointerEntered="Border_PointerEntered" PointerExited="Border_PointerExited"/>
+        </StackPanel>
+        <StackPanel Orientation="Horizontal" Grid.Column="1" HorizontalAlignment="Stretch">
+            <TextBlock Text="Datum" HorizontalAlignment="Stretch" />
+            <local:BorderGrid Width="5px" Background="Transparent" BorderBrush="DarkGray" BorderThickness="0, 0, 1, 0" 
+                    PointerEntered="Border_PointerEntered" PointerExited="Border_PointerExited"/>
+        </StackPanel>
+        <StackPanel Orientation="Horizontal" Grid.Column="2" HorizontalAlignment="Stretch">
+            <TextBlock Text="Größe" HorizontalAlignment="Stretch" />
+            <local:BorderGrid Width="5px" Background="Transparent" BorderBrush="DarkGray" BorderThickness="0, 0, 1, 0" 
+                    PointerEntered="Border_PointerEntered" PointerExited="Border_PointerExited"/>
+        </StackPanel>
     </Grid>
 </UserControl>
