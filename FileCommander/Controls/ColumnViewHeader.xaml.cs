@@ -85,6 +85,7 @@ public class BorderGrid : Grid
 
             void Moved(object? o, PointerRoutedEventArgs e)
             {
+                var context = DataContext as Context;
                 var grid = (Grid)((Parent as Grid)!.Parent!);
                 var diff = e.GetCurrentPoint(grid).Position.X - startPos;
                 var size1 = startWidth + diff;
@@ -92,6 +93,11 @@ public class BorderGrid : Grid
                 Debug.WriteLine($"Moved: {size1}, {size2} | {startWidth2}");
                 ((Parent as Grid)?.Parent as Grid).ColumnDefinitions[index].Width = new GridLength(size1, GridUnitType.Star);
                 ((Parent as Grid)?.Parent as Grid).ColumnDefinitions[index+1].Width = new GridLength(size2, GridUnitType.Star);
+                context?.ColumnWidths = [
+                    ((Parent as Grid)?.Parent as Grid).ColumnDefinitions[0].Width,
+                    ((Parent as Grid)?.Parent as Grid).ColumnDefinitions[1].Width,
+                    ((Parent as Grid)?.Parent as Grid).ColumnDefinitions[2].Width
+                ];      
             }
         };
     }

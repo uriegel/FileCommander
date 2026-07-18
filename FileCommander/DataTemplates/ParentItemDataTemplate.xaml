@@ -6,15 +6,15 @@
     xmlns:controls="using:FileCommander.Controls">
 
     <DataTemplate x:Key="ParentItemDataTemplate">
-        <controls:ItemGrid>
-            <Grid Margin="2, 0, 5, 0"  >
-                <Grid.ColumnDefinitions>
-                    <ColumnDefinition Width="Auto" />
-                    <ColumnDefinition Width="*" />
-                </Grid.ColumnDefinitions>
-                <!--<Image Source="/Assets/Folder.png" Width="16" Height="16" Margin="0,0,5,0"/>-->
-                <TextBlock Grid.Column="1" Text="{Binding Name}" VerticalAlignment="Center" TextTrimming="CharacterEllipsis" Margin="5,0" />
-            </Grid>
+        <controls:ItemGrid Margin="2, 0, 5, 0">
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition Width="*" />
+                <ColumnDefinition Width="auto" />
+                <ColumnDefinition Width="auto" />
+            </Grid.ColumnDefinitions>
+
+            <!--<Image Source="/Assets/Folder.png" Width="16" Height="16" Margin="0,0,5,0"/>-->
+            <TextBlock Grid.Column="1" Text="{Binding Name}" VerticalAlignment="Center" TextTrimming="CharacterEllipsis" Margin="5,0" />
         </controls:ItemGrid>
     </DataTemplate>
 </ResourceDictionary>

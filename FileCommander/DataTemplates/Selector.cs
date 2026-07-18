@@ -24,6 +24,7 @@ public class TemplateSelector : IElementFactory
         else
             row = (ItemGrid)lookup[type.Name].LoadContent();
         row.Type = type;
+        row.Prepare();
         return row;
     }
 

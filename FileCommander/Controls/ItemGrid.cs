@@ -4,6 +4,7 @@ using Microsoft.UI.Xaml.Media;
 
 using System;
 using System.Collections.Generic;
+using System.ComponentModel;
 using System.Diagnostics;
 using System.Runtime.CompilerServices;
 using System.Text;
@@ -18,16 +19,36 @@ public class ItemGrid : Grid
 
     public ItemGrid() => Loaded += OnLoaded;
 
-    public void Reset() { }
+    public void Prepare()
+        => context?.PropertyChanged += PropertyChanged;
+
+    public void Reset()
+        => context?.PropertyChanged -= PropertyChanged;
 
     void OnLoaded(object sender, RoutedEventArgs e)
     {
-        var explorer = FindAncestor<ListView>(this);
-        Console.WriteLine("Ein Element");
+        actives++;
+        Debug.WriteLine($"Geladen: {actives}");
+        var explorer = FindAncestor<ColumnView>(this);
+        context = explorer?.DataContext as Context;
+        context?.PropertyChanged += PropertyChanged;
+        int i = 0;
+        foreach (var def in context!.ColumnWidths)
+            ColumnDefinitions[i++].Width = def;
+    }
+
+    public void PropertyChanged(object? s, PropertyChangedEventArgs e) 
+    {
+        if (e.PropertyName == nameof(Context.ColumnWidths))
+        {
+            int i = 0;
+            foreach (var def in context!.ColumnWidths)
+                ColumnDefinitions[i++].Width = def;
+        }
     }
 
     static T? FindAncestor<T>(DependencyObject d)
-    where T : DependencyObject
+        where T : DependencyObject
     {
         while (d != null)
         {
@@ -39,4 +60,8 @@ public class ItemGrid : Grid
 
         return null;
     }
+
+    static int actives;
+
+    Context? context;
 }

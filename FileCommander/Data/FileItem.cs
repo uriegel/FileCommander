@@ -28,12 +28,23 @@ public record FileItem : Item
         }
     }
 
+    public long Size
+    {
+        get;
+        set
+        {
+            field = value;
+            OnChanged(nameof(Size));
+        }
+    }
+
     public static FileItem Create(FileInfo info)
     {
         var item = new FileItem()
         {
             IsHidden = info.Attributes.HasFlag(FileAttributes.Hidden),
             Name = info.Name ?? "",
+            Size = info.Length,
             DateTime = info.LastWriteTime
         };
 

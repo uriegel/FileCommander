@@ -7,9 +7,6 @@ using Microsoft.UI.Xaml.Input;
 // To learn more about WinUI, the WinUI project structure,
 // and more about our project templates, see: http://aka.ms/winui-project-info.
 
-// TODO ColumnViewHeaders: 3 fixed
-// TODO ColumnViewHeaders: column width adaption
-// TODO ColumnViewHeaders: column width adaption to column view
 // TODO ColumnViewHeaders: Binding to date and size
 // TODO ColumnViewHeaders: FileSystemWatcher for date and size
 // TODO ColumnViewHeaders: FileSystemWatcher binding to list content
