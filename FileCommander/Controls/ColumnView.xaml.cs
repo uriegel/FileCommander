@@ -26,6 +26,7 @@ public sealed partial class ColumnView : UserControl
     public ColumnView()
     {
         InitializeComponent();
+        DataContext = new Context();
     }
 
     internal void SetStore(Store store) => ListView.ItemsSource = store.Items;

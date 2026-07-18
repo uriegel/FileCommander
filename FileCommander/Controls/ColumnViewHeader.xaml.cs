@@ -1,23 +1,12 @@
-using CsTools.HttpRequest;
+using CsTools.Extensions;
 
 using Microsoft.UI.Input;
 using Microsoft.UI.Xaml;
 using Microsoft.UI.Xaml.Controls;
-using Microsoft.UI.Xaml.Controls.Primitives;
-using Microsoft.UI.Xaml.Data;
 using Microsoft.UI.Xaml.Input;
-using Microsoft.UI.Xaml.Media;
-using Microsoft.UI.Xaml.Navigation;
 
-using System;
-using System.Collections.Generic;
-using System.IO;
-using System.Linq;
-using System.Net.Security;
-using System.Runtime.InteropServices.WindowsRuntime;
-
-using Windows.Foundation;
-using Windows.Foundation.Collections;
+using System.ComponentModel;
+using System.Diagnostics;
 
 // To learn more about WinUI, the WinUI project structure,
 // and more about our project templates, see: http://aka.ms/winui-project-info.
@@ -72,7 +61,59 @@ public class BorderGrid : Grid
         this.ProtectedCursor = InputSystemCursor.Create(InputSystemCursorShape.SizeWestEast);
         PointerPressed += (s, e) =>
         {
-            CapturePointer(e.Pointer);
+            var ja = CapturePointer(e.Pointer);
+
+            var grid = (Grid)((Parent as Grid)!.Parent!);
+            var startPos = e.GetCurrentPoint(grid).Position.X;
+
+            var index = (int)Parent.GetValue(ColumnProperty);
+            var elements = ((Parent as Grid)?.Parent as Grid)?.Children;
+            var startWidth = elements![index].ActualSize.X;
+            var startWidth2 = elements![index + 1].ActualSize.X;
+
+            var i = 0; foreach (var element in elements)
+                ((Parent as Grid)?.Parent as Grid).ColumnDefinitions[i++].Width = new GridLength(element.ActualSize.X, GridUnitType.Star);
+
+            PointerReleased += Cancelled;
+            PointerMoved += Moved;
+
+            void Cancelled(object? o, PointerRoutedEventArgs e)
+            {
+                PointerReleased -= Cancelled;
+                PointerMoved -= Moved;
+            }
+
+            void Moved(object? o, PointerRoutedEventArgs e)
+            {
+                var grid = (Grid)((Parent as Grid)!.Parent!);
+                var diff = e.GetCurrentPoint(grid).Position.X - startPos;
+                var size1 = startWidth + diff;
+                var size2 = startWidth2 -diff;
+                Debug.WriteLine($"Moved: {size1}, {size2} | {startWidth2}");
+                ((Parent as Grid)?.Parent as Grid).ColumnDefinitions[index].Width = new GridLength(size1, GridUnitType.Star);
+                ((Parent as Grid)?.Parent as Grid).ColumnDefinitions[index+1].Width = new GridLength(size2, GridUnitType.Star);
+            }
         };
     }
+}
+
+class Context : INotifyPropertyChanged
+{
+    public GridLength[] ColumnWidths
+    {
+        get;
+        set
+        {
+            field = value;
+            OnChanged(nameof(ColumnWidths));
+        }
+    } = [
+            new GridLength(1, GridUnitType.Star),
+            new GridLength(1, GridUnitType.Star),
+            new GridLength(1, GridUnitType.Star)
+        ];
+
+    public event PropertyChangedEventHandler? PropertyChanged;
+
+    protected void OnChanged(string name) => PropertyChanged?.Invoke(this, new(name));
 }
