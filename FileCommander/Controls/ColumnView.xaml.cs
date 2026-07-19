@@ -13,7 +13,6 @@ using System.Threading.Tasks;
 // and more about our project templates, see: http://aka.ms/winui-project-info.
 
 // TODO Key control: tab left right, Control Tab select edit field
-// TODO Key control: keep lastFocused item
 
 // TODO ColumnViewHeaders: Binding to date and size
 // TODO ColumnViewHeaders: FileSystemWatcher for date and size
@@ -65,6 +64,7 @@ public sealed partial class ColumnView : UserControl
 
     public void ScrollCurrentIntoView(int pos, bool end = false)
     {
+        lastSelectedItemPos = pos;
         if (ListView.TryGetElement(pos) is FrameworkElement element)
         {
             element.StartBringIntoView(bringIntoViewOptions);
@@ -72,31 +72,35 @@ public sealed partial class ColumnView : UserControl
         }
         else
         {
+            Debug.WriteLine($"Springe nach {pos}, {pos * (context.ItemsHeight)}");
             // jump close enough to make it realized
             Scroller.ChangeView(
                 null,
                 end == false ? pos * (context.ItemsHeight) : Scroller.ScrollableHeight,
                 null,
-                true); // diable animation
+                true); // disable animation
 
-            Run();
-            async void Run()
+            Run(true);
+            async void Run(bool first)
             {
                 await Task.Delay(100);
+                Debug.WriteLine($"Will holen");
                 if (ListView.TryGetElement(pos) is FrameworkElement e)
                 {
+                    Debug.WriteLine($"geholt");
                     e.StartBringIntoView(bringIntoViewOptions);
                     e.Focus(FocusState.Keyboard);
                 }
-                else if (end)
+                else 
                 {
                     await Task.Delay(100);
                     Scroller.ChangeView(
                         null,
-                        Scroller.ScrollableHeight,
+                        end == false ? pos * (context.ItemsHeight) : Scroller.ScrollableHeight,
                         null,
-                        true); // diable animation
-                    Run();
+                        true); // disable animation
+                    if (first)
+                        Run(false);
                 }
             }
         }
@@ -159,28 +163,13 @@ public sealed partial class ColumnView : UserControl
         }
     }
 
-    void ListView_GotFocus(object sender, RoutedEventArgs e)
-    {
-
-    }
-
-    void ListView_SelectionChanged(object sender, SelectionChangedEventArgs e)
-    {
-
-    }
-
     Context context;
     Store? store;
+    int lastSelectedItemPos;
 
-    private void Grid_GotFocus(object sender, RoutedEventArgs e)
+    void Scroller_GotFocus(object sender, RoutedEventArgs e)
     {
-        Debug.WriteLine("Habe ihn");
-        context.IsFocused = true;
-    }
-
-    private void Grid_LostFocus(object sender, RoutedEventArgs e)
-    {
-        Debug.WriteLine("Habe ihn verloren");
-        context.IsFocused = false;
+        Debug.WriteLine($"Got fokus: {lastSelectedItemPos}");
+        ScrollCurrentIntoView(lastSelectedItemPos);
     }
 }

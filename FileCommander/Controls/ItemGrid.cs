@@ -2,9 +2,7 @@
 
 using Microsoft.UI;
 using Microsoft.UI.Xaml;
-using Microsoft.UI.Xaml.Automation.Peers;
 using Microsoft.UI.Xaml.Controls;
-using Microsoft.UI.Xaml.Data;
 using Microsoft.UI.Xaml.Media;
 
 using System;
@@ -105,18 +103,6 @@ public class ItemGrid : Grid
         int i = 0;
         foreach (var def in Context!.ColumnWidths)
             ColumnDefinitions[i++].Width = def;
-        //SetBinding(IsCurrentProperty, new Binding()
-        //{
-        //    Converter = new Konverter(this),
-        //    Source = Context,
-        //    Path = new PropertyPath(nameof(Context.SelectedItem)),
-        //});
-        //SetBinding(BorderBrushProperty, new Binding()
-        //{
-        //    Converter = new Konverter2(this),
-        //    Source = Context,
-        //    Path = new PropertyPath(nameof(Context.SelectedItem)),
-        //});
     }
 
     public void PropertyChanged(object? s, PropertyChangedEventArgs e)
@@ -159,19 +145,3 @@ public class ItemGrid : Grid
     public static SolidColorBrush DurchsichtigCurrent = new(Colors.LightGray);
 }
 
-class Konverter2(ItemGrid grid) : IValueConverter
-{
-    public object Convert(object value, Type targetType, object parameter, string language)
-        => (grid.DataContext as Item)?.Equals(value as Item) == true
-            ? ItemGrid.Rot
-            : ItemGrid.Durchsichtig;
-
-    public object ConvertBack(object value, Type targetType, object parameter, string language) => throw new NotImplementedException();
-}
-class Konverter(ItemGrid grid) : IValueConverter
-{
-    public object Convert(object value, Type targetType, object parameter, string language)
-        => (grid.DataContext as Item)?.Equals(value as Item) == true;
-
-    public object ConvertBack(object value, Type targetType, object parameter, string language) => throw new NotImplementedException();
-}

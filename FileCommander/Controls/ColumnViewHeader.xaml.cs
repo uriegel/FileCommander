@@ -1,5 +1,3 @@
-using CsTools.Extensions;
-
 using FileCommander.Data;
 
 using Microsoft.UI.Input;
@@ -20,39 +18,6 @@ public sealed partial class ColumnViewHeader : UserControl
     public ColumnViewHeader()
     {
         InitializeComponent();
-    }
-
-    void Grid_PointerPressed(object sender, PointerRoutedEventArgs e)
-    {
-        //var props = e.GetCurrentPoint((UIElement)sender).Properties;
-
-        //if (props.IsLeftButtonPressed)
-        //{
-        //    MainGrid.ColumnDefinitions.Add(new ColumnDefinition() { Width = new GridLength(1, GridUnitType.Star) });
-        //    var child = new TextBlock()
-        //    {
-        //        Text = "Hallo Welt"
-        //    };
-        //    Grid.SetColumn(child, MainGrid.ColumnDefinitions.Count - 1);
-
-        //    MainGrid.Children.Add(child);
-        //}
-        //else
-        //{
-        //    MainGrid.ColumnDefinitions.RemoveAt(MainGrid.ColumnDefinitions.Count - 1);
-        //    MainGrid.Children.RemoveAt(MainGrid.Children.Count - 1);
-        //}
-    }
-
-    void Border_PointerEntered(object sender, PointerRoutedEventArgs e)
-    {
-        //((UIElement)sender).InputCursor =
-        //    InputSystemCursor.Create(InputSystemCursorShape.SizeWestEast);
-    }
-
-    void Border_PointerExited(object sender, PointerRoutedEventArgs e)
-    {
-//         ((FrameworkElement)sender).Cursor = null;
     }
 }
 

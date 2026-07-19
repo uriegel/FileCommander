@@ -36,7 +36,6 @@ public sealed partial class FolderView : UserControl
         {
             await (new DirectoryController(store)).ChangePathAsync(@"C:\windows\system32");
             //await (new DirectoryController(store)).ChangePathAsync(@"C:\windows\");
-            (ColumnView.DataContext as Context)?.SelectedItem = store.Items.FirstOrDefault();
         }
     }
 

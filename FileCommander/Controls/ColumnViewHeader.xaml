@@ -8,7 +8,7 @@
     xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
     mc:Ignorable="d">
 
-    <Grid Name="MainGrid" PointerPressed="Grid_PointerPressed">
+    <Grid Name="MainGrid">
         <Grid.ColumnDefinitions>
             <ColumnDefinition Width="{Binding ColumnWidths[0]}" />
             <ColumnDefinition Width="{Binding ColumnWidths[1]}" />
@@ -20,8 +20,7 @@
                 <ColumnDefinition Width="Auto" />
             </Grid.ColumnDefinitions>
             <TextBlock Text="Name" HorizontalAlignment="Stretch" Margin="3, 0, 0, 0"/>
-            <local:BorderGrid Grid.Column="1" Width="5px" Background="Transparent" BorderBrush="DarkGray" BorderThickness="0, 0, 1, 0" 
-                    PointerEntered="Border_PointerEntered" PointerExited="Border_PointerExited"/>
+            <local:BorderGrid Grid.Column="1" Width="5px" Background="Transparent" BorderBrush="DarkGray" BorderThickness="0, 0, 1, 0" />
         </Grid>
         <Grid Grid.Column="1" HorizontalAlignment="Stretch">
             <Grid.ColumnDefinitions>
@@ -29,8 +28,7 @@
                 <ColumnDefinition Width="Auto" />
             </Grid.ColumnDefinitions>
             <TextBlock Text="Datum" HorizontalAlignment="Stretch" Margin="3, 0, 0, 0" />
-            <local:BorderGrid Grid.Column="1" Width="5px" Background="Transparent" BorderBrush="DarkGray" BorderThickness="0, 0, 1, 0" 
-                    PointerEntered="Border_PointerEntered" PointerExited="Border_PointerExited"/>
+            <local:BorderGrid Grid.Column="1" Width="5px" Background="Transparent" BorderBrush="DarkGray" BorderThickness="0, 0, 1, 0" />
         </Grid>
         <Grid Grid.Column="2" HorizontalAlignment="Stretch">
             <Grid.ColumnDefinitions>
@@ -38,8 +36,7 @@
                 <ColumnDefinition Width="Auto" />
             </Grid.ColumnDefinitions>
             <TextBlock Text="Größe" HorizontalAlignment="Stretch" Margin="3, 0, 0, 0"/>
-            <local:BorderGrid Grid.Column="1" Width="5px" Background="Transparent" BorderBrush="DarkGray" BorderThickness="0, 0, 1, 0" 
-                    PointerEntered="Border_PointerEntered" PointerExited="Border_PointerExited"/>
+            <local:BorderGrid Grid.Column="1" Width="5px" Background="Transparent" BorderBrush="DarkGray" BorderThickness="0, 0, 1, 0" />
         </Grid>
     </Grid>
 </UserControl>

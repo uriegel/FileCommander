@@ -36,10 +36,12 @@
 
         <ScrollViewer Grid.Row="1" Name="Scroller"
                   VerticalScrollBarVisibility="Visible"
+                      GotFocus="Scroller_GotFocus"
                   HorizontalScrollBarVisibility="Disabled">
             <ItemsRepeater Grid.Row="1" x:Name="ListView" 
                ScrollViewer.HorizontalScrollBarVisibility="Disabled" 
                            ScrollViewer.VerticalScrollBarVisibility="Visible"
+                           IsTabStop="False"
                KeyDown="ListView_KeyDown"
                ItemTemplate="{StaticResource TemplateSelector}">
             </ItemsRepeater>

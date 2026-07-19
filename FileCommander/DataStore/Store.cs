@@ -1,7 +1,5 @@
-﻿using FileCommander.Controls;
-using FileCommander.Data;
+﻿using FileCommander.Data;
 
-using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.Linq;
@@ -22,10 +20,6 @@ class Store
 
     public int GetIndex(Item? item)
     {
-        if (indexes.TryGetValue(item!, out var index2))
-        {
-            var jawoll = index2;
-        }
         return item != null
         ? indexes.TryGetValue(item, out var index)
         ? index
