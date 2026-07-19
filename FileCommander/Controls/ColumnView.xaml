@@ -34,7 +34,7 @@
 
         <controls:ColumnViewHeader Grid.Row="0" x:Name="Header" />
 
-        <ScrollViewer Grid.Row="1"
+        <ScrollViewer Grid.Row="1" Name="Scroller"
                   VerticalScrollBarVisibility="Visible"
                   HorizontalScrollBarVisibility="Disabled">
             <ItemsRepeater Grid.Row="1" x:Name="ListView" 

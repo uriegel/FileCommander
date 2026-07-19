@@ -1,5 +1,7 @@
 using CsTools.Extensions;
 
+using FileCommander.Data;
+
 using Microsoft.UI.Input;
 using Microsoft.UI.Xaml;
 using Microsoft.UI.Xaml.Controls;
@@ -105,6 +107,16 @@ public class BorderGrid : Grid
 
 class Context : INotifyPropertyChanged
 {
+    public Item? SelectedItem
+    {
+        get;
+        set
+        {
+            field = value;
+            OnChanged(nameof(SelectedItem));
+        }
+    }
+
     public GridLength[] ColumnWidths
     {
         get;
@@ -118,6 +130,9 @@ class Context : INotifyPropertyChanged
             new GridLength(1, GridUnitType.Star),
             new GridLength(1, GridUnitType.Star)
         ];
+
+    public double ItemsHeight { get; set; }
+
 
     public event PropertyChangedEventHandler? PropertyChanged;
 

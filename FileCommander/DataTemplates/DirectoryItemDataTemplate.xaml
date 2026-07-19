@@ -2,7 +2,6 @@
 <ResourceDictionary
     xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
     xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
-    xmlns:converter="using:FileCommander.ValueConverter"
     xmlns:controls="using:FileCommander.Controls">
 
     <DataTemplate x:Key="DirectoryItemDataTemplate">

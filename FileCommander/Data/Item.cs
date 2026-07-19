@@ -5,7 +5,7 @@ using System.Text;
 
 namespace FileCommander.Data;
 
-public record Item : INotifyPropertyChanged
+public class Item : INotifyPropertyChanged
 {
     public string Name
     {

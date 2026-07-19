@@ -4,7 +4,7 @@ using FileCommander.Data;
 using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
-using System.Text;
+using System.Linq;
 
 namespace FileCommander.DataStore;
 
@@ -17,5 +17,23 @@ class Store
         Items.Clear();
         foreach (var item in items)
             Items.Add(item);
+        indexes = Items.Select((n, i) => (n, i)).ToDictionary();
     }
+
+    public int GetIndex(Item? item)
+    {
+        if (indexes.TryGetValue(item!, out var index2))
+        {
+            var jawoll = index2;
+        }
+        return item != null
+        ? indexes.TryGetValue(item, out var index)
+        ? index
+        : -1
+        : -1;
+    }
+
+    public int GetCount() => indexes.Count;
+
+    Dictionary<Item, int> indexes = [];
 }

@@ -6,7 +6,7 @@ using System.Threading.Tasks;
 
 namespace FileCommander.Data;
 
-public record FileItem : Item
+public class FileItem : Item
 {
     public string? IconIndex
     {

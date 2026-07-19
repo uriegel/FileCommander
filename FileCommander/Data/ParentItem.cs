@@ -1,6 +1,6 @@
 ﻿namespace FileCommander.Data;
 
-public record ParentItem : Item
+public class ParentItem : Item
 {
     public ParentItem() => Name = "..";
 }

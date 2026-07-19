@@ -3,7 +3,7 @@ using System.IO;
 
 namespace FileCommander.Data;
 
-public record DirectoryItem : Item
+public class DirectoryItem : Item
 {
     public string? IconIndex
     {

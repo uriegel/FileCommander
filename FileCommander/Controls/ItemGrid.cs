@@ -1,15 +1,14 @@
-﻿using Microsoft.UI.Xaml;
+﻿using FileCommander.Data;
+
+using Microsoft.UI;
+using Microsoft.UI.Xaml;
 using Microsoft.UI.Xaml.Controls;
+using Microsoft.UI.Xaml.Data;
 using Microsoft.UI.Xaml.Media;
 
 using System;
-using System.Collections.Generic;
 using System.ComponentModel;
 using System.Diagnostics;
-using System.Runtime.CompilerServices;
-using System.Text;
-
-using Windows.Devices.Bluetooth.Advertisement;
 
 namespace FileCommander.Controls;
 
@@ -17,24 +16,40 @@ public class ItemGrid : Grid
 {
     public Type Type { get; set; } = typeof(ItemGrid);
 
-    public ItemGrid() => Loaded += OnLoaded;
+    public ItemGrid()
+    {
+        Loaded += OnLoaded;
+    }
 
     public void Prepare()
-        => context?.PropertyChanged += PropertyChanged;
+    {
+        Context?.PropertyChanged += PropertyChanged;
+    }
 
     public void Reset()
-        => context?.PropertyChanged -= PropertyChanged;
+        => Context?.PropertyChanged -= PropertyChanged;
 
     void OnLoaded(object sender, RoutedEventArgs e)
     {
         actives++;
+        BorderBrush = new SolidColorBrush(Colors.Transparent);
+        BorderThickness = new Thickness(1);
+        Background = new SolidColorBrush(Colors.Transparent);
+        IsTabStop = true;
         Debug.WriteLine($"Geladen: {actives}");
         var explorer = FindAncestor<ColumnView>(this);
-        context = explorer?.DataContext as Context;
-        context?.PropertyChanged += PropertyChanged;
+        Context = explorer?.DataContext as Context;
+        Context?.PropertyChanged += PropertyChanged;
+        Context?.ItemsHeight = ActualHeight + 2;
         int i = 0;
-        foreach (var def in context!.ColumnWidths)
+        foreach (var def in Context!.ColumnWidths)
             ColumnDefinitions[i++].Width = def;
+        SetBinding(BorderBrushProperty, new Binding()
+        {
+            Converter = new Konverter2(this),
+            Source = Context,
+            Path = new PropertyPath(nameof(Context.SelectedItem)),
+        });
     }
 
     public void PropertyChanged(object? s, PropertyChangedEventArgs e) 
@@ -42,7 +57,7 @@ public class ItemGrid : Grid
         if (e.PropertyName == nameof(Context.ColumnWidths))
         {
             int i = 0;
-            foreach (var def in context!.ColumnWidths)
+            foreach (var def in Context!.ColumnWidths)
                 ColumnDefinitions[i++].Width = def;
         }
     }
@@ -63,5 +78,16 @@ public class ItemGrid : Grid
 
     static int actives;
 
-    Context? context;
+    internal Context? Context { get; private set; }
+}
+
+class Konverter2(ItemGrid grid) : IValueConverter
+{
+    public object Convert(object value, Type targetType, object parameter, string language)
+        => (grid.DataContext as Item)?.Equals(value as Item) == true
+        // TODO use static Brushes
+            ? new SolidColorBrush(Colors.Red)
+            : new SolidColorBrush(Colors.Transparent);
+    
+    public object ConvertBack(object value, Type targetType, object parameter, string language) => throw new NotImplementedException();
 }
