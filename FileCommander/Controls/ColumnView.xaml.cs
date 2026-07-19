@@ -1,3 +1,4 @@
+using FileCommander.Data;
 using FileCommander.DataStore;
 
 using Microsoft.UI.Xaml;
@@ -6,23 +7,25 @@ using Microsoft.UI.Xaml.Input;
 
 using System;
 using System.Diagnostics;
+using System.Threading.Tasks;
 
 // To learn more about WinUI, the WinUI project structure,
 // and more about our project templates, see: http://aka.ms/winui-project-info.
 
-
-// TODO Idea: ListItemView as a focusable Control with FocusVisualStyle, bound to ListItemContext
-// TODO ListItemView loads DataTemplate as child, this is bound to ListItemContext.Item
-// TODO ColumnView with ItemsSource => ObservableCollection with ListItemContext.Item
-// TODO Testing Release fullscreen
-
-
 // TODO Key control: tab left right, Control Tab select edit field
-// TODO Key control: focused side selected item red, other side gray
+// TODO Key control: keep lastFocused item
+
 // TODO ColumnViewHeaders: Binding to date and size
 // TODO ColumnViewHeaders: FileSystemWatcher for date and size
 // TODO ColumnViewHeaders: FileSystemWatcher binding to list content
+
+// TODO ListItemTemplate binding to IsHidden
+
+// TODO Selection binding with keyboard (Shortcuts)
+
 // TODO GridSplitter
+
+// TODO WinUITools as nuget package
 
 // TODO TemplateSelector: move it to folderview, so that ColumnView is more generic 
 // TODO ListItemTemplate (hidden)
@@ -35,7 +38,18 @@ public sealed partial class ColumnView : UserControl
     {
         InitializeComponent();
         context = new Context();
+        context.PropertyChanged += Context_PropertyChanged;
         DataContext = context;
+    }
+
+    void Context_PropertyChanged(object? sender, System.ComponentModel.PropertyChangedEventArgs e)
+    {
+        if (e.PropertyName == nameof(Context.SelectedItem))
+        {
+            var next = store?.GetIndex(context.SelectedItem);
+            if (next.HasValue)
+                ScrollCurrentIntoView(next.Value);
+        }
     }
 
     internal void SetStore(Store store)
@@ -49,28 +63,42 @@ public sealed partial class ColumnView : UserControl
         AnimationDesired = false
     };
 
-    public void ScrollCurrentIntoView()
+    public void ScrollCurrentIntoView(int pos, bool end = false)
     {
-        if (ListView.TryGetElement(store?.GetIndex(context.SelectedItem)?? -1) is FrameworkElement element)
+        if (ListView.TryGetElement(pos) is FrameworkElement element)
         {
             element.StartBringIntoView(bringIntoViewOptions);
+            element.Focus(FocusState.Keyboard);
         }
         else
         {
             // jump close enough to make it realized
-            var index = store?.GetIndex(context.SelectedItem) ?? 0;
             Scroller.ChangeView(
                 null,
-                index * context.ItemsHeight,
+                end == false ? pos * (context.ItemsHeight) : Scroller.ScrollableHeight,
                 null,
                 true); // diable animation
 
-            //// after layout pass, bring it into view precisely
-            //DispatcherQueue.TryEnqueue(() =>
-            //{
-            //    if (ListView.TryGetElement(index) is FrameworkElement e)
-            //        e.StartBringIntoView();
-            //});
+            Run();
+            async void Run()
+            {
+                await Task.Delay(100);
+                if (ListView.TryGetElement(pos) is FrameworkElement e)
+                {
+                    e.StartBringIntoView(bringIntoViewOptions);
+                    e.Focus(FocusState.Keyboard);
+                }
+                else if (end)
+                {
+                    await Task.Delay(100);
+                    Scroller.ChangeView(
+                        null,
+                        Scroller.ScrollableHeight,
+                        null,
+                        true); // diable animation
+                    Run();
+                }
+            }
         }
     }
 
@@ -78,44 +106,55 @@ public sealed partial class ColumnView : UserControl
     {
         if (e.Key == Windows.System.VirtualKey.Down)
         {
-            var next = Math.Min(store?.GetIndex(context.SelectedItem) + 1 ?? 0, store?.GetCount() -1 ?? 0);
-            context.SelectedItem = store?.Items[next];
-            ScrollCurrentIntoView();
-            e.Handled = true;
+            var focused = FocusManager.GetFocusedElement(XamlRoot) as DependencyObject;
+            if (focused is ItemGrid grid && grid.DataContext is Item item)
+            {
+                var next = Math.Min(store?.GetIndex(item) + 1 ?? 0, store?.GetCount() - 1 ?? 0);
+                ScrollCurrentIntoView(next);
+                e.Handled = true;
+            }
         }
         else if (e.Key == Windows.System.VirtualKey.Up)
         {
-            var next = Math.Max(store?.GetIndex(context.SelectedItem) - 1 ?? 0, 0);
-            context.SelectedItem = store?.Items[next];
-            ScrollCurrentIntoView();
-            e.Handled = true;
+            var focused = FocusManager.GetFocusedElement(XamlRoot) as DependencyObject;
+            if (focused is ItemGrid grid && grid.DataContext is Item item)
+            {
+                var next = Math.Max(store?.GetIndex(item) - 1 ?? 0, 0);
+                ScrollCurrentIntoView(next);
+                e.Handled = true;
+            }
         }
         else if (e.Key == Windows.System.VirtualKey.PageDown)
         {
-            int visibleRows = (int)(Scroller.ViewportHeight / context.ItemsHeight);
-            var next = Math.Min(store?.GetIndex(context.SelectedItem) + visibleRows - 1 ?? 0, store?.GetCount() - 1 ?? 0);
-            context.SelectedItem = store?.Items[next];
-            ScrollCurrentIntoView();
-            e.Handled = true;
+            var focused = FocusManager.GetFocusedElement(XamlRoot) as DependencyObject;
+            if (focused is ItemGrid grid && grid.DataContext is Item item)
+            {
+                int visibleRows = (int)(Scroller.ViewportHeight / context.ItemsHeight);
+                var next = Math.Min(store?.GetIndex(item) + visibleRows - 1 ?? 0, store?.GetCount() - 1 ?? 0);
+                ScrollCurrentIntoView(next);
+                e.Handled = true;
+            }
         }
         else if (e.Key == Windows.System.VirtualKey.PageUp)
         {
-            int visibleRows = (int)(Scroller.ViewportHeight / context.ItemsHeight);
-            var next = Math.Max(store?.GetIndex(context.SelectedItem) - visibleRows + 1 ?? 0, 0);
-            context.SelectedItem = store?.Items[next];
-            ScrollCurrentIntoView();
+            var focused = FocusManager.GetFocusedElement(XamlRoot) as DependencyObject;
+            if (focused is ItemGrid grid && grid.DataContext is Item item)
+            {
+                int visibleRows = (int)(Scroller.ViewportHeight / context.ItemsHeight);
+                var next = Math.Max(store?.GetIndex(item) - visibleRows + 1 ?? 0, 0);
+                ScrollCurrentIntoView(next);
+            }
             e.Handled = true;
         }
         else if (e.Key == Windows.System.VirtualKey.Home)
         {
-            context.SelectedItem = store?.Items[0];
-            ScrollCurrentIntoView();
+            ScrollCurrentIntoView(0);
             e.Handled = true;
         }
+
         else if (e.Key == Windows.System.VirtualKey.End)
         {
-            context.SelectedItem = store?.Items[store?.GetCount() - 1 ?? 0];
-            ScrollCurrentIntoView();
+            ScrollCurrentIntoView(store?.GetCount() - 1 ?? 0, true);
             e.Handled = true;
         }
     }

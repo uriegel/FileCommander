@@ -82,6 +82,21 @@ public class ItemGrid : Grid
         Context?.PropertyChanged += PropertyChanged;
         Context?.ItemsHeight = ActualHeight + 2;
 
+
+        IsTabStop = true;
+
+        GotFocus += (_, _) =>
+        {
+            BorderBrush = new SolidColorBrush(Colors.Red);
+            BorderThickness = new Thickness(1);
+        };
+
+        LostFocus += (_, _) =>
+        {
+            BorderBrush = new SolidColorBrush(Colors.Transparent);
+            BorderThickness = new Thickness(1);
+        };
+
         PointerPressed += (_, _) =>
         {
             Context?.SelectedItem = DataContext as Item;
