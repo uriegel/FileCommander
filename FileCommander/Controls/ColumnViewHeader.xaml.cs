@@ -133,7 +133,6 @@ class Context : INotifyPropertyChanged
 
     public double ItemsHeight { get; set; }
 
-
     public event PropertyChangedEventHandler? PropertyChanged;
 
     protected void OnChanged(string name) => PropertyChanged?.Invoke(this, new(name));

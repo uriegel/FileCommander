@@ -23,11 +23,19 @@ public class ItemGrid : Grid
 
     public void Prepare()
     {
+        SetBinding(BorderBrushProperty, new Binding()
+        {
+            Converter = new Konverter2(this),
+            Source = Context,
+            Path = new PropertyPath(nameof(Context.SelectedItem)),
+        });
         Context?.PropertyChanged += PropertyChanged;
     }
 
     public void Reset()
-        => Context?.PropertyChanged -= PropertyChanged;
+    {
+        Context?.PropertyChanged -= PropertyChanged;
+    }
 
     void OnLoaded(object sender, RoutedEventArgs e)
     {
@@ -41,6 +49,13 @@ public class ItemGrid : Grid
         Context = explorer?.DataContext as Context;
         Context?.PropertyChanged += PropertyChanged;
         Context?.ItemsHeight = ActualHeight + 2;
+
+
+        PointerPressed += (_, _) =>
+        {
+            Context?.SelectedItem = DataContext as Item;
+        };
+
         int i = 0;
         foreach (var def in Context!.ColumnWidths)
             ColumnDefinitions[i++].Width = def;
