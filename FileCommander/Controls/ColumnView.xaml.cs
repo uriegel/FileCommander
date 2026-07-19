@@ -9,7 +9,6 @@ using System;
 // To learn more about WinUI, the WinUI project structure,
 // and more about our project templates, see: http://aka.ms/winui-project-info.
 
-// TODO Click ListView: select the currentItem 
 // TODO Key control: tab left right, Control Tab select edit field
 // TODO Key control: focused side selected item red, other side gray
 // TODO ColumnViewHeaders: Binding to date and size

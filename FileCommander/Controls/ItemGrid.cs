@@ -23,12 +23,6 @@ public class ItemGrid : Grid
 
     public void Prepare()
     {
-        SetBinding(BorderBrushProperty, new Binding()
-        {
-            Converter = new Konverter2(this),
-            Source = Context,
-            Path = new PropertyPath(nameof(Context.SelectedItem)),
-        });
         Context?.PropertyChanged += PropertyChanged;
     }
 
@@ -40,9 +34,18 @@ public class ItemGrid : Grid
     void OnLoaded(object sender, RoutedEventArgs e)
     {
         actives++;
-        BorderBrush = new SolidColorBrush(Colors.Transparent);
+        BorderBrush = Rot;
         BorderThickness = new Thickness(1);
-        Background = new SolidColorBrush(Colors.Transparent);
+        Background = Durchsichtig;
+        DataContextChanged += (_, e) =>
+        {
+            SetBinding(BorderBrushProperty, new Binding()
+            {
+                Converter = new Konverter2(this),
+                Source = Context,
+                Path = new PropertyPath(nameof(Context.SelectedItem)),
+            });
+        };
         IsTabStop = true;
         Debug.WriteLine($"Geladen: {actives}");
         var explorer = FindAncestor<ColumnView>(this);
@@ -94,15 +97,20 @@ public class ItemGrid : Grid
     static int actives;
 
     internal Context? Context { get; private set; }
+
+
+
+    public static SolidColorBrush Rot = new SolidColorBrush(Colors.Red);
+    public static SolidColorBrush Durchsichtig = new SolidColorBrush(Colors.Transparent);
 }
 
 class Konverter2(ItemGrid grid) : IValueConverter
 {
     public object Convert(object value, Type targetType, object parameter, string language)
         => (grid.DataContext as Item)?.Equals(value as Item) == true
-        // TODO use static Brushes
-            ? new SolidColorBrush(Colors.Red)
-            : new SolidColorBrush(Colors.Transparent);
-    
+            ? ItemGrid.Rot
+            : ItemGrid.Durchsichtig;
+
+
     public object ConvertBack(object value, Type targetType, object parameter, string language) => throw new NotImplementedException();
 }
