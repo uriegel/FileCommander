@@ -14,7 +14,10 @@
             </Grid.ColumnDefinitions>
 
             <!--<Image Source="/Assets/Folder.png" Width="16" Height="16" Margin="0,0,5,0"/>-->
-            <TextBlock Grid.Column="1" Text="{Binding Name}" VerticalAlignment="Center" TextTrimming="CharacterEllipsis" Margin="5,0" />
+            <TextBlock Grid.Column="0" Text="{Binding Name}" VerticalAlignment="Center" TextTrimming="CharacterEllipsis" Margin="5,0" />
+            <TextBlock Margin="0, 0, 5, 0" Grid.Column="1" TextTrimming="CharacterEllipsis" Text="" />
+            <TextBlock Margin="5, 0, 0, 0" Grid.Column="2" TextAlignment="Right" TextTrimming="CharacterEllipsis" Text="" />
+
         </controls:ItemGrid>
     </DataTemplate>
 </ResourceDictionary>

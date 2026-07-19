@@ -32,7 +32,7 @@ public class DirectoryItem : Item
             //Icon = "Resources/Folder.ico".IconFromResource(),
             IsHidden = info.Attributes.HasFlag(FileAttributes.Hidden),
             Name = info.Name ?? "",
-            DateTime = info.LastWriteTime
+            DateTime = info.LastWriteTime,
         };
         return item;
     }

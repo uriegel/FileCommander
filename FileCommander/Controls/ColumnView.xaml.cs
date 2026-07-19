@@ -12,17 +12,18 @@ using System.Threading.Tasks;
 // To learn more about WinUI, the WinUI project structure,
 // and more about our project templates, see: http://aka.ms/winui-project-info.
 
-// TODO ColumnViewHeaders: Binding to date and size
+// TODO ListItemTemplate binding to IsHidden
+
 // TODO ColumnViewHeaders: FileSystemWatcher for date and size
 // TODO ColumnViewHeaders: FileSystemWatcher binding to list content
-
-// TODO ListItemTemplate binding to IsHidden
 
 // TODO Selection binding with keyboard (Shortcuts)
 
 // TODO GridSplitter
 
 // TODO WinUITools as nuget package
+
+// TODO DateTime/Exif converter
 
 // TODO TemplateSelector: move it to folderview, so that ColumnView is more generic 
 // TODO ListItemTemplate (hidden)
