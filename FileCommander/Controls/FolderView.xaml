@@ -14,9 +14,9 @@
             <RowDefinition Height="auto" />
             <RowDefinition Height="*" />
         </Grid.RowDefinitions>
-        <TextBox x:Name="PathTextBox" KeyDown="TextBox_KeyDown" 
+        <TextBox x:Name="PathTextBox" KeyDown="TextBox_KeyDown" TabIndex="2" 
           Text="{Binding CurrentPath}"
-          GotFocus="TextBox_GotFocus" BorderThickness="0" FontSize="12" />
-        <controls:ColumnView Grid.Row="1" x:Name="ColumnView" x:FieldModifier="private"/>
+          GotFocus="TextBox_GotFocus" BorderThickness="0" FontSize="12"  />
+        <controls:ColumnView Grid.Row="1" x:Name="ColumnView" x:FieldModifier="private" TabIndex="1"/>
     </Grid>
 </UserControl>

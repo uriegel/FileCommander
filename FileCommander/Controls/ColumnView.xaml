@@ -36,6 +36,7 @@
 
         <ScrollViewer Grid.Row="1" Name="Scroller"
                   VerticalScrollBarVisibility="Visible"
+                      GettingFocus="Scroller_GettingFocus"
                       GotFocus="Scroller_GotFocus"
                   HorizontalScrollBarVisibility="Disabled">
             <ItemsRepeater Grid.Row="1" x:Name="ListView" 

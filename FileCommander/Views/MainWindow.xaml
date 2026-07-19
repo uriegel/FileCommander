@@ -40,7 +40,7 @@
         </Grid>
 
         <controls:DockPanel Grid.Row="1">
-            <Grid>
+            <Grid KeyDown="Grid_KeyDown">
                 <Grid.ColumnDefinitions>
                     <ColumnDefinition Width="*" MinWidth="15" />
                     <ColumnDefinition Width="5" />

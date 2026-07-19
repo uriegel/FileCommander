@@ -1,8 +1,14 @@
+using FileCommander.Controls;
+using FileCommander.Data;
+using FileCommander.DataStore;
+
 using Microsoft.UI.Windowing;
 using Microsoft.UI.Xaml;
+using Microsoft.UI.Xaml.Input;
 using Microsoft.UI.Xaml.Media;
 
 using System;
+using System.Threading.Tasks;
 
 using Windows.ApplicationModel;
 
@@ -20,7 +26,7 @@ public sealed partial class MainWindow : Window
         Activated += MainWindow_Activated;
         AppTitleBar.SizeChanged += AppTitleBar_SizeChanged;
         AppTitleBar.Loaded += AppTitleBar_Loaded;
-
+        
         ExtendsContentIntoTitleBar = true;
         if (ExtendsContentIntoTitleBar == true)
             AppWindow.TitleBar.PreferredHeightOption = TitleBarHeightOption.Tall;
@@ -30,6 +36,16 @@ public sealed partial class MainWindow : Window
         if (OperatingSystem.IsWindowsVersionAtLeast(10, 0, 19041))
             appDisplayName = AppInfo.Current.DisplayInfo.DisplayName;
         TitleBarTextBlock.Text = appDisplayName;
+
+        activeView = LeftView;
+        Focus();
+
+        async void Focus()
+        {
+            await Task.Delay(100);
+            activeView.Focus(FocusState.Keyboard);
+        }
+        
     }
 
     void AppTitleBar_Loaded(object sender, RoutedEventArgs e)
@@ -115,13 +131,27 @@ public sealed partial class MainWindow : Window
         
     }
 
-    void RightView_GotFocus(object sender, RoutedEventArgs e)
-    {
-
-    }
-
     void LeftView_GotFocus(object sender, RoutedEventArgs e)
     {
-
+        activeView = sender as FolderView;
     }
+
+    void RightView_GotFocus(object sender, RoutedEventArgs e)
+    {
+        activeView = sender as FolderView;
+    }
+
+    void Grid_KeyDown(object sender, Microsoft.UI.Xaml.Input.KeyRoutedEventArgs e)
+    {
+        if (e.Key == Windows.System.VirtualKey.Tab)
+        {
+            GetOtherView().Focus(FocusState.Keyboard);
+            e.Handled = true;
+        }
+    }
+
+    FolderView GetOtherView()
+        => activeView == LeftView ? RightView : LeftView;
+
+    FolderView? activeView;
 }

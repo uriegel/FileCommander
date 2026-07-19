@@ -12,8 +12,6 @@ using System.Threading.Tasks;
 // To learn more about WinUI, the WinUI project structure,
 // and more about our project templates, see: http://aka.ms/winui-project-info.
 
-// TODO Key control: tab left right, Control Tab select edit field
-
 // TODO ColumnViewHeaders: Binding to date and size
 // TODO ColumnViewHeaders: FileSystemWatcher for date and size
 // TODO ColumnViewHeaders: FileSystemWatcher binding to list content
@@ -171,5 +169,11 @@ public sealed partial class ColumnView : UserControl
     {
         Debug.WriteLine($"Got fokus: {lastSelectedItemPos}");
         ScrollCurrentIntoView(lastSelectedItemPos);
+    }
+
+    private void Scroller_GettingFocus(UIElement sender, GettingFocusEventArgs args)
+    {
+        if (ListView.TryGetElement(lastSelectedItemPos) is FrameworkElement element)
+            args.NewFocusedElement = element;
     }
 }
