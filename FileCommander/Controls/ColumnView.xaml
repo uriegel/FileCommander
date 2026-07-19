@@ -40,10 +40,10 @@
             <ItemsRepeater Grid.Row="1" x:Name="ListView" 
                ScrollViewer.HorizontalScrollBarVisibility="Disabled" 
                            ScrollViewer.VerticalScrollBarVisibility="Visible"
-               IsTabStop="False"
+               IsTabStop="True"
                KeyDown="ListView_KeyDown"
                ItemTemplate="{StaticResource TemplateSelector}"
-               GotFocus="ListView_GotFocus">
+               GotFocus="Grid_GotFocus" LostFocus="Grid_LostFocus">
             </ItemsRepeater>
         </ScrollViewer>
     </Grid>

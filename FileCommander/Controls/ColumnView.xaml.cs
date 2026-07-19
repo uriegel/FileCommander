@@ -5,9 +5,17 @@ using Microsoft.UI.Xaml.Controls;
 using Microsoft.UI.Xaml.Input;
 
 using System;
+using System.Diagnostics;
 
 // To learn more about WinUI, the WinUI project structure,
 // and more about our project templates, see: http://aka.ms/winui-project-info.
+
+
+// TODO Idea: ListItemView as a focusable Control with FocusVisualStyle, bound to ListItemContext
+// TODO ListItemView loads DataTemplate as child, this is bound to ListItemContext.Item
+// TODO ColumnView with ItemsSource => ObservableCollection with ListItemContext.Item
+// TODO Testing Release fullscreen
+
 
 // TODO Key control: tab left right, Control Tab select edit field
 // TODO Key control: focused side selected item red, other side gray
@@ -124,4 +132,16 @@ public sealed partial class ColumnView : UserControl
 
     Context context;
     Store? store;
+
+    private void Grid_GotFocus(object sender, RoutedEventArgs e)
+    {
+        Debug.WriteLine("Habe ihn");
+        context.IsFocused = true;
+    }
+
+    private void Grid_LostFocus(object sender, RoutedEventArgs e)
+    {
+        Debug.WriteLine("Habe ihn verloren");
+        context.IsFocused = false;
+    }
 }
