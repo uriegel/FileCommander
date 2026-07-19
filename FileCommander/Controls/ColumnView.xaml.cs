@@ -14,8 +14,6 @@ using System.Threading.Tasks;
 
 // TODO Key control: tab left right, Control Tab select edit field
 
-// TODO scrolling: Sometimes grid widths are not correct
-
 // TODO ColumnViewHeaders: Binding to date and size
 // TODO ColumnViewHeaders: FileSystemWatcher for date and size
 // TODO ColumnViewHeaders: FileSystemWatcher binding to list content

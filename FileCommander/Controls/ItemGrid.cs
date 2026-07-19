@@ -45,6 +45,10 @@ public class ItemGrid : Grid
     public void Prepare()
     {
         Context?.PropertyChanged += PropertyChanged;
+        int i = 0;
+        if (Context != null)
+            foreach (var def in Context!.ColumnWidths)
+                ColumnDefinitions[i++].Width = def;
     }
 
     public void Reset()
@@ -58,22 +62,6 @@ public class ItemGrid : Grid
         BorderBrush = Durchsichtig;
         BorderThickness = new Thickness(1);
         Background = Durchsichtig;
-        DataContextChanged += (_, e) =>
-        {
-            //SetBinding(IsCurrentProperty, new Binding()
-            //{
-            //    Converter = new Konverter(this),
-            //    Source = Context,
-            //    Path = new PropertyPath(nameof(Context.SelectedItem)),
-            //});
-            //SetBinding(BorderBrushProperty, new Binding()
-            //{
-            //    Converter = new Konverter2(this),
-            //    Source = Context,
-            //    Path = new PropertyPath(nameof(Context.SelectedItem)),
-            //});
-        };
-
         Debug.WriteLine($"Geladen: {actives}");
         var explorer = FindAncestor<ColumnView>(this);
         Context = explorer?.DataContext as Context;
