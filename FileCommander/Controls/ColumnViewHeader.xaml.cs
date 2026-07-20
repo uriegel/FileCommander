@@ -82,6 +82,16 @@ class Context : INotifyPropertyChanged
         }
     }
 
+    public string CurrentPath
+    {
+        get;
+        set
+        {
+            field = value;
+            OnChanged(nameof(CurrentPath));
+        }
+    } = "";
+
     public GridLength[] ColumnWidths
     {
         get;

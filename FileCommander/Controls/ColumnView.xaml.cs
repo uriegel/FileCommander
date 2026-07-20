@@ -172,7 +172,14 @@ public sealed partial class ColumnView : UserControl
 
     private void Scroller_GettingFocus(UIElement sender, GettingFocusEventArgs args)
     {
-        if (ListView.TryGetElement(lastSelectedItemPos) is FrameworkElement element)
-            args.NewFocusedElement = element;
+        try
+        {
+            if (ListView.TryGetElement(lastSelectedItemPos) is FrameworkElement element)
+                args.NewFocusedElement = element;
+        }
+        catch (Exception e)
+        {
+
+        }
     }
 }
