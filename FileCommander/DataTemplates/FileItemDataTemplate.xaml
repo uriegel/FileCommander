@@ -6,9 +6,13 @@
     xmlns:controls="using:FileCommander.Controls">
 
     <converter:IconImageConverter x:Key="IconImageConverter" />
-
+    <converter:IsHiddenConverter x:Key="IsHiddenConverter" />
+    <converter:DateTimeConverter x:Key="DateConverter" />
+    <converter:IsSelectedConverter x:Key="IsSelectedConverter" />
+    
     <DataTemplate x:Key="FileItemDataTemplate">
-        <controls:ItemGrid>
+        <controls:ItemGrid Opacity="{Binding IsHidden, Converter={StaticResource IsHiddenConverter}}"
+                           Background="{Binding IsSelected, Converter={StaticResource IsSelectedConverter}}">
             <Grid.ColumnDefinitions>
                 <ColumnDefinition Width="*" />
                 <ColumnDefinition Width="auto" />
@@ -24,7 +28,8 @@
                 <Image Source="{Binding IconIndex, Converter={StaticResource IconImageConverter}}" Width="16" Height="16" Margin="0,0,5,0"/>
                 <TextBlock Grid.Column="1" Text="{Binding Name}" VerticalAlignment="Center" TextTrimming="CharacterEllipsis"/>
             </Grid>
-            <TextBlock Margin="0, 0, 5, 0" Grid.Column="1" TextTrimming="CharacterEllipsis" Text="{Binding DateTime}" />
+            <TextBlock Margin="0, 0, 5, 0" Grid.Column="1" TextTrimming="CharacterEllipsis" 
+                       Text="{Binding DateTime, Converter={StaticResource DateConverter}}" />
             <TextBlock Margin="5, 0, 0, 0" Grid.Column="2" TextAlignment="Right" TextTrimming="CharacterEllipsis" Text="{Binding Size}" />
         </controls:ItemGrid>
     </DataTemplate>

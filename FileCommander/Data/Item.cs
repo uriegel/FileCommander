@@ -17,10 +17,22 @@ public class Item : INotifyPropertyChanged
         }
     } = "";
 
+    public bool IsSelected
+    {
+        get;
+        set
+        {
+            field = value;
+            OnChanged(nameof(IsSelected));
+        }
+    } 
+    
     public bool IsHidden { get; init; }
 
     public event PropertyChangedEventHandler? PropertyChanged;
 
     protected void OnChanged(string name) => PropertyChanged?.Invoke(this, new(name));
+
+    protected const string HiddenNamestart = ".";
 }
 

@@ -30,13 +30,12 @@ public class DirectoryItem : Item
         var item = new DirectoryItem()
         {
             //Icon = "Resources/Folder.ico".IconFromResource(),
-            IsHidden = info.Attributes.HasFlag(FileAttributes.Hidden),
+            IsHidden = info.Attributes.HasFlag(FileAttributes.Hidden) || info.Name.StartsWith(HiddenNamestart),
             Name = info.Name ?? "",
             DateTime = info.LastWriteTime,
         };
         return item;
     }
-
 }
 
 

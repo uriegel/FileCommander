@@ -61,7 +61,7 @@ public class ItemGrid : Grid
         actives++;
         BorderBrush = Durchsichtig;
         BorderThickness = new Thickness(1);
-        Background = Durchsichtig;
+        Background ??= Durchsichtig;
         Debug.WriteLine($"Geladen: {actives}");
         var explorer = FindAncestor<ColumnView>(this);
         Context = explorer?.DataContext as Context;

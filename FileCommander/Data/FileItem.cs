@@ -42,7 +42,7 @@ public class FileItem : Item
     {
         var item = new FileItem()
         {
-            IsHidden = info.Attributes.HasFlag(FileAttributes.Hidden),
+            IsHidden = info.Attributes.HasFlag(FileAttributes.Hidden) || info.Name.StartsWith(HiddenNamestart),
             Name = info.Name ?? "",
             Size = info.Length,
             DateTime = info.LastWriteTime

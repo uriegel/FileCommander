@@ -34,6 +34,7 @@ public sealed partial class FolderView : UserControl
         
         async Task Test()
         {
+            //await (new DirectoryController(store)).ChangePathAsync(@"C:\users\Urieg");
             await (new DirectoryController(store)).ChangePathAsync(@"C:\windows\system32");
             //await (new DirectoryController(store)).ChangePathAsync(@"C:\windows\");
         }
