@@ -5,6 +5,7 @@
     xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
     xmlns:controls="using:FileCommander.Controls"
     xmlns:template="using:FileCommander.DataTemplates"
+    xmlns:cvh="using:WinUITools.ColumnViewHeaders"
     xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
     xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
     mc:Ignorable="d">
@@ -26,25 +27,22 @@
         </ResourceDictionary>
     </UserControl.Resources>
 
-    <Grid>
+    <Grid Name="Grid">
         <Grid.RowDefinitions>
             <RowDefinition Height="auto" />
             <RowDefinition Height="*" />
         </Grid.RowDefinitions>
 
-        <controls:ColumnViewHeader Grid.Row="0" x:Name="Header" />
+        <!--<controls:ColumnViewHeader Grid.Row="0" x:Name="Header" />-->
+        <cvh:ColumnViewHeaders Name="Headers"/>
 
         <ScrollViewer Grid.Row="1" Name="Scroller"
-                  VerticalScrollBarVisibility="Visible"
+                  VerticalScrollBarVisibility="Auto"
                       GettingFocus="Scroller_GettingFocus"
                       GotFocus="Scroller_GotFocus"
                   HorizontalScrollBarVisibility="Disabled">
-            <ItemsRepeater Grid.Row="1" x:Name="ListView" 
-               ScrollViewer.HorizontalScrollBarVisibility="Disabled" 
-                           ScrollViewer.VerticalScrollBarVisibility="Visible"
-                           IsTabStop="False"
-               KeyDown="ListView_KeyDown"
-               ItemTemplate="{StaticResource TemplateSelector}">
+            <ItemsRepeater Grid.Row="1" x:Name="ListView" IsTabStop="False"
+               ItemTemplate="{StaticResource FileItemDataTemplate}">
             </ItemsRepeater>
         </ScrollViewer>
     </Grid>

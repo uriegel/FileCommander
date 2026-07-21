@@ -61,10 +61,10 @@ public class ItemGrid : Grid
             BorderThickness = new Thickness(1);
         };
 
-        PointerPressed += (_, _) =>
-        {
-            Context?.SelectedItem = DataContext as Item;
-        };
+        //PointerPressed += (_, _) =>
+        //{
+        //    Context?.SelectedItem = DataContext as Item;
+        //};
 
         int i = 0;
         foreach (var def in Context!.ColumnWidths)

@@ -7,7 +7,14 @@ using Microsoft.UI.Xaml.Input;
 
 using System;
 using System.Diagnostics;
+using System.Linq;
 using System.Threading.Tasks;
+
+using WinUITools.ColumnView;
+using WinUITools.ColumnViewHeaders;
+using WinUITools.DataContext;
+
+using static CsTools.Functional.Memoization;
 
 // To learn more about WinUI, the WinUI project structure,
 // and more about our project templates, see: http://aka.ms/winui-project-info.
@@ -33,19 +40,20 @@ public sealed partial class ColumnView : UserControl
     public ColumnView()
     {
         InitializeComponent();
-        context = new Context();
-        context.PropertyChanged += Context_PropertyChanged;
-        DataContext = context;
-    }
+        navigation = new Navigation(ListView, Scroller);
 
-    void Context_PropertyChanged(object? sender, System.ComponentModel.PropertyChangedEventArgs e)
-    {
-        if (e.PropertyName == nameof(Context.SelectedItem))
-        {
-            var next = store?.GetIndex(context.SelectedItem);
-            if (next.HasValue)
-                ScrollCurrentIntoView(next.Value);
-        }
+        Grid.DataContext = new ColumnViewContext();
+        Headers.SetColumns([
+            new TextColumnViewHeader("Name"),
+            new TextColumnViewHeader("Datum"),
+            new TextColumnViewHeader("Größe")
+        ]);
+
+        ListView.ItemsSource = Enumerable.Range(1, 100_000).Select(n => new Item { Name = $"Item # {n}"}).ToArray();
+
+
+        context = new Context();
+        DataContext = context;
     }
 
     internal void SetStore(Store store)
@@ -59,123 +67,22 @@ public sealed partial class ColumnView : UserControl
         AnimationDesired = false
     };
 
-    public void ScrollCurrentIntoView(int pos, bool end = false)
-    {
-        lastSelectedItemPos = pos;
-        if (ListView.TryGetElement(pos) is FrameworkElement element)
-        {
-            element.StartBringIntoView(bringIntoViewOptions);
-            element.Focus(FocusState.Keyboard);
-        }
-        else
-        {
-            Debug.WriteLine($"Springe nach {pos}, {pos * (context.ItemsHeight)}");
-            // jump close enough to make it realized
-            Scroller.ChangeView(
-                null,
-                end == false ? pos * (context.ItemsHeight) : Scroller.ScrollableHeight,
-                null,
-                true); // disable animation
-
-            Run(true);
-            async void Run(bool first)
-            {
-                await Task.Delay(100);
-                Debug.WriteLine($"Will holen");
-                if (ListView.TryGetElement(pos) is FrameworkElement e)
-                {
-                    Debug.WriteLine($"geholt");
-                    e.StartBringIntoView(bringIntoViewOptions);
-                    e.Focus(FocusState.Keyboard);
-                }
-                else 
-                {
-                    await Task.Delay(100);
-                    Scroller.ChangeView(
-                        null,
-                        end == false ? pos * (context.ItemsHeight) : Scroller.ScrollableHeight,
-                        null,
-                        true); // disable animation
-                    if (first)
-                        Run(false);
-                }
-            }
-        }
-    }
-
-    void ListView_KeyDown(object sender, KeyRoutedEventArgs e)
-    {
-        if (e.Key == Windows.System.VirtualKey.Down)
-        {
-            var focused = FocusManager.GetFocusedElement(XamlRoot) as DependencyObject;
-            if (focused is ItemGrid grid && grid.DataContext is Item item)
-            {
-                var next = Math.Min(store?.GetIndex(item) + 1 ?? 0, store?.GetCount() - 1 ?? 0);
-                ScrollCurrentIntoView(next);
-                e.Handled = true;
-            }
-        }
-        else if (e.Key == Windows.System.VirtualKey.Up)
-        {
-            var focused = FocusManager.GetFocusedElement(XamlRoot) as DependencyObject;
-            if (focused is ItemGrid grid && grid.DataContext is Item item)
-            {
-                var next = Math.Max(store?.GetIndex(item) - 1 ?? 0, 0);
-                ScrollCurrentIntoView(next);
-                e.Handled = true;
-            }
-        }
-        else if (e.Key == Windows.System.VirtualKey.PageDown)
-        {
-            var focused = FocusManager.GetFocusedElement(XamlRoot) as DependencyObject;
-            if (focused is ItemGrid grid && grid.DataContext is Item item)
-            {
-                int visibleRows = (int)(Scroller.ViewportHeight / context.ItemsHeight);
-                var next = Math.Min(store?.GetIndex(item) + visibleRows - 1 ?? 0, store?.GetCount() - 1 ?? 0);
-                ScrollCurrentIntoView(next);
-                e.Handled = true;
-            }
-        }
-        else if (e.Key == Windows.System.VirtualKey.PageUp)
-        {
-            var focused = FocusManager.GetFocusedElement(XamlRoot) as DependencyObject;
-            if (focused is ItemGrid grid && grid.DataContext is Item item)
-            {
-                int visibleRows = (int)(Scroller.ViewportHeight / context.ItemsHeight);
-                var next = Math.Max(store?.GetIndex(item) - visibleRows + 1 ?? 0, 0);
-                ScrollCurrentIntoView(next);
-            }
-            e.Handled = true;
-        }
-        else if (e.Key == Windows.System.VirtualKey.Home)
-        {
-            ScrollCurrentIntoView(0);
-            e.Handled = true;
-        }
-
-        else if (e.Key == Windows.System.VirtualKey.End)
-        {
-            ScrollCurrentIntoView(store?.GetCount() - 1 ?? 0, true);
-            e.Handled = true;
-        }
-    }
-
     Context context;
     Store? store;
-    int lastSelectedItemPos;
+    Navigation navigation;
 
     void Scroller_GotFocus(object sender, RoutedEventArgs e)
     {
-        Debug.WriteLine($"Got fokus: {lastSelectedItemPos}");
-        ScrollCurrentIntoView(lastSelectedItemPos);
+//        Debug.WriteLine($"Got fokus: {lastSelectedItemPos}");
+//        ScrollCurrentIntoView(lastSelectedItemPos);
     }
 
     private void Scroller_GettingFocus(UIElement sender, GettingFocusEventArgs args)
     {
         try
         {
-            if (ListView.TryGetElement(lastSelectedItemPos) is FrameworkElement element)
-                args.NewFocusedElement = element;
+            //if (ListView.TryGetElement(lastSelectedItemPos) is FrameworkElement element)
+            //    args.NewFocusedElement = element;
         }
         catch (Exception e)
         {

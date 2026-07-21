@@ -4,11 +4,13 @@ using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.Linq;
 
+using WinUITools.Data;
+
 namespace FileCommander.DataStore;
 
 class Store
 {
-    public ObservableCollection<Item> Items { get; } = [];
+    public ObservableCollection<ColumnViewItem> Items { get; } = [];
 
     public void ChangeItems(IEnumerable<Item> items)
     {
@@ -29,5 +31,5 @@ class Store
 
     public int GetCount() => indexes.Count;
 
-    Dictionary<Item, int> indexes = [];
+    Dictionary<ColumnViewItem, int> indexes = [];
 }

@@ -73,11 +73,12 @@ class DirectoryController : IDisposable
                         .ToArray();
         context.CurrentPath = dirInfo.FullName;
         //Application.Settings.SetString($"path-{Id}", dirInfo.FullName);
-        return [
-            new ParentItem(),
-            .. dirs,
-            .. files
-        ];
+        return files;
+        //return [
+        //    new ParentItem(),
+        //    .. dirs,
+        //    .. files
+        //];
     }
 
     void WatchCreated(object _, FileSystemEventArgs e)
@@ -100,16 +101,16 @@ class DirectoryController : IDisposable
     void WatchChanged(object _, FileSystemEventArgs e)
     {
         var fileInfo = new FileInfo(context.CurrentPath.AppendPath(e.Name));
-        var item = store.Items.FirstOrDefault(n => n.Name == e.Name);
-        if (item is DirectoryItem di)
-        {
-            di.DateTime = fileInfo.LastWriteTime;
-        }
-        if (item is FileItem fi)
-        {
-            fi.DateTime = fileInfo.LastWriteTime;
-            fi.Size = fileInfo.Length;
-        }
+//        var item = store.Items.FirstOrDefault(n => n.Name == e.Name);
+        //if (item is DirectoryItem di)
+        //{
+        //    di.DateTime = fileInfo.LastWriteTime;
+        //}
+        //if (item is FileItem fi)
+        //{
+        //    fi.DateTime = fileInfo.LastWriteTime;
+        //    fi.Size = fileInfo.Length;
+        //}
     }
 
     void WatchRenamed(object _, RenamedEventArgs e)

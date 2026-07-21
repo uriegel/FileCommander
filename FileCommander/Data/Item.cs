@@ -3,9 +3,11 @@ using System.Collections.Generic;
 using System.ComponentModel;
 using System.Text;
 
+using WinUITools.Data;
+
 namespace FileCommander.Data;
 
-public class Item : INotifyPropertyChanged
+public class Item : ColumnViewItem, INotifyPropertyChanged
 {
     public string Name
     {
