@@ -106,16 +106,6 @@ class Context : INotifyPropertyChanged
             new GridLength(1, GridUnitType.Star)
         ];
 
-    public bool IsFocused
-    {
-        get;
-        set
-        {
-            field = value;
-            OnChanged(nameof(IsFocused));
-        }
-    }
-    
     public double ItemsHeight { get; set; }
 
     public event PropertyChangedEventHandler? PropertyChanged;

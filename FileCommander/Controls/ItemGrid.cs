@@ -13,28 +13,6 @@ namespace FileCommander.Controls;
 
 public class ItemGrid : Grid
 {
-    public static readonly DependencyProperty IsCurrentProperty = DependencyProperty.Register("IsCurrent", typeof(bool),
-        typeof(ItemGrid), new PropertyMetadata(false, IsCurrentChanged));
-    public bool IsCurrent
-    {
-        get { return (bool)GetValue(IsCurrentProperty); }
-        set { SetValue(IsCurrentProperty, value); }
-    }
-    static void IsCurrentChanged(DependencyObject d, DependencyPropertyChangedEventArgs e)
-    {
-        if (d is ItemGrid grid)
-            grid.IsCurrentChanged();
-    }
-
-    void IsCurrentChanged()
-    {
-        BorderBrush = IsCurrent && Context?.IsFocused == true
-            ? Rot
-            : IsCurrent && Context?.IsFocused != true
-            ? DurchsichtigCurrent
-            : Durchsichtig;
-    }
-
     public Type Type { get; set; } = typeof(ItemGrid);
 
     public ItemGrid()
@@ -100,10 +78,6 @@ public class ItemGrid : Grid
             int i = 0;
             foreach (var def in Context!.ColumnWidths)
                 ColumnDefinitions[i++].Width = def;
-        }
-        else if (e.PropertyName == nameof(Context.IsFocused))
-        {
-            IsCurrentChanged();
         }
     }
 

@@ -56,7 +56,6 @@
                           Background="Transparent"/>
                 <controls1:FolderView x:Name="RightView" Grid.Column="2" 
                                  HorizontalAlignment="Stretch"
-                                      Opacity="0.7"
                                  GotFocus="RightView_GotFocus">
                 </controls1:FolderView>
             </Grid>
