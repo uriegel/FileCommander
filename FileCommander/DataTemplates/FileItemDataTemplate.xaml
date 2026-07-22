@@ -4,7 +4,7 @@
     xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
     xmlns:converter="using:FileCommander.ValueConverter"
     xmlns:controls="using:FileCommander.Controls"
-    xmlns:headers="using:WinUITools.ColumnViewHeaders">
+    xmlns:headers="using:WinUITools.ItemsRepeaterExtensions">
 
     <converter:IconImageConverter x:Key="IconImageConverter" />
     <converter:IsHiddenConverter x:Key="IsHiddenConverter" />

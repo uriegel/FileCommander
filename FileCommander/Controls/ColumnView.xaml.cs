@@ -10,11 +10,7 @@ using System.Diagnostics;
 using System.Linq;
 using System.Threading.Tasks;
 
-using WinUITools.ColumnView;
-using WinUITools.ColumnViewHeaders;
-using WinUITools.DataContext;
-
-using static CsTools.Functional.Memoization;
+using WinUITools.ItemsRepeaterExtensions;
 
 // To learn more about WinUI, the WinUI project structure,
 // and more about our project templates, see: http://aka.ms/winui-project-info.
@@ -42,7 +38,6 @@ public sealed partial class ColumnView : UserControl
         InitializeComponent();
         navigation = new Navigation(ListView, Scroller);
 
-        Grid.DataContext = new ColumnViewContext();
         Headers.SetColumns([
             new TextColumnViewHeader("Name"),
             new TextColumnViewHeader("Datum"),
