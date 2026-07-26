@@ -155,7 +155,7 @@ public sealed partial class VirtualTable : UserControl
                         .GetDirectories()
                         .Select(DirectoryItem.Create)
                         .OrderBy(n => n.Name)
-                        .Select(n => new VTItem(null, n.Name, 0, n.DateTime))
+                        .Select(n => new VTItem(null, n.Name, null, n.DateTime.ToString("g")))
                         .ToArray();
         var files = dirInfo
                         .GetFiles()
@@ -163,15 +163,39 @@ public sealed partial class VirtualTable : UserControl
                         .Select(n => new VTItem(
                             $"icon/{(n.Name.EndsWith(".exe", StringComparison.OrdinalIgnoreCase) ? dirInfo.FullName.AppendPath(n.Name) : n.Name.GetFileExtension())}",
                             n.Name,
-                            n.Size, 
-                            n.DateTime))
+                            n.Size.FormatSize(), 
+                            n.DateTime.ToString("g")))
                         .ToArray();
         return [
-            new VTItem(null, "..", 0, null),
+            new VTItem(null, "..", null, null),
             .. dirs,
             .. files
         ];
     }
 }
 
-record VTItem(string? icon, string Name, long Size, DateTime? Date);
+record VTItem(string? icon, string Name, string? Size, string? Date);
+
+static class ControllerExtensions
+{
+    public static string FormatSize(this long size)
+    {
+        if (size == -1)
+            return "";
+        var sizeStr = size.ToString();
+        var sep = '.';
+        if (sizeStr.Length > 3)
+        {
+            var sizePart = sizeStr;
+            sizeStr = "";
+            for (var j = 3; j < sizePart.Length; j += 3)
+            {
+                var extract = sizePart.Substring(sizePart.Length - j, 3);
+                sizeStr = sep + extract + sizeStr;
+            }
+            var strfirst = sizePart[..((sizePart.Length % 3 == 0) ? 3 : (sizePart.Length % 3))];
+            sizeStr = strfirst + sizeStr;
+        }
+        return sizeStr;
+    }
+}
