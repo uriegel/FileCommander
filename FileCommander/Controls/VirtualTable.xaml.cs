@@ -1,3 +1,5 @@
+using ClrWinApi;
+
 using CsTools;
 using CsTools.Extensions;
 
@@ -10,9 +12,12 @@ using Microsoft.UI.Xaml.Controls;
 using Microsoft.Web.WebView2.Core;
 
 using System;
+using System.Drawing;
+using System.Drawing.Imaging;
 using System.IO;
 using System.Linq;
 using System.Reflection;
+using System.Runtime.InteropServices;
 using System.Text.Json;
 using System.Threading.Tasks;
 
@@ -41,6 +46,8 @@ public sealed partial class VirtualTable : UserControl
             var path = new Uri(args.Request.Uri).AbsolutePath[1..];
             if (path.StartsWith("request"))
                 ServeRequest(path[8..], args);
+            else if (path.StartsWith("icon"))
+                ServeIcon(path[5..], args);
             else
             {
                 var names = Assembly.GetExecutingAssembly().GetManifestResourceNames();
@@ -91,6 +98,55 @@ public sealed partial class VirtualTable : UserControl
         }
     }
 
+    async void ServeIcon(string path, CoreWebView2WebResourceRequestedEventArgs args)
+    {
+        var deferral = args.GetDeferral();
+        try
+        {
+            var hIcon = GetIconHandle(path, 16);
+            using var icon = Icon.FromHandle(hIcon);
+            using var bitmap = icon.ToBitmap();
+            var stream = new MemoryStream();
+            bitmap.Save(stream, ImageFormat.Png);
+            args.Response =
+                WebView.CoreWebView2.Environment.CreateWebResourceResponse(
+                    stream.AsRandomAccessStream(),
+                    200,
+                    "OK",
+                    "Content-Type: image/png");
+        }
+        finally
+        {
+            deferral.Complete();
+        }
+    }
+
+    static nint GetIconHandle(string pathOrExtension, int size)
+    {
+        var info = new ShFileInfo();
+        var result = Api.SHGetFileInfo(pathOrExtension, ClrWinApi.FileAttributes.Normal, ref info, Marshal.SizeOf<ShFileInfo>(),
+            SHGetFileInfoConstants.SYSICONINDEX | SHGetFileInfoConstants.USEFILEATTRIBUTES | SHGetFileInfoConstants.TYPENAME);
+        if (result == 0)
+            return 0;
+
+        var imageListSize = size switch
+        {
+            <= 16 => ShilImageListSize.Small,
+            <= 32 => ShilImageListSize.Large,
+            <= 48 => ShilImageListSize.ExtraLarge,
+            _ => ShilImageListSize.Jumbo
+        };
+
+        var guid = Guids.IID_IImageList;
+        Api.SHGetImageList(imageListSize, ref guid, out IImageList? imageList);
+        if (imageList == null)
+            return 0;
+
+        imageList.GetIcon(info.Icon, ImageListDrawFlags.Transparent, out IntPtr hIcon);
+        return hIcon;
+    }
+
+
     VTItem[] Get(string path)
     {
         var dirInfo = new DirectoryInfo(path);
@@ -98,19 +154,19 @@ public sealed partial class VirtualTable : UserControl
                         .GetDirectories()
                         .Select(DirectoryItem.Create)
                         .OrderBy(n => n.Name)
-                        .Select(n => new VTItem(n.Name, 0, n.DateTime))
+                        .Select(n => new VTItem(null, n.Name, 0, n.DateTime))
                         .ToArray();
         var files = dirInfo
                         .GetFiles()
                         .Select(FileItem.Create)
-                        .Select(n => new VTItem(n.Name, n.Size, n.DateTime))
+                        .Select(n => new VTItem($"icon/{n.Name.GetFileExtension()}", n.Name, n.Size, n.DateTime))
                         .ToArray();
         return [
-            new VTItem("..", 0, null),
+            new VTItem(null, "..", 0, null),
             .. dirs,
             .. files
         ];
     }
 }
 
-record VTItem(string Name, long Size, DateTime? Date);
+record VTItem(string? icon, string Name, long Size, DateTime? Date);
