@@ -1,10 +1,8 @@
 ﻿using System.ComponentModel;
 
-using WinUITools.ItemsRepeaterExtensions;
-
 namespace FileCommander.Data;
 
-public class Item : ColumnViewItem, INotifyPropertyChanged
+public class Item : INotifyPropertyChanged
 {
     public string Name
     {

@@ -1,10 +1,7 @@
 using FileCommander.Controls;
-using FileCommander.Data;
-using FileCommander.DataStore;
 
 using Microsoft.UI.Windowing;
 using Microsoft.UI.Xaml;
-using Microsoft.UI.Xaml.Input;
 using Microsoft.UI.Xaml.Media;
 
 using System;

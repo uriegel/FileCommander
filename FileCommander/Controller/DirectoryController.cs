@@ -1,8 +1,4 @@
-﻿using CsTools.Extensions;
-
-using FileCommander.Controls;
-using FileCommander.Data;
-using FileCommander.DataStore;
+﻿using FileCommander.Data;
 
 using System;
 using System.IO;
@@ -13,11 +9,8 @@ namespace FileCommander.Controller;
 
 class DirectoryController : IDisposable
 {
-    public DirectoryController(Store store, Context context)
+    public DirectoryController()
     {
-        this.store = store;
-        this.context = context;
-
         watcher.Created += WatchCreated;
         watcher.Deleted += WatchDeleted;
         watcher.Changed += WatchChanged;
@@ -36,13 +29,11 @@ class DirectoryController : IDisposable
         //        cancellation = new();
         var items = await Get(path);
         var enableEvents = watcher.Path == "";
-        watcher.Path = context.CurrentPath;
+        //watcher.Path = context.CurrentPath;
         if (enableEvents)
             watcher.EnableRaisingEvents = true;
         //view.OnItemsChange(true);
         //        store.Splice(0, store.ItemsCount(), items);
-        store.Items.Clear();
-        store.ChangeItems(items);
        
         //        StartExifResolving(items);
         //view.OnItemsChange(false);
@@ -71,7 +62,7 @@ class DirectoryController : IDisposable
                         .GetFiles()
                         .Select(FileItem.Create)
                         .ToArray();
-        context.CurrentPath = dirInfo.FullName;
+        //context.CurrentPath = dirInfo.FullName;
         //Application.Settings.SetString($"path-{Id}", dirInfo.FullName);
         return files;
         //return [
@@ -100,7 +91,7 @@ class DirectoryController : IDisposable
 
     void WatchChanged(object _, FileSystemEventArgs e)
     {
-        var fileInfo = new FileInfo(context.CurrentPath.AppendPath(e.Name));
+    //    var fileInfo = new FileInfo(context.CurrentPath.AppendPath(e.Name));
 //        var item = store.Items.FirstOrDefault(n => n.Name == e.Name);
         //if (item is DirectoryItem di)
         //{
@@ -145,9 +136,6 @@ class DirectoryController : IDisposable
         //        SetSelection(newPos.Value);
         //}
     }
-
-    Context context;
-    readonly Store store;
     readonly FileSystemWatcher watcher = new();
 
     #region IDiposable

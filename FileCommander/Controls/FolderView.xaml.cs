@@ -1,14 +1,8 @@
-using FileCommander.Controller;
-using FileCommander.DataStore;
-
 using Microsoft.UI.Xaml;
 using Microsoft.UI.Xaml.Controls;
 using Microsoft.UI.Xaml.Input;
 
 using System.Threading.Tasks;
-
-// To learn more about WinUI, the WinUI project structure,
-// and more about our project templates, see: http://aka.ms/winui-project-info.
 
 namespace FileCommander.Controls;
 
@@ -39,8 +33,6 @@ public sealed partial class FolderView : UserControl
     //    //};
     //    //ColumnView.ListView.ItemsSource = view;
     //}
-
-    Store store = new();
 
     void TextBox_GotFocus(object sender, RoutedEventArgs e)
     {

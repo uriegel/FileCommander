@@ -93,6 +93,11 @@ export class VirtualTable extends HTMLElement {
                 table-layout: fixed;
                 width: 100%;        
             }
+            tr>td {
+                text-overflow: ellipsis;
+                overflow: hidden;
+                white-space: nowrap;
+            }
             tr.isCurrent {
                 outline-color: var(--vtc-current-color);
                 outline-width: 1px;

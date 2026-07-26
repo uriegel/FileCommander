@@ -3,9 +3,7 @@ using ClrWinApi;
 using CsTools;
 using CsTools.Extensions;
 
-using FileCommander.Controller;
 using FileCommander.Data;
-using FileCommander.DataStore;
 
 using Microsoft.UI.Xaml;
 using Microsoft.UI.Xaml.Controls;
@@ -19,9 +17,12 @@ using System.Linq;
 using System.Reflection;
 using System.Runtime.InteropServices;
 using System.Text.Json;
-using System.Threading.Tasks;
 
 namespace FileCommander.Controls;
+
+// TODO Grid Splitter (maybe WinUITools)
+// TODO getRoot
+// TODO getFiles
 
 public sealed partial class VirtualTable : UserControl
 {
@@ -159,7 +160,11 @@ public sealed partial class VirtualTable : UserControl
         var files = dirInfo
                         .GetFiles()
                         .Select(FileItem.Create)
-                        .Select(n => new VTItem($"icon/{n.Name.GetFileExtension()}", n.Name, n.Size, n.DateTime))
+                        .Select(n => new VTItem(
+                            $"icon/{(n.Name.EndsWith(".exe", StringComparison.OrdinalIgnoreCase) ? dirInfo.FullName.AppendPath(n.Name) : n.Name.GetFileExtension())}",
+                            n.Name,
+                            n.Size, 
+                            n.DateTime))
                         .ToArray();
         return [
             new VTItem(null, "..", 0, null),

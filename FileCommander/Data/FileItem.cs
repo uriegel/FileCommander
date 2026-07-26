@@ -48,18 +48,7 @@ public class FileItem : Item
             DateTime = info.LastWriteTime
         };
 
-        var _ = GetIcon();
         return item;
-
-        async Task GetIcon()
-        {
-
-            var ext = item.Name.EndsWith(".exe", StringComparison.OrdinalIgnoreCase)
-                    ? info.FullName
-                    : item.Name.GetFileExtension();
-            var _ = await ShellIconCache.GetAsync(ext);
-            item.IconIndex = ext;
-        }
     }
 }
 
