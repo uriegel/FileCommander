@@ -1,0 +1,35 @@
+:root  {
+    --vtc-current-color: blue;
+    --vtc-current-focus-color: blue;
+}
+
+body {
+    font-family: 'Lucida Sans', 'Lucida Sans Regular', 'Lucida Grande', 'Lucida Sans Unicode', Geneva, Verdana, sans-serif;
+    margin: 0px;
+    padding: 0px;
+    font-size: 85%;
+    height: 100vh;
+    display: flex;
+    flex-direction: column;
+}
+
+.tableContainer {
+    flex-grow: 1;
+    position: relative;
+}
+
+.hidden {
+    display: none;
+}
+.icon {
+    width: 16px;
+    vertical-align: bottom;
+}
+
+@media (prefers-color-scheme: dark) {
+    :root {
+        color: lightgray;
+        background-color: #2f2f2f; 
+    }
+}
+

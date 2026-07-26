@@ -17,14 +17,14 @@ public sealed partial class FolderView : UserControl
     public FolderView()
     {
         InitializeComponent();
-        ColumnView.SetStore(store);
+        //ColumnView.SetStore(store);
 
         var _ = Test();
         
         async Task Test()
         {
             //await (new DirectoryController(store, (ColumnView.DataContext as Context)!)).ChangePathAsync(@"C:\users\Urieg");
-            await (new DirectoryController(store, (ColumnView.DataContext as Context)!)).ChangePathAsync(@"C:\windows\system32");
+            //await (new DirectoryController(store, (ColumnView.DataContext as Context)!)).ChangePathAsync(@"C:\windows\system32");
             //await (new DirectoryController(store, (ColumnView.DataContext as Context)!)).ChangePathAsync(@"C:\windows\");
         }
     }

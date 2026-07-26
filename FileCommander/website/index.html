@@ -1,0 +1,29 @@
+﻿<!DOCTYPE html>
+<html>
+<head>
+    <title>Virtual Table</title>
+    <meta charset="utf-8" />
+    <link rel="stylesheet" href="styles/style.css">
+</head>
+
+<body class="blue">
+    <div class="tableContainer">
+        <virtual-table id="virtual-table"></virtual-table>
+    </div>
+
+    <template id="item">
+        <tr>
+            <td>
+                <span>
+                    <img id="img" class="icon" style="width: 16px; height: 16px; vertical-align: bottom;" />
+                </span>
+                <span id="text"></span>
+            </td>
+            <td id="item2"></td>
+            <td id="item3"></td>
+        </tr>
+    </template>
+
+    <script type="module" src="index.js"></script>
+</body>
+</html>

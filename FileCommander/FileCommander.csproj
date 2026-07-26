@@ -27,6 +27,7 @@
   <ItemGroup>
     <None Remove="Assets\FolderView.xaml" />
     <None Remove="Controls\ColumnView.xaml" />
+    <None Remove="Controls\VirtualTable.xaml" />
     <None Remove="DataTemplates\DirectoryItemDataTemplate.xaml" />
   </ItemGroup>
 	<ItemGroup>
@@ -89,7 +90,13 @@
     </Page>
   </ItemGroup>
   <ItemGroup>
+    <Folder Include="website\" />
     <Folder Include="Views\" />
+  </ItemGroup>
+  <ItemGroup>
+    <Page Update="Controls\VirtualTable.xaml">
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
   </ItemGroup>
 
   <!--
@@ -117,4 +124,22 @@
     <AppxBundle>Never</AppxBundle>
     <HoursBetweenUpdateChecks>0</HoursBetweenUpdateChecks>
   </PropertyGroup>
+
+	<ItemGroup>
+		<EmbeddedResource Include="website/index.html">
+			<LogicalName>$([System.String]::new('%(RelativeDir)').SubString(8).Replace('\','/'))%(FileName)%(Extension)</LogicalName>
+		</EmbeddedResource>
+		<EmbeddedResource Include="website/styles/*.css">
+			<LogicalName>$([System.String]::new('%(RelativeDir)').SubString(8).Replace('\','/'))%(FileName)%(Extension)</LogicalName>
+		</EmbeddedResource>
+		<EmbeddedResource Include="website/styles/themes/*.css">
+			<LogicalName>$([System.String]::new('%(RelativeDir)').SubString(8).Replace('\','/'))%(FileName)%(Extension)</LogicalName>
+		</EmbeddedResource>
+		<EmbeddedResource Include="website/*.js">
+			<LogicalName>$([System.String]::new('%(RelativeDir)').SubString(8).Replace('\','/'))%(FileName)%(Extension)</LogicalName>
+		</EmbeddedResource>
+		<EmbeddedResource Include="website/virtualtable/*.js">
+			<LogicalName>$([System.String]::new('%(RelativeDir)').SubString(8).Replace('\','/'))%(FileName)%(Extension)</LogicalName>
+		</EmbeddedResource>
+	</ItemGroup>
 </Project>

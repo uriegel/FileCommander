@@ -1,0 +1,386 @@
+import './Scrollbar.js'
+
+// TODO set columns: remove old columns, reset scrollbar
+// TODO set items: remove old items, reset scrollbar
+// TODO css style for item row from css: call method to transfer it o the shadow dom
+
+export class VirtualTable extends HTMLElement {
+    #offset = 0
+
+    constructor() {
+        super()
+        this.itemHeight = 0
+        this.currentPosition = 0
+        this.visualItemsCount = 0
+        this.items = []
+
+        const style = document.createElement("style")
+        document.head.appendChild(style)
+        style.sheet?.insertRule(`:root {
+            --vtc-current-color: lightgray;
+            --vtc-current-focus-color: red;
+            --vtc-font-size: 100%;
+            --vtc-selected-background-color: blue;
+            --vtc-scrollbar-width: 16px;
+
+            --vtc-scrollbar-grip-width: 4px;
+            --vtc-scrollbar-grip-radius: 999px;
+            --vtc-scrollbar-grip-color: gray;
+            --vtc-scrollbar-grip-active-color: var(--vtc-selected-background-color);
+            --vtc-scrollbar-grip-right: 1px;
+            
+            --vtc-scrollbar-border-color: gray;
+            --vtc-scrollbar-border-width: 1px;
+            --vtc-scrollbar-background-color: white;
+            --vtc-scrollbar-button-background-color: white;
+            --vtc-scrollbar-button-color: #666;
+            --vtc-scrollbar-button-hover-color: #555
+            --vtc-scrollbar-button-active-color: #444
+            --vtc-scrollbar-button-hover-background-color: rgb(209, 209, 209);
+            --vtc-scrollbar-button-active-background-color: #aaa;
+            --vtc-scrollbar-grip-color: rgb(209, 209, 209); 
+            --vtc-scrollbar-grip-hover-color: #bbb;
+            --vtc111-scrollbar-grip-width: calc(100% - var(--vtc-scrollbar-grip-right));
+            --vtc-scrollbar-right-margin: 15px;
+        }`)
+    }
+
+    set offset(val) {
+        if (this.#offset != val)
+            this.scrollbar.scrollPosition = val
+        this.#offset = val
+    }
+
+    get offset() {
+        return this.#offset
+    }
+    
+    connectedCallback() {
+        this.shadow = this.attachShadow({ mode: "open" })
+        this.root = document.createElement("div")
+        this.root.id = "root"
+        this.root.setAttribute("tabindex", "0")
+        this.root.addEventListener("keydown", evt => this.onKeyDown(evt))
+        this.root.addEventListener("mousedown", evt => this.onMouseDown(evt))
+        this.root.addEventListener("wheel", evt => this.onWheel(evt))
+        this.table = document.createElement("table")
+        this.tableHead = document.createElement("thead")
+        this.table.appendChild(this.tableHead)
+        this.tableBody = document.createElement("tbody")
+        this.table.appendChild(this.tableBody)
+        this.root.appendChild(this.table)
+        this.scrollbar = document.createElement("scroll-bar")
+        this.scrollbar.addEventListener("scrollbar-scrolled", evt => this.onScrolled(evt))
+        this.root.appendChild(this.scrollbar)
+        this.shadow.appendChild(this.root)
+        this.setAttribute("tabindex", "0")
+        this.addEventListener("focus", () => this.root.focus())
+
+        const resizeObserver = new ResizeObserver(() => this.onResize())
+        resizeObserver.observe(this.root)
+
+        const style = document.createElement('style')
+        style.textContent = `
+            #root {
+                overflow: hidden;
+                position: absolute;
+                width: 100%;
+                height: 100%;
+                outline: none;
+            }
+            table {
+                border-spacing: 0px;
+                table-layout: fixed;
+                width: 100%;        
+            }
+            tr.isCurrent {
+                outline-color: var(--vtc-current-color);
+                outline-width: 1px;
+                outline-style: solid;
+                outline-offset: -1px;    
+            }
+            #root:focus tr.isCurrent {
+                outline-color: var(--vtc-current-focus-color);
+            }`
+
+        this.shadow.appendChild(style)
+    }
+
+    setColumns(columns) {
+        const tr = document.createElement("tr")
+        this.tableHead.appendChild(tr)
+        columns.forEach(item => {
+            const th = document.createElement("th")
+            th.textContent = item
+            tr.appendChild(th)
+        })      
+        this.scrollbar.setHeightOffset(tr.clientHeight)
+    }
+
+    setItems(items) {
+        this.items = items
+        if (this.itemHeight == 0) 
+            this.measure()
+        this.scrollbar.setCount(this.items.length)
+
+        while (this.tableBody.lastElementChild)
+            this.tableBody.removeChild(this.tableBody.lastElementChild)
+
+        const count = this.getVisualItems()
+
+        items
+            .filter((_, idx) => idx <= count)
+            .forEach((item, idx) => {
+                const tr = this.createItem(item, idx)
+                this.tableBody.appendChild(tr)
+            })
+    }
+    measure() {
+        var tr = this.createRowItem()
+        this.measureRowItem(tr)
+        this.tableBody.appendChild(tr)
+        this.itemHeight = tr.clientHeight
+        this.visualItemsCount = this.getVisualItems()
+        this.scrollbar.setDisplayCount(this.visualItemsCount)
+    }
+
+    getVisualItems() {
+        return Math.floor((this.root.clientHeight - this.tableHead.clientHeight) / this.itemHeight)
+    }
+
+    scrollToOffset() {
+        const elements = Array.from(this.tableBody.children)
+        elements.forEach((element, idx) => {
+            this.checkCurrentItem(element, this.offset + idx)
+            this.renderRowItem(element, this.items[this.offset + idx])
+        })
+    }
+
+    createRowItem() {
+        const event = new CustomEvent('create-rowitem', {
+            bubbles: false,
+            cancelable: false,
+            detail: { tr: null }
+        })
+        this.dispatchEvent(event)
+        return event.detail.tr
+    }
+
+    measureRowItem(tr) {
+        const event = new CustomEvent('measure-rowitem', {
+            bubbles: false,
+            cancelable: false,
+            detail: { tr }
+        })
+        this.dispatchEvent(event)
+    }
+
+    renderRowItem(tr, item) {
+        if (item) {
+            tr.style.setProperty('display', "")
+            const event = new CustomEvent('render-rowitem', {
+                bubbles: false,
+                cancelable: false,
+                detail: { tr, item }
+            })
+            this.dispatchEvent(event)
+        }
+        else
+            tr.style.setProperty('display', 'none')
+    }
+
+    scroll(up) {
+        if (!up) {
+            if (this.offset + this.visualItemsCount >= this.items.length)
+                return
+            this.offset++
+            const recycled = this.tableBody.firstElementChild
+            recycled.remove()
+
+            this.checkCurrentItem(recycled, this.offset + this.visualItemsCount)
+            this.renderRowItem(recycled, this.items[this.offset + this.visualItemsCount])
+            this.tableBody.appendChild(recycled)
+        } else {
+            if (this.offset < 0)
+                return
+            this.offset--
+            const recycled = this.tableBody.lastElementChild
+            recycled.remove()
+            this.checkCurrentItem(recycled, this.offset)
+            this.renderRowItem(recycled, this.items[this.offset])
+            this.tableBody.insertBefore(recycled, this.tableBody.firstElementChild)
+        }
+    }
+
+    onResize() {
+        if (this.items.length == 0)
+            return
+        const itemsCount = this.visualItemsCount
+        this.visualItemsCount = this.getVisualItems()
+        this.scrollbar.setDisplayCount(this.visualItemsCount)
+        const elements = Array.from(this.tableBody.children) 
+        var tooMuch = elements.length - this.visualItemsCount - 1
+        if (tooMuch > 0) {
+            for (let i = 0; i < tooMuch; i++) { 
+                const recycled = this.tableBody.lastElementChild
+                recycled.remove()
+            }
+        } else if (tooMuch < 0) {
+            for (let i = 0; i < -tooMuch && itemsCount + i < this.items.length; i++) { 
+                const tr = this.createItem(this.items[itemsCount + i + 1 + this.offset], -1)
+                this.tableBody.appendChild(tr)
+            }
+        }
+        // TODO check if too small
+        this.checkPosition(this.currentPosition)
+    }
+
+    onKeyDown(evt) {
+        if (evt.key == "ArrowDown") {
+            evt.preventDefault()
+            evt.stopPropagation()
+            this.checkPosition(this.currentPosition + 1)
+        }
+        else if (evt.key == "ArrowUp") {
+            evt.preventDefault()
+            evt.stopPropagation()
+            this.checkPosition(this.currentPosition - 1)
+        }
+        else if (evt.key == "PageDown") {
+            evt.preventDefault()
+            evt.stopPropagation()
+            this.checkPosition(this.currentPosition + this.visualItemsCount - 1)
+        }
+        else if (evt.key == "PageUp") {
+            evt.preventDefault()
+            evt.stopPropagation()
+            this.checkPosition(this.currentPosition - this.visualItemsCount + 1)
+        }
+        else if (evt.key == "End") {
+            evt.preventDefault()
+            evt.stopPropagation()
+            this.offset = Math.max(this.items.length - this.visualItemsCount, 0)
+            this.currentPosition = this.items.length - 1
+            this.scrollToOffset()
+        }
+        else if (evt.key == "Home") {
+            evt.preventDefault()
+            evt.stopPropagation()
+            this.offset = 0
+            this.currentPosition = 0
+            this.scrollToOffset()
+        }
+    }
+
+    onMouseDown(evt) {
+        const index = Math.floor((evt.layerY - this.tableHead.clientHeight) / this.itemHeight) 
+        const elements = Array.from(this.tableBody.children) 
+        let element = elements[this.currentPosition - this.offset]
+        if (element)
+            element.classList.remove("isCurrent")
+        element = elements[index]
+        if (element)
+            element.classList.add("isCurrent")
+        this.currentPosition = index + this.offset
+    }
+
+    onWheel(evt) {
+        const delta = evt.deltaY / Math.abs(evt.deltaY) * 3
+        if (this.items.length > this.visualItemsCount && !Number.isNaN(delta)) {
+            this.scroll(delta < 0)
+            this.scroll(delta < 0)
+            this.scroll(delta < 0)
+        }
+    }
+
+    onScrolled(evt) {
+        const scroll = this.offset != evt.detail.pos
+        this.offset = evt.detail.pos
+        if (scroll)
+            this.scrollToOffset()
+    }
+
+    checkPosition(newPos) {
+        const up = newPos < this.currentPosition
+        newPos = up ? Math.max(newPos, 0) : Math.min(newPos, this.items.length - 1)
+        const delta =this.scrollIntoView(newPos, up)
+        const elements = Array.from(this.tableBody.children) 
+        const element = elements[this.currentPosition - this.offset]
+        if (element)
+            element.classList.remove("isCurrent")
+        const newElement = elements[newPos - this.offset]
+        newElement.classList.add("isCurrent")
+        this.currentPosition = newPos
+    }
+
+    scrollIntoView(newPos, up) {
+
+        const scrollDown = () => {
+            const offset = newPos - this.offset - this.visualItemsCount + 1
+            if (offset >= 0) {
+                const elements = Array.from(this.tableBody.children) 
+                for (let i = 0; i < offset; i++) { 
+                    const recycled = this.tableBody.firstElementChild
+                    recycled.remove()
+                    recycled.classList.remove("isCurrent")
+                    this.renderRowItem(recycled, this.items[this.offset + this.visualItemsCount + 1 + i])
+                    this.tableBody.appendChild(recycled)
+                }
+
+                this.offset += offset
+                return offset
+            }
+            return 0
+        }
+
+        const scrollUp = () => {
+            const offset = newPos - this.offset
+            if (offset < 0) {
+                const elements = Array.from(this.tableBody.children) 
+                if (newPos >= 0) {
+                    for (let i = 0; i < -offset; i++) {
+                        const recycled = this.tableBody.lastElementChild
+                        recycled.remove()
+                        recycled.classList.remove("isCurrent")
+                        this.renderRowItem(recycled, this.items[this.offset - 1 - i])
+                        this.tableBody.insertBefore(recycled, this.tableBody.firstElementChild)
+                    }
+                }
+                this.offset += offset
+                return offset
+            }
+            return 0
+        }
+
+        if (!up) { 
+            const res = scrollDown()
+            if (res != 0)
+                return res
+        } else {
+            const res = scrollUp()
+            if (res != 0)
+                return res
+        }
+        if (!up && this.currentPosition < this.offset) 
+            return scrollUp()
+        else if (this.currentPosition > this.offset + this.visualItemsCount) 
+            return scrollDown()
+        return 0
+    }    
+
+    checkCurrentItem(element, idx) {
+        if (idx == this.currentPosition)
+            element.classList.add("isCurrent")
+        else
+            element.classList.remove("isCurrent")
+    }
+
+    createItem(item, idx) {
+        const tr = this.createRowItem()
+        this.checkCurrentItem(tr, idx)
+        this.renderRowItem(tr, item)
+        return tr
+    }
+}
+
+customElements.define("virtual-table", VirtualTable)
