@@ -23,16 +23,24 @@ tableView.addEventListener("measure-rowitem", evt => {
 })
 tableView.addEventListener("render-rowitem", evt => {
     const tr = evt.detail.tr
-    const number = evt.detail.item.slice(-1)
     const img = tr.querySelector('#img')
-    img.src = `image/icon${number}`
+//    img.src = `image/icon${number}`
     const sp = tr.querySelector('#text')
-    sp.textContent = evt.detail.item
+    sp.textContent = evt.detail.item.name
     const element2 = tr.querySelector('#item2')
-    element2.textContent = `Item 2 - ${evt.detail.item}`
+    element2.textContent = evt.detail.item.date
     const element3 = tr.querySelector('#item3')
-    element3.textContent = `Item 3 - ${evt.detail.item}`
+    element3.textContent = evt.detail.item.size
 })
 
-tableView.setItems(Array.from({ length: 70_000 }, (value, index) => `Eintrag Numero: ${index}`))
+init()
+
+async function init() {
+    const response = await fetch("request/getItems")
+    const data = await response.json()
+    console.log("request arrives", data)
+    tableView.setItems(data)
+}
+
+
 tableView.focus()
