@@ -3,6 +3,9 @@ import './Scrollbar.js'
 // TODO set columns: remove old columns, reset scrollbar
 // TODO set items: remove old items, reset scrollbar
 // TODO css style for item row from css: call method to transfer it o the shadow dom
+// TODO scrollbar hidden: transition
+// TODO scrollbar active transition
+
 
 export class VirtualTable extends HTMLElement {
     #offset = 0
@@ -21,7 +24,7 @@ export class VirtualTable extends HTMLElement {
             --vtc-current-focus-color: red;
             --vtc-font-size: 100%;
             --vtc-selected-background-color: blue;
-            --vtc-scrollbar-width: 16px;
+            --vtc-scrollbar-width: 12px;
 
             --vtc-scrollbar-grip-width: 4px;
             --vtc-scrollbar-grip-radius: 999px;
@@ -40,8 +43,11 @@ export class VirtualTable extends HTMLElement {
             --vtc-scrollbar-button-active-background-color: #aaa;
             --vtc-scrollbar-grip-color: rgb(209, 209, 209); 
             --vtc-scrollbar-grip-hover-color: #bbb;
-            --vtc111-scrollbar-grip-width: calc(100% - var(--vtc-scrollbar-grip-right));
             --vtc-scrollbar-right-margin: 15px;
+            --vtc-caption-color: white;
+            --vtc-caption-background-color: gray;
+            --vtc-caption-background-hover-color: #0063ff;
+            --vtc-caption-separator-color: white;
         }`)
     }
 
@@ -54,7 +60,7 @@ export class VirtualTable extends HTMLElement {
     get offset() {
         return this.#offset
     }
-    
+
     connectedCallback() {
         this.shadow = this.attachShadow({ mode: "open" })
         this.root = document.createElement("div")
@@ -93,10 +99,23 @@ export class VirtualTable extends HTMLElement {
                 table-layout: fixed;
                 width: 100%;        
             }
-            tr>td {
+            td {
+                padding-left: 6px;
                 text-overflow: ellipsis;
                 overflow: hidden;
                 white-space: nowrap;
+                -webkit-user-select: none;
+                user-select: none;
+                transition: padding-right .4s;
+            }
+            td:first-child {
+                padding-left: 1px;
+            }
+            th.rightAligned {
+                text-align: right;
+            }
+            td.rightAligned {
+                text-align: right;
             }
             tr.isCurrent {
                 outline-color: var(--vtc-current-color);
@@ -104,6 +123,30 @@ export class VirtualTable extends HTMLElement {
                 outline-style: solid;
                 outline-offset: -1px;    
             }
+            .scrollbarActive tr td:last-child {
+                padding-right: calc(3px + var(--vtc-scrollbar-right-margin));
+            }                
+            thead {
+                color: var(--vtr-caption-color);
+                background-color: var(--vtc-caption-background-color);
+            }
+            th {
+                text-overflow: ellipsis;
+                -webkit-user-select: none;
+                user-select: none;
+                text-align: left;
+                font-weight: normal;
+                border-left-style: solid;
+                border-left-width: 1px;
+                border-left-color: var(--vtc-caption-separator-color);
+                padding-left: 5px;
+                padding-right: 5px;
+                overflow: hidden;
+                white-space: nowrap;
+            }
+            th:first-child {
+                border-left-width: 0px;
+            }                  
             #root:focus tr.isCurrent {
                 outline-color: var(--vtc-current-focus-color);
             }`
@@ -118,13 +161,13 @@ export class VirtualTable extends HTMLElement {
             const th = document.createElement("th")
             th.textContent = item
             tr.appendChild(th)
-        })      
+        })
         this.scrollbar.setHeightOffset(tr.clientHeight)
     }
 
     setItems(items) {
         this.items = items
-        if (this.itemHeight == 0) 
+        if (this.itemHeight == 0)
             this.measure()
         this.scrollbar.setCount(this.items.length)
 
@@ -223,15 +266,15 @@ export class VirtualTable extends HTMLElement {
         const itemsCount = this.visualItemsCount
         this.visualItemsCount = this.getVisualItems()
         this.scrollbar.setDisplayCount(this.visualItemsCount)
-        const elements = Array.from(this.tableBody.children) 
+        const elements = Array.from(this.tableBody.children)
         var tooMuch = elements.length - this.visualItemsCount - 1
         if (tooMuch > 0) {
-            for (let i = 0; i < tooMuch; i++) { 
+            for (let i = 0; i < tooMuch; i++) {
                 const recycled = this.tableBody.lastElementChild
                 recycled.remove()
             }
         } else if (tooMuch < 0) {
-            for (let i = 0; i < -tooMuch && itemsCount + i < this.items.length; i++) { 
+            for (let i = 0; i < -tooMuch && itemsCount + i < this.items.length; i++) {
                 const tr = this.createItem(this.items[itemsCount + i + 1 + this.offset], -1)
                 this.tableBody.appendChild(tr)
             }
@@ -278,8 +321,8 @@ export class VirtualTable extends HTMLElement {
     }
 
     onMouseDown(evt) {
-        const index = Math.floor((evt.layerY - this.tableHead.clientHeight) / this.itemHeight) 
-        const elements = Array.from(this.tableBody.children) 
+        const index = Math.floor((evt.layerY - this.tableHead.clientHeight) / this.itemHeight)
+        const elements = Array.from(this.tableBody.children)
         let element = elements[this.currentPosition - this.offset]
         if (element)
             element.classList.remove("isCurrent")
@@ -308,8 +351,8 @@ export class VirtualTable extends HTMLElement {
     checkPosition(newPos) {
         const up = newPos < this.currentPosition
         newPos = up ? Math.max(newPos, 0) : Math.min(newPos, this.items.length - 1)
-        const delta =this.scrollIntoView(newPos, up)
-        const elements = Array.from(this.tableBody.children) 
+        const delta = this.scrollIntoView(newPos, up)
+        const elements = Array.from(this.tableBody.children)
         const element = elements[this.currentPosition - this.offset]
         if (element)
             element.classList.remove("isCurrent")
@@ -323,8 +366,8 @@ export class VirtualTable extends HTMLElement {
         const scrollDown = () => {
             const offset = newPos - this.offset - this.visualItemsCount + 1
             if (offset >= 0) {
-                const elements = Array.from(this.tableBody.children) 
-                for (let i = 0; i < offset; i++) { 
+                const elements = Array.from(this.tableBody.children)
+                for (let i = 0; i < offset; i++) {
                     const recycled = this.tableBody.firstElementChild
                     recycled.remove()
                     recycled.classList.remove("isCurrent")
@@ -341,7 +384,7 @@ export class VirtualTable extends HTMLElement {
         const scrollUp = () => {
             const offset = newPos - this.offset
             if (offset < 0) {
-                const elements = Array.from(this.tableBody.children) 
+                const elements = Array.from(this.tableBody.children)
                 if (newPos >= 0) {
                     for (let i = 0; i < -offset; i++) {
                         const recycled = this.tableBody.lastElementChild
@@ -357,7 +400,7 @@ export class VirtualTable extends HTMLElement {
             return 0
         }
 
-        if (!up) { 
+        if (!up) {
             const res = scrollDown()
             if (res != 0)
                 return res
@@ -366,12 +409,12 @@ export class VirtualTable extends HTMLElement {
             if (res != 0)
                 return res
         }
-        if (!up && this.currentPosition < this.offset) 
+        if (!up && this.currentPosition < this.offset)
             return scrollUp()
-        else if (this.currentPosition > this.offset + this.visualItemsCount) 
+        else if (this.currentPosition > this.offset + this.visualItemsCount)
             return scrollDown()
         return 0
-    }    
+    }
 
     checkCurrentItem(element, idx) {
         if (idx == this.currentPosition)
