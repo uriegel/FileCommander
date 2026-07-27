@@ -77,9 +77,6 @@
     </Page>
   </ItemGroup>
   <ItemGroup>
-    <Folder Include="DataStore\" />
-    <Folder Include="DataTemplates\" />
-    <Folder Include="ValueConverter\" />
     <Folder Include="website\" />
     <Folder Include="Views\" />
   </ItemGroup>

@@ -1,7 +1,7 @@
 ﻿using System;
 using System.IO;
 
-namespace FileCommander.Data;
+namespace FileCommander.Obsoletes;
 
 public class DirectoryItem : Item
 {

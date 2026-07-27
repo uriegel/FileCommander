@@ -13,10 +13,7 @@ abstract class Controller
         //return DirectoryController.Get(id, current, view, context);
     }
 
-    public Column[] GetColumns()
-        => [
-            new("Name"),
-            new("Bezeichnung"),
-            new("Größe")
-        ];
+    public abstract Column[] GetColumns();
+
+    public abstract Item[] GetItems();
 }

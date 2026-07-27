@@ -1,35 +1,16 @@
-﻿using System.ComponentModel;
+﻿namespace FileCommander.Data;
 
-namespace FileCommander.Data;
+record Item(
+    int Index,
+    string Name,
+    Value[] Values
 
-public class Item : INotifyPropertyChanged
-{
-    public string Name
-    {
-        get;
-        set
-        {
-            field = value;
-            OnChanged(nameof(Name));
-        }
-    } = "";
+);
 
-    public bool IsSelected
-    {
-        get;
-        set
-        {
-            field = value;
-            OnChanged(nameof(IsSelected));
-        }
-    } 
-    
-    public bool IsHidden { get; init; }
-
-    public event PropertyChangedEventHandler? PropertyChanged;
-
-    protected void OnChanged(string name) => PropertyChanged?.Invoke(this, new(name));
-
-    protected const string HiddenNamestart = ".";
-}
-
+record Value(
+    string? StringVal = null,
+    long? LongVal = null,
+    long? DateVal = null,
+    bool? BoolVal = null
+// TODO VersionVal
+);

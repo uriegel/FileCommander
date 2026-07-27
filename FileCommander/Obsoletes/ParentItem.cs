@@ -1,4 +1,4 @@
-﻿namespace FileCommander.Data;
+﻿namespace FileCommander.Obsoletes;
 
 public class ParentItem : Item
 {

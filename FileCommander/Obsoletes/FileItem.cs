@@ -4,7 +4,7 @@ using System;
 using System.IO;
 using System.Threading.Tasks;
 
-namespace FileCommander.Data;
+namespace FileCommander.Obsoletes;
 
 public class FileItem : Item
 {

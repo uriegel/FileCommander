@@ -1,14 +1,84 @@
-﻿using FileCommander.Data;
+﻿using ClrWinApi;
+
+using CsTools.Extensions;
+
+using FileCommander.Controls;
+
+using Microsoft.Web.WebView2.Core;
 
 using System;
+using System.Drawing;
+using System.Drawing.Imaging;
 using System.IO;
 using System.Linq;
+using System.Runtime.InteropServices;
 using System.Threading.Tasks;
 
-namespace FileCommander.Controllers;
+namespace FileCommander.Obsoletes;
 
 class DirectoryController : IDisposable
 {
+
+    //var items = Get(@"c:\windows\system32");
+    //var ms = new MemoryStream();
+    //JsonSerializer.Serialize(ms, items, Json.Defaults);
+    //                args.Response =
+    //                    WebView.CoreWebView2.Environment.CreateWebResourceResponse(
+    //                        ms.AsRandomAccessStream(),
+    //                        200,
+    //                        "OK",
+    //                        "Content-Type: application/json");
+
+    //VTItem[] Get(string path)
+    //{
+    //    var dirInfo = new DirectoryInfo(path);
+    //    var dirs = dirInfo
+    //                    .GetDirectories()
+    //                    .Select(DirectoryItem.Create)
+    //                    .OrderBy(n => n.Name)
+    //                    .Select(n => new VTItem(null, n.Name, null, n.DateTime.ToString("g")))
+    //                    .ToArray();
+    //    var files = dirInfo
+    //                    .GetFiles()
+    //                    .Select(FileItem.Create)
+    //                    .Select(n => new VTItem(
+    //                        $"icon/{(n.Name.EndsWith(".exe", StringComparison.OrdinalIgnoreCase) ? dirInfo.FullName.AppendPath(n.Name) : n.Name.GetFileExtension())}",
+    //                        n.Name,
+    //                        n.Size.FormatSize(),
+    //                        n.DateTime.ToString("g")))
+    //                    .ToArray();
+    //    return [
+    //        new VTItem(null, "..", null, null),
+    //        .. dirs,
+    //        .. files
+    //    ];
+    //}
+
+    //static class ControllerExtensions
+    //{
+    //    public static string FormatSize(this long size)
+    //    {
+    //        if (size == -1)
+    //            return "";
+    //        var sizeStr = size.ToString();
+    //        var sep = '.';
+    //        if (sizeStr.Length > 3)
+    //        {
+    //            var sizePart = sizeStr;
+    //            sizeStr = "";
+    //            for (var j = 3; j < sizePart.Length; j += 3)
+    //            {
+    //                var extract = sizePart.Substring(sizePart.Length - j, 3);
+    //                sizeStr = sep + extract + sizeStr;
+    //            }
+    //            var strfirst = sizePart[..((sizePart.Length % 3 == 0) ? 3 : (sizePart.Length % 3))];
+    //            sizeStr = strfirst + sizeStr;
+    //        }
+    //        return sizeStr;
+    //    }
+    //}
+
+    // record VTItem(string? icon, string Name, string? Size, string? Date);
     public DirectoryController()
     {
         watcher.Created += WatchCreated;
