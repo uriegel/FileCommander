@@ -24,6 +24,14 @@ namespace FileCommander.Controls;
 // TODO getRoot
 // TODO getFiles
 
+// TODO Responsibilities:
+//  items C# with idx as handle
+//  displayItems in webview    
+//  displayItems with displayTypes (text, date, size, version)
+//  displayItems sorting, filtering in webview
+//  displayItems webview is using maps and arrays of objects
+//  Sort by text or indexed sort kind (date, size, text, ext)
+//  
 public sealed partial class VirtualTable : UserControl
 {
     public VirtualTable()
