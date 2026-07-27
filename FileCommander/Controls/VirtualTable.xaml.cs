@@ -4,6 +4,7 @@ using CsTools;
 using CsTools.Extensions;
 
 using FileCommander.Data;
+using FileCommander.Controllers;
 
 using Microsoft.UI.Xaml;
 using Microsoft.UI.Xaml.Controls;
@@ -76,7 +77,7 @@ public sealed partial class VirtualTable : UserControl
                 }
             }
         }
-        catch (Exception ex)
+        catch
         {
             args.Response = WebView.CoreWebView2.Environment.CreateWebResourceResponse(null, 500, "Handler Error", null);
             return;
@@ -85,27 +86,57 @@ public sealed partial class VirtualTable : UserControl
 
     async void ServeRequest(string path, CoreWebView2WebResourceRequestedEventArgs args)
     {
-        if (path == "getItems")
+        switch (path)
         {
-            var deferral = args.GetDeferral();
-            try
-            {
-                var items = Get(@"c:\windows\system32");
-                var ms = new MemoryStream();
-                JsonSerializer.Serialize(ms, items, Json.Defaults);
-                args.Response =
-                    WebView.CoreWebView2.Environment.CreateWebResourceResponse(
-                        ms.AsRandomAccessStream(),
-                        200,
-                        "OK",
-                        "Content-Type: application/json");
-            }
-            finally
-            {
-                deferral.Complete();
-            }
+            case "getItems":
+                var deferral = args.GetDeferral();
+                try
+                {
+                    var items = Get(@"c:\windows\system32");
+                    var ms = new MemoryStream();
+                    JsonSerializer.Serialize(ms, items, Json.Defaults);
+                    args.Response =
+                        WebView.CoreWebView2.Environment.CreateWebResourceResponse(
+                            ms.AsRandomAccessStream(),
+                            200,
+                            "OK",
+                            "Content-Type: application/json");
+                }
+                finally
+                {
+                    deferral.Complete();
+                }
+                break;
+            case "init":
+                // TODO retrieve last path from storage
+                controller = Controller.GetFromPath(null, null);
+                var columns = controller.GetColumns();
+                SendEvent(new(GetItems: new GetItems(columns)));
+                args.Response = WebView.CoreWebView2.Environment.CreateWebResourceResponse(null, 200, "OK", null);
+                break;
         }
     }
+
+    void SendEvent(Event evt)
+    {
+        string json = JsonSerializer.Serialize(evt, Json.Defaults);
+        WebView.CoreWebView2.PostWebMessageAsJson(json);
+    }
+
+    Controller controller = null!;
+
+
+
+
+
+
+
+
+
+
+
+
+
 
     async void ServeIcon(string path, CoreWebView2WebResourceRequestedEventArgs args)
     {

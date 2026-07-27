@@ -5,7 +5,7 @@ using System.IO;
 using System.Linq;
 using System.Threading.Tasks;
 
-namespace FileCommander.Controller;
+namespace FileCommander.Controllers;
 
 class DirectoryController : IDisposable
 {

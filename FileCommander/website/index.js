@@ -3,12 +3,6 @@
 const tableView = document.getElementById("virtual-table")
 const fill = document.getElementById("fill")
 
-tableView.setColumns([
-    "Name",
-    "Date",
-    "Size"
-])
-
 tableView.addEventListener("create-rowitem", evt => {
     const template = document.getElementById('item')
     const tr = template.content.cloneNode(true).firstElementChild
@@ -35,11 +29,22 @@ tableView.addEventListener("render-rowitem", evt => {
 
 init()
 
+function onEvent(evt) {
+    console.log("Event", evt)
+    if (evt.getItems) {
+        tableView.setColumns(evt.getItems.columns.map(n => n.name))
+        const getItems = async () => {
+            const response = await fetch("request/getItems")
+            const data = await response.json()
+            tableView.setItems(data)
+        }
+        getItems()
+    }
+}
+
 async function init() {
-    const response = await fetch("request/getItems")
-    const data = await response.json()
-    console.log("request arrives", data)
-    tableView.setItems(data)
+    window.chrome.webview.addEventListener('message', event => onEvent(event.data))
+    const response = await fetch("request/init")
 }
 
 
