@@ -18,6 +18,7 @@ namespace FileCommander.Controls;
 
 // TODO Folder icons
 // TODO Questions: sorting in view or controller? View has to know isMounted, column type, rules parent directory...
+// TODO I think sorting in the controller
 // TODO interpret Values and display them (isMounted??? opacity)
 
 // TODO processItem request => perhaps getFiles ...
