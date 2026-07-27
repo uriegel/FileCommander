@@ -16,7 +16,7 @@ using System.Text.Json;
 
 namespace FileCommander.Controls;
 
-// TODO Folder icons
+// TODO Folder icons1
 // TODO Questions: sorting in view or controller? View has to know isMounted, column type, rules parent directory...
 // TODO I think sorting in the controller
 // TODO Then this is not necessary: interpret Values and display them (isMounted??? opacity)
