@@ -1,7 +1,5 @@
 ﻿using FileCommander.Data;
 
-using Microsoft.UI.Xaml.Media;
-
 using System.IO;
 using System.Linq;
 
@@ -33,30 +31,29 @@ class RootController : Controller
                .Select(RootItem.Create)
                .OrderByDescending(n => n.IsMounted)
                .ThenBy(n => n.Name)];
-        return [.. items.Select((n, idx) => new Item(idx, n.Name, [
-            new Value(StringVal: n.Description),
-            new Value(LongVal: n.Size),
-            new Value(BoolVal: n.IsMounted)
+        return [.. items.Select((n, idx) => new Item(idx, n.Name, n.GetIcon(), [
+            n.Description,
+            n.Size.FormatSize()
           ]))];
     }
 
     RootItem[] items = [];
 }
 
-public record RootItem(string Name, string Description, long Size, bool IsMounted)
+record RootItem(string Name, string Description, long Size, bool IsMounted, bool IsRemovable)
 {
     public static RootItem Create(DriveInfo driveInfo)
         => new(
             driveInfo.Name ?? "", 
             driveInfo.IsReady ? driveInfo.VolumeLabel : "", 
             driveInfo.IsReady ? driveInfo.TotalSize : 0, 
-            driveInfo.IsReady);
-
-    static string GetIcon(DriveInfo driveInfo)
-        => driveInfo.Name == @"C:\"
+            driveInfo.IsReady,
+            driveInfo.DriveType == DriveType.Removable);
+    public string GetIcon()
+        => "iconFromRes/" + (Name == @"C:\"
             ? "WindowsDrive"
-            : driveInfo.DriveType == DriveType.Removable
+            : IsRemovable
             ? "RemovableDrive"
-            : "Drive";
+            : "Drive");
 }
-//Icon = $"Resources/{GetIcon(driveInfo)}.ico".IconFromResource(),
+

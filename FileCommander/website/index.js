@@ -1,17 +1,22 @@
 ﻿import './virtualtable/index.js'
 
+let columnCount = 0
+
 const tableView = document.getElementById("virtual-table")
 const fill = document.getElementById("fill")
 
 tableView.addEventListener("create-rowitem", evt => {
     const template = document.getElementById('item')
     const tr = template.content.cloneNode(true).firstElementChild
+    for (let i = 0; i < columnCount - 1; i++) {
+        const td = document.createElement("td")
+        td.id = `item${i}`
+        tr.appendChild(td)
+    }
     evt.detail.tr = tr
 })
 tableView.addEventListener("measure-rowitem", evt => {
     const tr = evt.detail.tr
-    const img = tr.querySelector('#img')
-    img.src = "image/icon5"
     const sp = tr.querySelector('#text')
     sp.textContent = 'Measuring...'
 })
@@ -20,23 +25,25 @@ tableView.addEventListener("render-rowitem", evt => {
     const img = tr.querySelector('#img')
     img.src = evt.detail.item.icon
     const sp = tr.querySelector('#text')
-    sp.textContent = evt.detail.item.name
-    const element2 = tr.querySelector('#item2')
-    element2.textContent = evt.detail.item.date
-    const element3 = tr.querySelector('#item3')
-    element3.textContent = evt.detail.item.size
+    sp.textContent = evt.detail.item.text
+    for (let i = 0; i < columnCount - 1; i++) {
+        const element = tr.querySelector(`#item${i}`)
+        element.textContent = evt.detail.item.values[i]
+    }
 })
 
 init()
 
 function onEvent(evt) {
     console.log("Event", evt)
-    if (evt.getItems) {
-        tableView.setColumns(evt.getItems.columns.map(n => n.name))
+    if (evt.columnsChanged) {
+        const cols = evt.columnsChanged.columns.map(n => n.name)
+        columnCount = cols.length
+        tableView.setColumns(cols)
         const getItems = async () => {
             const response = await fetch("request/getItems")
-            const data = await response.json()
-            tableView.setItems(data)
+            const items = await response.json()
+            tableView.setItems(items)
         }
         getItems()
     }

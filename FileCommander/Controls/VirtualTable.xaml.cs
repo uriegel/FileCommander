@@ -16,10 +16,7 @@ using System.Text.Json;
 
 namespace FileCommander.Controls;
 
-// TODO Folder icons1
-// TODO Questions: sorting in view or controller? View has to know isMounted, column type, rules parent directory...
-// TODO I think sorting in the controller
-// TODO Then this is not necessary: interpret Values and display them (isMounted??? opacity)
+// TODO Home folder (later Favorites, Remotes)
 
 // TODO processItem request => perhaps getFiles ...
 
@@ -59,6 +56,8 @@ public sealed partial class VirtualTable : UserControl
             var path = new Uri(args.Request.Uri).AbsolutePath[1..];
             if (path.StartsWith("request"))
                 ServeRequest(path[8..], args);
+            else if (path.StartsWith("iconFromRes"))
+                ServeIconFromRes(path[12..], args);
             else if (path.StartsWith("icon"))
                 ServeIcon(path[5..], args);
             else
@@ -106,7 +105,7 @@ public sealed partial class VirtualTable : UserControl
                 // TODO retrieve last path from storage
                 controller = Controller.GetFromPath(null, null);
                 var columns = controller.GetColumns();
-                SendEvent(new(GetItems: new GetItems(columns)));
+                SendEvent(new(new ColumnsChanged(columns)));
                 args.Response = WebView.CoreWebView2.Environment.CreateWebResourceResponse(null, 200, "OK", null);
                 break;
             case "TODO":
@@ -130,6 +129,17 @@ public sealed partial class VirtualTable : UserControl
                     200,
                     "OK",
                     "Content-Type: image/png");
+
+    void ServeIconFromRes(string path, CoreWebView2WebResourceRequestedEventArgs args)
+    {
+        var stream = Assembly.GetExecutingAssembly().GetManifestResourceStream(path);
+        args.Response =
+                WebView.CoreWebView2.Environment.CreateWebResourceResponse(
+                    stream.AsRandomAccessStream(),
+                    200,
+                    "OK",
+                    "Content-Type: image/png");
+    }
 
     void SendEvent(Event evt)
         => WebView.CoreWebView2.PostWebMessageAsJson(JsonSerializer.Serialize(evt, Json.Defaults));

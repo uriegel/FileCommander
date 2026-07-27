@@ -13,12 +13,6 @@
 	<UseSystemDrawing>true</UseSystemDrawing>
     <EnableMsixTooling>true</EnableMsixTooling>
     <Nullable>enable</Nullable>
-
-
-	  <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
-
-
-
   </PropertyGroup>
   <ItemGroup>
     <Content Remove="Assets\FolderView.xaml" />
@@ -36,15 +30,30 @@
 		<None Remove="Resources\WindowsDrive.ico" />
 	</ItemGroup>
 
-	<ItemGroup>
-    <Content Include="Assets\SplashScreen.scale-200.png" />
-    <Content Include="Assets\LockScreenLogo.scale-200.png" />
-    <Content Include="Assets\Square150x150Logo.scale-200.png" />
-    <Content Include="Assets\Square44x44Logo.scale-200.png" />
-    <Content Include="Assets\Square44x44Logo.targetsize-24_altform-unplated.png" />
-    <Content Include="Assets\StoreLogo.png" />
-    <Content Include="Assets\Wide310x150Logo.scale-200.png" />
-  </ItemGroup>
+    <ItemGroup>
+        <Content Include="Assets\SplashScreen.scale-200.png" />
+        <Content Include="Assets\LockScreenLogo.scale-200.png" />
+        <Content Include="Assets\Square150x150Logo.scale-200.png" />
+        <Content Include="Assets\Square44x44Logo.scale-200.png" />
+        <Content Include="Assets\Square44x44Logo.targetsize-24_altform-unplated.png" />
+        <Content Include="Assets\StoreLogo.png" />
+        <Content Include="Assets\Wide310x150Logo.scale-200.png" />
+    </ItemGroup>
+	
+    <ItemGroup>
+	    <EmbeddedResource Include="./Resources/Drive.png">
+          <LogicalName>Drive</LogicalName>
+        </EmbeddedResource>
+	    <EmbeddedResource Include="./Resources/Folder.png">
+          <LogicalName>Folder</LogicalName>
+        </EmbeddedResource>
+	    <EmbeddedResource Include="./Resources/RemovableDrive.png">
+          <LogicalName>RemovableDrive</LogicalName>
+        </EmbeddedResource>
+	    <EmbeddedResource Include="./Resources/WindowsDrive.png">
+          <LogicalName>WindowsDrive</LogicalName>
+        </EmbeddedResource>
+    </ItemGroup>
 
   <ItemGroup>
     <Manifest Include="$(ApplicationManifest)" />
