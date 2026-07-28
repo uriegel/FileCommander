@@ -23,10 +23,11 @@ namespace FileCommander.Controls;
 // TODO path control
 //      * styled like javascript
 //      * optional in javascript
-// TODO Tab control viewLeft -> viewRight, to path edit
 // TODO Grid Splitter (maybe WinUITools)
 // TODO getRoot
 // TODO getFiles
+
+// TODO Tab control shift tab -> path edit
 
 // TODO Responsibilities:
 //  items C# with idx as handle
@@ -38,6 +39,8 @@ namespace FileCommander.Controls;
 //  
 public sealed partial class VirtualTable : UserControl
 {
+    public event Action? OnTab;
+
     public VirtualTable() => InitializeComponent();
 
     async void Grid_Loaded(object sender, RoutedEventArgs e)
@@ -107,6 +110,9 @@ public sealed partial class VirtualTable : UserControl
                 var columns = controller.GetColumns();
                 SendEvent(new(new ColumnsChanged(columns)));
                 args.Response = WebView.CoreWebView2.Environment.CreateWebResourceResponse(null, 200, "OK", null);
+                break;
+            case "tab":
+                OnTab?.Invoke();
                 break;
             case "TODO":
                 var deferral = args.GetDeferral();

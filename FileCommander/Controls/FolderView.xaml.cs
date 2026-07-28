@@ -1,16 +1,20 @@
+using System;
+using System.Threading.Tasks;
+
 using Microsoft.UI.Xaml;
 using Microsoft.UI.Xaml.Controls;
 using Microsoft.UI.Xaml.Input;
-
-using System.Threading.Tasks;
 
 namespace FileCommander.Controls;
 
 public sealed partial class FolderView : UserControl
 {
+    public event Action? OnTab;
+
     public FolderView()
     {
         InitializeComponent();
+        VirtualTable.OnTab += () => OnTab?.Invoke();
         //ColumnView.SetStore(store);
 
         var _ = Test();

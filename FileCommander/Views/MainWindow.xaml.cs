@@ -1,11 +1,12 @@
+using System;
+using System.Threading.Tasks;
+
 using FileCommander.Controls;
 
 using Microsoft.UI.Windowing;
 using Microsoft.UI.Xaml;
+using Microsoft.UI.Xaml.Controls;
 using Microsoft.UI.Xaml.Media;
-
-using System;
-using System.Threading.Tasks;
 
 using Windows.ApplicationModel;
 
@@ -33,6 +34,9 @@ public sealed partial class MainWindow : Window
         if (OperatingSystem.IsWindowsVersionAtLeast(10, 0, 19041))
             appDisplayName = AppInfo.Current.DisplayInfo.DisplayName;
         TitleBarTextBlock.Text = appDisplayName;
+
+        LeftView.OnTab += () => RightView.Focus(FocusState.Keyboard);
+        RightView.OnTab += () => LeftView.Focus(FocusState.Keyboard);
 
         activeView = LeftView;
         Focus();

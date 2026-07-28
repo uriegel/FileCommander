@@ -1,5 +1,6 @@
 import './Scrollbar.js'
 
+// TODO onSelection
 // TODO set columns: remove old columns, reset scrollbar
 // TODO set columns: sorting items by sort function
 // TODO set items: remove old items, reset scrollbar
@@ -20,7 +21,7 @@ export class VirtualTable extends HTMLElement {
 
         const style = document.createElement("style")
         document.head.appendChild(style)
-        style.sheet?.insertRule(`:root {
+        style.textContent = `:root {
             --vtc-current-color: lightgray;
             --vtc-current-focus-color: red;
             --vtc-font-size: 100%;
@@ -46,10 +47,15 @@ export class VirtualTable extends HTMLElement {
             --vtc-scrollbar-grip-hover-color: #bbb;
             --vtc-scrollbar-right-margin: 15px;
             --vtc-caption-color: white;
-            --vtc-caption-background-color: gray;
+            --vtc-caption-background-color: #efefef;
             --vtc-caption-background-hover-color: #0063ff;
             --vtc-caption-separator-color: white;
-        }`)
+        }
+        @media (prefers-color-scheme: dark) {
+            :root {
+                --vtc-caption-background-color: #212121;
+            }
+        }`
     }
 
     set offset(val) {

@@ -32,6 +32,17 @@ tableView.addEventListener("render-rowitem", evt => {
     }
 })
 
+async function onKeyDown(evt) {
+    if (evt.key == "Tab") {
+        evt.preventDefault()
+        evt.stopPropagation()
+        const response = await fetch("request/tab")
+    }
+}
+
+document.addEventListener("keydown", evt => onKeyDown(evt))
+
+
 init()
 
 function onEvent(evt) {
