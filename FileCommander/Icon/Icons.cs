@@ -1,7 +1,6 @@
 ﻿using ClrWinApi;
 
 using System;
-using System.Collections.Generic;
 using System.Drawing.Imaging;
 using System.IO;
 using System.Runtime.InteropServices;
@@ -17,6 +16,7 @@ static class Icons
         using var bitmap = icon.ToBitmap();
         var stream = new MemoryStream();
         bitmap.Save(stream, ImageFormat.Png);
+        Api.DestroyIcon(hIcon);
         return stream;
     }
 

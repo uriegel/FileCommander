@@ -20,9 +20,7 @@ abstract class Controller
     public abstract OnProcessResult OnProcess(int pos);
 }
 
-record OnProcessResult;
+record OnProcessResult(
+    Controller? NewController = null,
+    bool? NewItems = null);
 
-
-record ChangePathResult(
-    Controller? NewController = null
-) : OnProcessResult;

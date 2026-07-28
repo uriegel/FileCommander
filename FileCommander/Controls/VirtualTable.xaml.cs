@@ -16,8 +16,6 @@ using System.Text.Json;
 
 namespace FileCommander.Controls;
 
-// TODO processItem request => perhaps getFiles ...
-
 // TODO path control
 //      * styled like javascript
 //      * optional in javascript
@@ -94,6 +92,7 @@ public sealed partial class VirtualTable : UserControl
         switch (path)
         {
             case "getItems":
+            {
                 var items = controller.GetItems();
                 var ms = new MemoryStream();
                 JsonSerializer.Serialize(ms, items, Json.Defaults);
@@ -104,6 +103,7 @@ public sealed partial class VirtualTable : UserControl
                         "OK",
                         "Content-Type: application/json");
                 break;
+            }
             case "tab":
                 OnTab?.Invoke();
                 break;
@@ -126,21 +126,27 @@ public sealed partial class VirtualTable : UserControl
                 }
                 break;
             default:
-                if (path.StartsWith("process")) {
+            {
+                if (path.StartsWith("process"))
+                {
                     var pos = int.Parse(path[8..]);
                     var res = controller.OnProcess(pos);
-                    if (res is ChangePathResult changePath)
+                    if (res.NewController != null)
                     {
-                        if (changePath.NewController != null)
-                        {
-                            this.controller = changePath.NewController;
-                            SendEvent(new(new ColumnsChanged(controller.GetColumns())));
-                        }
-                        args.Response = WebView.CoreWebView2.Environment.CreateWebResourceResponse(null, 200, "OK", null);
+                        this.controller = res.NewController;
+                        SendEvent(new(new ColumnsChanged(controller.GetColumns())));
                     }
-                    // check in controller: path -> ChangeColumns
+                    var ms = new MemoryStream();
+                    JsonSerializer.Serialize(ms, res, Json.Defaults);
+                    args.Response =
+                        WebView.CoreWebView2.Environment.CreateWebResourceResponse(
+                            ms.AsRandomAccessStream(),
+                            200,
+                            "OK",
+                            "Content-Type: application/json");
                 }
                 break;
+            }
         }
     }
 

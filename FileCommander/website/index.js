@@ -34,6 +34,15 @@ tableView.addEventListener("render-rowitem", evt => {
 
 tableView.addEventListener("process-selected", async evt => {
     const response = await fetch(`request/process/${evt.detail.pos}`)
+    const res = await response.json()
+    if (res.newItems) {
+        const getItems = async () => {
+            const response = await fetch("request/getItems")
+            const items = await response.json()
+            tableView.setItems(items)
+        }
+        getItems()
+    }
 })
 
 async function onKeyDown(evt) {
@@ -45,7 +54,6 @@ async function onKeyDown(evt) {
 }
 
 document.addEventListener("keydown", evt => onKeyDown(evt))
-
 
 init()
 

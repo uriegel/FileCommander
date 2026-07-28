@@ -27,32 +27,38 @@ class DirectoryController : Controller
     {
         var dirInfo = new DirectoryInfo(path);
         path = dirInfo.FullName;
-        var parentItem = new ParentItem();
-        var dirs = dirInfo
+        dirItems = [.. dirInfo
             .GetDirectories()
             .Select(DirectoryItem.Create)
-            .OrderBy(n => n.Name)
-            .ToArray();
-        var files = dirInfo
+            .OrderBy(n => n.Name)];
+        fileItems = [.. dirInfo
             .GetFiles()
-            .Select(FileItem.Create)
-            .ToArray();
+            .Select(FileItem.Create)];
         return [
              new Item(0, "..", "iconFromRes/GoUp", []),
-            ..dirs.Select((n, idx) => new Item(idx + 1, n.Name, n.GetIcon(), [ n.DateTime.ToString("g") ])),
-            ..files.Select((n, idx) => new Item(idx + dirs.Length + 1, n.Name, n.GetIcon(path), [ n.DateTime.ToString("g"), n.Size.FormatSize() ]))
+            ..dirItems.Select((n, idx) => new Item(idx + 1, n.Name, n.GetIcon(), [ n.DateTime.ToString("g") ])),
+            ..fileItems.Select((n, idx) => new Item(idx + dirItems.Length + 1, n.Name, n.GetIcon(path), [ n.DateTime.ToString("g"), n.Size.FormatSize() ]))
         ];
     }
 
     public override OnProcessResult OnProcess(int pos)
     {
-        return new();
+        if (pos == 0)
+            return new OnProcessResult();
+
+        if (pos < dirItems.Length + 1)
+        {
+            path = path.AppendPath(dirItems[pos-1].Name);
+            return new(NewItems: true);
+        }
+        return new OnProcessResult();
     }
+
+    DirectoryItem[] dirItems = null!;
+    FileItem[] fileItems = null!;
 
     string path;
 }
-
-record ParentItem();
 
 record DirectoryItem(string Name, DateTime DateTime)
 {
