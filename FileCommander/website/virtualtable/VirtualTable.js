@@ -78,6 +78,8 @@ export class VirtualTable extends HTMLElement {
         this.root.addEventListener("wheel", evt => this.onWheel(evt))
         this.table = document.createElement("table")
         this.tableHead = document.createElement("thead")
+        this.tableHeadRow = document.createElement("tr")
+        this.tableHead.appendChild(this.tableHeadRow)
         this.table.appendChild(this.tableHead)
         this.tableBody = document.createElement("tbody")
         this.table.appendChild(this.tableBody)
@@ -162,17 +164,19 @@ export class VirtualTable extends HTMLElement {
     }
 
     setColumns(columns) {
-        const tr = document.createElement("tr")
-        this.tableHead.appendChild(tr)
+        while (this.tableHeadRow.lastElementChild)
+            this.tableHeadRow.removeChild(this.tableHeadRow.lastElementChild)
         columns.forEach(item => {
             const th = document.createElement("th")
             th.textContent = item
-            tr.appendChild(th)
+            this.tableHeadRow.appendChild(th)
         })
-        this.scrollbar.setHeightOffset(tr.clientHeight)
+        this.scrollbar.setHeightOffset(this.tableHeadRow.clientHeight)
     }
 
     setItems(items) {
+        this.currentPosition = 0
+        this.offset = 0
         this.items = items
         if (this.itemHeight == 0)
             this.measure()

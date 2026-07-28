@@ -29,32 +29,6 @@ class DirectoryController : IDisposable
     //                        "OK",
     //                        "Content-Type: application/json");
 
-    //VTItem[] Get(string path)
-    //{
-    //    var dirInfo = new DirectoryInfo(path);
-    //    var dirs = dirInfo
-    //                    .GetDirectories()
-    //                    .Select(DirectoryItem.Create)
-    //                    .OrderBy(n => n.Name)
-    //                    .Select(n => new VTItem(null, n.Name, null, n.DateTime.ToString("g")))
-    //                    .ToArray();
-    //    var files = dirInfo
-    //                    .GetFiles()
-    //                    .Select(FileItem.Create)
-    //                    .Select(n => new VTItem(
-    //                        $"icon/{(n.Name.EndsWith(".exe", StringComparison.OrdinalIgnoreCase) ? dirInfo.FullName.AppendPath(n.Name) : n.Name.GetFileExtension())}",
-    //                        n.Name,
-    //                        n.Size.FormatSize(),
-    //                        n.DateTime.ToString("g")))
-    //                    .ToArray();
-    //    return [
-    //        new VTItem(null, "..", null, null),
-    //        .. dirs,
-    //        .. files
-    //    ];
-    //}
-
-
     // record VTItem(string? icon, string Name, string? Size, string? Date);
     public DirectoryController()
     {
