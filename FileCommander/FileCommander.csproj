@@ -41,7 +41,10 @@
     </ItemGroup>
 	
     <ItemGroup>
-	    <EmbeddedResource Include="./Resources/Drive.png">
+		<EmbeddedResource Include="./Resources/go-up.png">
+			<LogicalName>GoUp</LogicalName>
+		</EmbeddedResource>
+		<EmbeddedResource Include="./Resources/Drive.png">
           <LogicalName>Drive</LogicalName>
         </EmbeddedResource>
 	    <EmbeddedResource Include="./Resources/Folder.png">

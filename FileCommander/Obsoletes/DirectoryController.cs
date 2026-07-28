@@ -18,18 +18,6 @@ namespace FileCommander.Obsoletes;
 
 class DirectoryController : IDisposable
 {
-
-    //var items = Get(@"c:\windows\system32");
-    //var ms = new MemoryStream();
-    //JsonSerializer.Serialize(ms, items, Json.Defaults);
-    //                args.Response =
-    //                    WebView.CoreWebView2.Environment.CreateWebResourceResponse(
-    //                        ms.AsRandomAccessStream(),
-    //                        200,
-    //                        "OK",
-    //                        "Content-Type: application/json");
-
-    // record VTItem(string? icon, string Name, string? Size, string? Date);
     public DirectoryController()
     {
         watcher.Created += WatchCreated;
@@ -42,7 +30,6 @@ class DirectoryController : IDisposable
                     | NotifyFilters.LastWrite
                     | NotifyFilters.Size;
     }
-
     public async Task ChangePathAsync(string path)
     {
         //var folderToSelect = path.EndsWith("..") ? context.CurrentPath.SubstringAfterLast('/') : null;
