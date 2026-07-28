@@ -32,6 +32,10 @@ tableView.addEventListener("render-rowitem", evt => {
     }
 })
 
+tableView.addEventListener("process-selected", async evt => {
+    const response = await fetch(`request/process/${evt.detail.pos}`)
+})
+
 async function onKeyDown(evt) {
     if (evt.key == "Tab") {
         evt.preventDefault()

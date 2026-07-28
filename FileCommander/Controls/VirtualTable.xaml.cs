@@ -16,8 +16,6 @@ using System.Text.Json;
 
 namespace FileCommander.Controls;
 
-// TODO Home folder (later Favorites, Remotes)
-
 // TODO processItem request => perhaps getFiles ...
 
 // TODO path control
@@ -28,6 +26,8 @@ namespace FileCommander.Controls;
 // TODO getFiles
 
 // TODO Tab control shift tab -> path edit
+
+// TODO Home folder (later Favorites, Remotes)
 
 // TODO Responsibilities:
 //  items C# with idx as handle
@@ -104,15 +104,15 @@ public sealed partial class VirtualTable : UserControl
                         "OK",
                         "Content-Type: application/json");
                 break;
+            case "tab":
+                OnTab?.Invoke();
+                break;
             case "init":
                 // TODO retrieve last path from storage
                 controller = Controller.GetFromPath(null, null);
                 var columns = controller.GetColumns();
                 SendEvent(new(new ColumnsChanged(columns)));
                 args.Response = WebView.CoreWebView2.Environment.CreateWebResourceResponse(null, 200, "OK", null);
-                break;
-            case "tab":
-                OnTab?.Invoke();
                 break;
             case "TODO":
                 var deferral = args.GetDeferral();
@@ -123,6 +123,12 @@ public sealed partial class VirtualTable : UserControl
                 finally
                 {
                     deferral.Complete();
+                }
+                break;
+            default:
+                if (path.StartsWith("process")) {
+                    var pos = int.Parse(path[8..]);
+                    // check in controller: path -> ChangeColumns
                 }
                 break;
         }

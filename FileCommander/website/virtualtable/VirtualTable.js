@@ -1,6 +1,5 @@
 import './Scrollbar.js'
 
-// TODO onSelection
 // TODO set columns: remove old columns, reset scrollbar
 // TODO set columns: sorting items by sort function
 // TODO set items: remove old items, reset scrollbar
@@ -75,6 +74,7 @@ export class VirtualTable extends HTMLElement {
         this.root.setAttribute("tabindex", "0")
         this.root.addEventListener("keydown", evt => this.onKeyDown(evt))
         this.root.addEventListener("mousedown", evt => this.onMouseDown(evt))
+        this.root.addEventListener("dblclick", () => this.onSelected())
         this.root.addEventListener("wheel", evt => this.onWheel(evt))
         this.table = document.createElement("table")
         this.tableHead = document.createElement("thead")
@@ -325,6 +325,11 @@ export class VirtualTable extends HTMLElement {
             this.currentPosition = 0
             this.scrollToOffset()
         }
+        else if (evt.key == "Enter") {
+            evt.preventDefault()
+            evt.stopPropagation()
+            this.onSelected()
+        }
     }
 
     onMouseDown(evt) {
@@ -353,6 +358,15 @@ export class VirtualTable extends HTMLElement {
         this.offset = evt.detail.pos
         if (scroll)
             this.scrollToOffset()
+    }
+
+    onSelected() {
+        const event = new CustomEvent('process-selected', {
+            bubbles: false,
+            cancelable: false,
+            detail: { pos: this.currentPosition }
+        })
+        this.dispatchEvent(event)
     }
 
     checkPosition(newPos) {
