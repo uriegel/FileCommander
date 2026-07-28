@@ -15,7 +15,7 @@ abstract class Controller
 
     public abstract Column[] GetColumns();
 
-    public abstract Item[] GetItems();
+    public abstract ItemResult GetItems();
 
     public abstract OnProcessResult OnProcess(int pos);
 }

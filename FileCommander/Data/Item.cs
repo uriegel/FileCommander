@@ -2,6 +2,8 @@
 
 record Item(int Index, string Text, string Icon, string[] Values);
 
+record ItemResult(Item[] Items, int Pos);
+
 static class ItemExtensions
 {
     public static string FormatSize(this long size)

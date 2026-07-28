@@ -174,7 +174,7 @@ export class VirtualTable extends HTMLElement {
         this.scrollbar.setHeightOffset(this.tableHeadRow.clientHeight)
     }
 
-    setItems(items) {
+    setItems(items, pos) {
         this.currentPosition = 0
         this.offset = 0
         this.items = items
@@ -193,6 +193,8 @@ export class VirtualTable extends HTMLElement {
                 const tr = this.createItem(item, idx)
                 this.tableBody.appendChild(tr)
             })
+        if (pos || pos > 0)
+            this.checkPosition(pos)
     }
     measure() {
         var tr = this.createRowItem()

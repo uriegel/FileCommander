@@ -39,7 +39,7 @@ tableView.addEventListener("process-selected", async evt => {
         const getItems = async () => {
             const response = await fetch("request/getItems")
             const items = await response.json()
-            tableView.setItems(items)
+            tableView.setItems(items.items, items.pos)
         }
         getItems()
     }
@@ -66,7 +66,7 @@ function onEvent(evt) {
         const getItems = async () => {
             const response = await fetch("request/getItems")
             const items = await response.json()
-            tableView.setItems(items)
+            tableView.setItems(items.items, items.pos)
         }
         getItems()
     }

@@ -23,7 +23,7 @@ class RootController : Controller
             new("Größe")
         ];
 
-    public override Item[] GetItems()
+    public override ItemResult GetItems()
     {
         items =
            [.. DriveInfo
@@ -31,10 +31,10 @@ class RootController : Controller
                .Select(RootItem.Create)
                .OrderByDescending(n => n.IsMounted)
                .ThenBy(n => n.Name)];
-        return [.. items.Select((n, idx) => new Item(idx, n.Name, n.GetIcon(), [
+        return new([.. items.Select((n, idx) => new Item(idx, n.Name, n.GetIcon(), [
             n.Description,
             n.Size.FormatSize()
-          ]))];
+          ]))], 0);
     }
 
     public override OnProcessResult OnProcess(int pos)
