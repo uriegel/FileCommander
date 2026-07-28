@@ -128,6 +128,16 @@ public sealed partial class VirtualTable : UserControl
             default:
                 if (path.StartsWith("process")) {
                     var pos = int.Parse(path[8..]);
+                    var res = controller.OnProcess(pos);
+                    if (res is ChangePathResult changePath)
+                    {
+                        if (changePath.NewController != null)
+                        {
+                            this.controller = changePath.NewController;
+                            SendEvent(new(new ColumnsChanged(controller.GetColumns())));
+                        }
+                        args.Response = WebView.CoreWebView2.Environment.CreateWebResourceResponse(null, 200, "OK", null);
+                    }
                     // check in controller: path -> ChangeColumns
                 }
                 break;

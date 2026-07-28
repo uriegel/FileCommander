@@ -16,4 +16,13 @@ abstract class Controller
     public abstract Column[] GetColumns();
 
     public abstract Item[] GetItems();
+
+    public abstract OnProcessResult OnProcess(int pos);
 }
+
+record OnProcessResult;
+
+
+record ChangePathResult(
+    Controller? NewController = null
+) : OnProcessResult;

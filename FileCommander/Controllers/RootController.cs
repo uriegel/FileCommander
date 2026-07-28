@@ -37,6 +37,11 @@ class RootController : Controller
           ]))];
     }
 
+    public override OnProcessResult OnProcess(int pos)
+    {
+        return new ChangePathResult(new DirectoryController(items[pos].Name));
+    }
+
     RootItem[] items = [];
 }
 
