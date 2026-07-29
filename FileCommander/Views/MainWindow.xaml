@@ -18,6 +18,7 @@
             <Grid.ColumnDefinitions>
                 <ColumnDefinition x:Name="LeftPaddingColumn" Width="0"/>
                 <ColumnDefinition x:Name="IconColumn" Width="Auto"/>
+                <ColumnDefinition x:Name="HamburgerColumn" Width="Auto"/>
                 <ColumnDefinition x:Name="TitleColumn" Width="Auto"/>
                 <ColumnDefinition x:Name="LeftDragColumn" Width="*"/>
                 <ColumnDefinition x:Name="SearchColumn" Width="4*" MinWidth="220"/>
@@ -26,6 +27,20 @@
             </Grid.ColumnDefinitions>
             <Image x:Name="TitleBarIcon" Source="ms-appx:///Assets/StoreLogo.png" Grid.Column="1"
                    Width="16" Height="16" Margin="8,0,4,0"/>
+
+            <AppBarButton x:Name="HamburgerButton" Grid.Column="2" FontFamily="Segoe Fluent Icons" 
+                          Content="&#xE700;" Width="36" Height="32" Click="HamburgerButton_Click">
+                <AppBarButton.Flyout>
+                    <MenuFlyout Placement="BottomEdgeAlignedLeft">
+                        <MenuFlyoutItem Text="Bookmarks" />
+                        <MenuFlyoutItem Text="Open Terminal"/>
+                        <MenuFlyoutSeparator/>
+                        <MenuFlyoutItem Text="Settings" />
+                        <MenuFlyoutItem Text="About" />
+                    </MenuFlyout>
+                </AppBarButton.Flyout>
+            </AppBarButton>
+
             <TextBlock x:Name="TitleBarTextBlock"
                        Text="App title" 
                        Style="{StaticResource CaptionTextBlockStyle}"
@@ -34,37 +49,24 @@
             </TextBlock>
         </Grid>
 
-        <NavigationView Grid.Row="1"
-                        IsBackButtonVisible="Collapsed"
-                        IsSettingsVisible="True">
-            <Grid Grid.Row="1" KeyDown="Grid_KeyDown">
+        <controls:DockPanel Grid.Row="1">
+            <Grid KeyDown="Grid_KeyDown">
                 <Grid.ColumnDefinitions>
                     <ColumnDefinition Width="*" MinWidth="15" />
                     <ColumnDefinition Width="5" />
                     <ColumnDefinition Width="*" MinWidth="15" />
                 </Grid.ColumnDefinitions>
                 <controls1:FolderView x:Name="LeftView" Grid.Column="0" 
-                                HorizontalAlignment="Stretch"
-                                GotFocus="LeftView_GotFocus">
+                                 HorizontalAlignment="Stretch"
+                                 GotFocus="LeftView_GotFocus">
                 </controls1:FolderView>
                 <Border Grid.Column="1" Width="5" HorizontalAlignment="Stretch" 
-                        Background="Transparent"/>
+                          Background="Transparent"/>
                 <controls1:FolderView x:Name="RightView" Grid.Column="2" 
-                                HorizontalAlignment="Stretch"
-                                GotFocus="RightView_GotFocus">
+                                 HorizontalAlignment="Stretch"
+                                 GotFocus="RightView_GotFocus">
                 </controls1:FolderView>
             </Grid>
-                <!--<StackPanel Grid.Row="1" VerticalAlignment="Center">
-                    <Button Margin="4" x:Name="CompactoverlaytBtn"
-                            Content="Enter CompactOverlay"
-                            Click="SwitchPresenter"/>
-                    <Button Margin="4" x:Name="FullscreenBtn" 
-                            Content="Enter FullScreen"
-                            Click="SwitchPresenter"/>
-                    <Button Margin="4" x:Name="OverlappedBtn"
-                            Content="Revert to default (Overlapped)"
-                            Click="SwitchPresenter"/>
-                </StackPanel>-->
-        </NavigationView>
+        </controls:DockPanel>
     </Grid>
 </Window>

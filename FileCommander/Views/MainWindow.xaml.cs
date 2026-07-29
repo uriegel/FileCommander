@@ -24,11 +24,11 @@ public sealed partial class MainWindow : Window
         Activated += MainWindow_Activated;
         AppTitleBar.SizeChanged += AppTitleBar_SizeChanged;
         AppTitleBar.Loaded += AppTitleBar_Loaded;
-        
+
         ExtendsContentIntoTitleBar = true;
         if (ExtendsContentIntoTitleBar == true)
-            AppWindow.TitleBar.PreferredHeightOption = TitleBarHeightOption.Tall;
-        
+            AppWindow.TitleBar.PreferredHeightOption = TitleBarHeightOption.Standard;
+
         // Laufzeit-Guard für API, die ab Windows 10.0.19041 verfügbar ist
         string appDisplayName = "File Commander";
         if (OperatingSystem.IsWindowsVersionAtLeast(10, 0, 19041))
@@ -46,7 +46,7 @@ public sealed partial class MainWindow : Window
             await Task.Delay(100);
             activeView.Focus(FocusState.Keyboard);
         }
-        
+
     }
 
     void AppTitleBar_Loaded(object sender, RoutedEventArgs e)
@@ -129,7 +129,7 @@ public sealed partial class MainWindow : Window
 
     void HamburgerButton_Click(object sender, RoutedEventArgs e)
     {
-        
+
     }
 
     void LeftView_GotFocus(object sender, RoutedEventArgs e)
@@ -151,44 +151,6 @@ public sealed partial class MainWindow : Window
         }
     }
 
-    private void SwitchPresenter(object sender, RoutedEventArgs e)
-    {
-        if (AppWindow != null)
-        {
-            AppWindowPresenterKind newPresenterKind;
-            switch ((sender as Button).Name)
-            {
-                case "CompactoverlaytBtn":
-                    newPresenterKind = AppWindowPresenterKind.CompactOverlay;
-                    break;
-
-                case "FullscreenBtn":
-                    newPresenterKind = AppWindowPresenterKind.FullScreen;
-                    break;
-
-                case "OverlappedBtn":
-                    newPresenterKind = AppWindowPresenterKind.Overlapped;
-                    break;
-
-                default:
-                    newPresenterKind = AppWindowPresenterKind.Default;
-                    break;
-            }
-
-            // If the same presenter button was pressed as the
-            // mode we're in, toggle the window back to Default.
-            if (newPresenterKind == AppWindow.Presenter.Kind)
-            {
-                AppWindow.SetPresenter(AppWindowPresenterKind.Default);
-            }
-            else
-            {
-                // Else request a presenter of the selected kind
-                // to be created and applied to the window.
-                AppWindow.SetPresenter(newPresenterKind);
-            }
-        }
-    }
     FolderView GetOtherView()
         => activeView == LeftView ? RightView : LeftView;
 
