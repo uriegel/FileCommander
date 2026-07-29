@@ -16,11 +16,11 @@ using System.Text.Json;
 
 namespace FileCommander.Controls;
 
-// TODO hidden items (files and not mounted
 // TODO Hamburger menu
 // TODO Show/Hide hidden
 // TODO Sorting
 // TODO restriction
+// TODO hidden items (files and not mounted
 // TODO exif date and version
 // TODO File SystemWatcher with directories
 // TODO Tab control shift tab -> path edit

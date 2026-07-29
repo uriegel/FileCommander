@@ -34,7 +34,7 @@ class RootController : Controller
         return new([.. items.Select((n, idx) => new Item(idx, n.Name, n.GetIcon(), [
             n.Description,
             n.Size.FormatSize()
-          ]))], 0);
+          ], !n.IsMounted))], 0);
     }
 
     public override OnProcessResult OnProcess(int pos)

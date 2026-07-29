@@ -1,6 +1,6 @@
 ﻿namespace FileCommander.Data;
 
-record Item(int Index, string Text, string Icon, string[] Values);
+record Item(int Index, string Text, string Icon, string[] Values, bool Hidden = false);
 
 record ItemResult(Item[] Items, int Pos);
 
