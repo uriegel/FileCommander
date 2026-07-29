@@ -52,6 +52,11 @@ async function onKeyDown(evt) {
         evt.stopPropagation()
         const response = await fetch("request/tab")
     }
+    else if (evt.ctrlKey && evt.key == "h") {
+        evt.preventDefault();
+        evt.stopPropagation()
+        await fetch("request/command/toggleHidden")
+    }
 }
 
 document.addEventListener("keydown", evt => onKeyDown(evt))

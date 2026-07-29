@@ -1,12 +1,13 @@
-using System;
-using System.Threading.Tasks;
-
+using FileCommander.Contexts;
 using FileCommander.Controls;
 
 using Microsoft.UI.Windowing;
 using Microsoft.UI.Xaml;
-using Microsoft.UI.Xaml.Controls;
+using Microsoft.UI.Xaml.Input;
 using Microsoft.UI.Xaml.Media;
+
+using System;
+using System.Threading.Tasks;
 
 using Windows.ApplicationModel;
 
@@ -17,6 +18,8 @@ public sealed partial class MainWindow : Window
     public MainWindow()
     {
         this.InitializeComponent();
+        MainGrid.DataContext = MainContext.Instance;
+        MainContext.Instance.ShowHiddenCommand = ShowHiddenCommand;
 
         // Assumes "this" is a XAML Window. In projects that don't use 
         // WinUI 1.3 or later, use interop APIs to get the AppWindow.
@@ -127,11 +130,6 @@ public sealed partial class MainWindow : Window
         }
     }
 
-    void HamburgerButton_Click(object sender, RoutedEventArgs e)
-    {
-
-    }
-
     void LeftView_GotFocus(object sender, RoutedEventArgs e)
     {
         activeView = sender as FolderView;
@@ -151,8 +149,12 @@ public sealed partial class MainWindow : Window
         }
     }
 
-    FolderView GetOtherView()
-        => activeView == LeftView ? RightView : LeftView;
+    void ShowHiddenCommand_ExecuteRequested(XamlUICommand sender, ExecuteRequestedEventArgs args)
+    {
+
+    }
+
+    FolderView GetOtherView() => activeView == LeftView ? RightView : LeftView;
 
     FolderView? activeView;
 }

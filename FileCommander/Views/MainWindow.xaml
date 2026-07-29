@@ -8,7 +8,20 @@
     xmlns:controls1="using:FileCommander.Controls"
     mc:Ignorable="d">
 
-    <Grid>
+    <Grid Name="MainGrid">
+        <Grid.Resources>
+            <ResourceDictionary>
+                <XamlUICommand x:Name="ShowHiddenCommand" Label="Versteckte Dateien" Description="Versteckte Dateien werden ebenfalls angezeigt"
+                               ExecuteRequested="ShowHiddenCommand_ExecuteRequested">
+                    <!--<XamlUICommand.IconSource>
+                        <SymbolIconSource Symbol="Hide"/>
+                    </XamlUICommand.IconSource>-->
+                    <XamlUICommand.KeyboardAccelerators>
+                        <KeyboardAccelerator Key="H" Modifiers="Control"/>
+                    </XamlUICommand.KeyboardAccelerators>
+                </XamlUICommand>
+            </ResourceDictionary>
+        </Grid.Resources>
         <Grid.RowDefinitions>
             <RowDefinition Height="Auto"/>
             <RowDefinition/>
@@ -29,9 +42,10 @@
                    Width="16" Height="16" Margin="8,0,4,0"/>
 
             <AppBarButton x:Name="HamburgerButton" Grid.Column="2" FontFamily="Segoe Fluent Icons" 
-                          Content="&#xE700;" Width="36" Height="32" Click="HamburgerButton_Click">
+                          Content="&#xE700;" Width="36" Height="32">
                 <AppBarButton.Flyout>
                     <MenuFlyout Placement="BottomEdgeAlignedLeft">
+                        <ToggleMenuFlyoutItem Command="{StaticResource ShowHiddenCommand}" IsChecked="{Binding ShowHidden, Mode=TwoWay}" />
                         <MenuFlyoutItem Text="Bookmarks" />
                         <MenuFlyoutItem Text="Open Terminal"/>
                         <MenuFlyoutSeparator/>

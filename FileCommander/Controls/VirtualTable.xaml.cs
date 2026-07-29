@@ -1,6 +1,9 @@
+using CommunityToolkit.WinUI.Controls;
+
 using CsTools;
 using CsTools.Extensions;
 
+using FileCommander.Contexts;
 using FileCommander.Controllers;
 using FileCommander.Data;
 using FileCommander.Icon;
@@ -139,6 +142,17 @@ public sealed partial class VirtualTable : UserControl
                             200,
                             "OK",
                             "Content-Type: application/json");
+                }
+                else if (path.StartsWith("command"))
+                {
+                    var cmd = path[8..];
+                    switch (cmd)
+                    {
+                        case "toggleHidden":
+                            MainContext.Instance.ShowHidden = !MainContext.Instance.ShowHidden;
+                            MainContext.Instance.ShowHiddenCommand.Execute(null);
+                            break;
+                    }
                 }
                 break;
             }
