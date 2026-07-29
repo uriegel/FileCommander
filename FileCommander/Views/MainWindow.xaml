@@ -18,7 +18,6 @@
             <Grid.ColumnDefinitions>
                 <ColumnDefinition x:Name="LeftPaddingColumn" Width="0"/>
                 <ColumnDefinition x:Name="IconColumn" Width="Auto"/>
-                <ColumnDefinition x:Name="HamburgerColumn" Width="Auto"/>
                 <ColumnDefinition x:Name="TitleColumn" Width="Auto"/>
                 <ColumnDefinition x:Name="LeftDragColumn" Width="*"/>
                 <ColumnDefinition x:Name="SearchColumn" Width="4*" MinWidth="220"/>
@@ -27,10 +26,6 @@
             </Grid.ColumnDefinitions>
             <Image x:Name="TitleBarIcon" Source="ms-appx:///Assets/StoreLogo.png" Grid.Column="1"
                    Width="16" Height="16" Margin="8,0,4,0"/>
-            <Button x:Name="HamburgerButton" Width="32" Height="32" Background="Transparent" Grid.Column="2" Click="HamburgerButton_Click">
-                <FontIcon Glyph="&#xE700;" />
-                <!-- Hamburger icon -->
-            </Button>
             <TextBlock x:Name="TitleBarTextBlock"
                        Text="App title" 
                        Style="{StaticResource CaptionTextBlockStyle}"
@@ -39,24 +34,37 @@
             </TextBlock>
         </Grid>
 
-        <controls:DockPanel Grid.Row="1">
-            <Grid KeyDown="Grid_KeyDown">
+        <NavigationView Grid.Row="1"
+                        IsBackButtonVisible="Collapsed"
+                        IsSettingsVisible="True">
+            <Grid Grid.Row="1" KeyDown="Grid_KeyDown">
                 <Grid.ColumnDefinitions>
                     <ColumnDefinition Width="*" MinWidth="15" />
                     <ColumnDefinition Width="5" />
                     <ColumnDefinition Width="*" MinWidth="15" />
                 </Grid.ColumnDefinitions>
                 <controls1:FolderView x:Name="LeftView" Grid.Column="0" 
-                                 HorizontalAlignment="Stretch"
-                                 GotFocus="LeftView_GotFocus">
+                                HorizontalAlignment="Stretch"
+                                GotFocus="LeftView_GotFocus">
                 </controls1:FolderView>
                 <Border Grid.Column="1" Width="5" HorizontalAlignment="Stretch" 
-                          Background="Transparent"/>
+                        Background="Transparent"/>
                 <controls1:FolderView x:Name="RightView" Grid.Column="2" 
-                                 HorizontalAlignment="Stretch"
-                                 GotFocus="RightView_GotFocus">
+                                HorizontalAlignment="Stretch"
+                                GotFocus="RightView_GotFocus">
                 </controls1:FolderView>
             </Grid>
-        </controls:DockPanel>
+                <!--<StackPanel Grid.Row="1" VerticalAlignment="Center">
+                    <Button Margin="4" x:Name="CompactoverlaytBtn"
+                            Content="Enter CompactOverlay"
+                            Click="SwitchPresenter"/>
+                    <Button Margin="4" x:Name="FullscreenBtn" 
+                            Content="Enter FullScreen"
+                            Click="SwitchPresenter"/>
+                    <Button Margin="4" x:Name="OverlappedBtn"
+                            Content="Revert to default (Overlapped)"
+                            Click="SwitchPresenter"/>
+                </StackPanel>-->
+        </NavigationView>
     </Grid>
 </Window>

@@ -151,6 +151,44 @@ public sealed partial class MainWindow : Window
         }
     }
 
+    private void SwitchPresenter(object sender, RoutedEventArgs e)
+    {
+        if (AppWindow != null)
+        {
+            AppWindowPresenterKind newPresenterKind;
+            switch ((sender as Button).Name)
+            {
+                case "CompactoverlaytBtn":
+                    newPresenterKind = AppWindowPresenterKind.CompactOverlay;
+                    break;
+
+                case "FullscreenBtn":
+                    newPresenterKind = AppWindowPresenterKind.FullScreen;
+                    break;
+
+                case "OverlappedBtn":
+                    newPresenterKind = AppWindowPresenterKind.Overlapped;
+                    break;
+
+                default:
+                    newPresenterKind = AppWindowPresenterKind.Default;
+                    break;
+            }
+
+            // If the same presenter button was pressed as the
+            // mode we're in, toggle the window back to Default.
+            if (newPresenterKind == AppWindow.Presenter.Kind)
+            {
+                AppWindow.SetPresenter(AppWindowPresenterKind.Default);
+            }
+            else
+            {
+                // Else request a presenter of the selected kind
+                // to be created and applied to the window.
+                AppWindow.SetPresenter(newPresenterKind);
+            }
+        }
+    }
     FolderView GetOtherView()
         => activeView == LeftView ? RightView : LeftView;
 
