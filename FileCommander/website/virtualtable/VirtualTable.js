@@ -193,9 +193,21 @@ export class VirtualTable extends HTMLElement {
                 const tr = this.createItem(item, idx)
                 this.tableBody.appendChild(tr)
             })
-        if (pos || pos > 0)
-            this.checkPosition(pos)
     }
+
+    setPosition(newPos) {
+        const up = newPos < this.currentPosition
+        newPos = up ? Math.max(newPos, 0) : Math.min(newPos, this.items.length - 1)
+        const delta = this.scrollIntoView(newPos, up)
+        const elements = Array.from(this.tableBody.children)
+        const element = elements[this.currentPosition - this.offset]
+        if (element)
+            element.classList.remove("isCurrent")
+        const newElement = elements[newPos - this.offset]
+        newElement.classList.add("isCurrent")
+        this.currentPosition = newPos
+    }
+
     measure() {
         var tr = this.createRowItem()
         this.measureRowItem(tr)
@@ -293,29 +305,29 @@ export class VirtualTable extends HTMLElement {
             }
         }
         // TODO check if too small
-        this.checkPosition(this.currentPosition)
+        this.setPosition(this.currentPosition)
     }
 
     onKeyDown(evt) {
         if (evt.key == "ArrowDown") {
             evt.preventDefault()
             evt.stopPropagation()
-            this.checkPosition(this.currentPosition + 1)
+            this.setPosition(this.currentPosition + 1)
         }
         else if (evt.key == "ArrowUp") {
             evt.preventDefault()
             evt.stopPropagation()
-            this.checkPosition(this.currentPosition - 1)
+            this.setPosition(this.currentPosition - 1)
         }
         else if (evt.key == "PageDown") {
             evt.preventDefault()
             evt.stopPropagation()
-            this.checkPosition(this.currentPosition + this.visualItemsCount - 1)
+            this.setPosition(this.currentPosition + this.visualItemsCount - 1)
         }
         else if (evt.key == "PageUp") {
             evt.preventDefault()
             evt.stopPropagation()
-            this.checkPosition(this.currentPosition - this.visualItemsCount + 1)
+            this.setPosition(this.currentPosition - this.visualItemsCount + 1)
         }
         else if (evt.key == "End") {
             evt.preventDefault()
@@ -373,19 +385,6 @@ export class VirtualTable extends HTMLElement {
             detail: { pos: this.currentPosition }
         })
         this.dispatchEvent(event)
-    }
-
-    checkPosition(newPos) {
-        const up = newPos < this.currentPosition
-        newPos = up ? Math.max(newPos, 0) : Math.min(newPos, this.items.length - 1)
-        const delta = this.scrollIntoView(newPos, up)
-        const elements = Array.from(this.tableBody.children)
-        const element = elements[this.currentPosition - this.offset]
-        if (element)
-            element.classList.remove("isCurrent")
-        const newElement = elements[newPos - this.offset]
-        newElement.classList.add("isCurrent")
-        this.currentPosition = newPos
     }
 
     scrollIntoView(newPos, up) {

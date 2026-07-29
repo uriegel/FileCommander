@@ -16,25 +16,20 @@ using System.Text.Json;
 
 namespace FileCommander.Controls;
 
+// TODO hidden items (files and not mounted
+// TODO Hamburger menu
+// TODO Show/Hide hidden
+// TODO Sorting
+// TODO restriction
+// TODO exif date and version
+// TODO File SystemWatcher with directories
+// TODO Tab control shift tab -> path edit
 // TODO path control
 //      * styled like javascript
 //      * optional in javascript
 // TODO Grid Splitter (maybe WinUITools)
-// TODO getRoot
-// TODO getFiles
-
-// TODO Tab control shift tab -> path edit
-
+// TODO SetSelections
 // TODO Home folder (later Favorites, Remotes)
-
-// TODO Responsibilities:
-//  items C# with idx as handle
-//  displayItems in webview    
-//  displayItems with displayTypes (text, date, size, version)
-//  displayItems sorting, filtering in webview
-//  displayItems webview is using maps and arrays of objects
-//  Sort by text or indexed sort kind (date, size, text, ext)
-//  
 public sealed partial class VirtualTable : UserControl
 {
     public event Action? OnTab;
