@@ -19,8 +19,9 @@ using System.Text.Json;
 
 namespace FileCommander.Controls;
 
-// TODO Hamburger menu
-// TODO Show/Hide hidden
+// TODO Show/Hide hidden: in Controller 2 arrays:
+// * original items, 
+// * filtered and sorted item[]
 // TODO Sorting
 // TODO restriction
 // TODO hidden items (files and not mounted
