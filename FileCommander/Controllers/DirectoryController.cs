@@ -10,11 +10,6 @@ namespace FileCommander.Controllers;
 
 class DirectoryController : Controller
 {
-    public DirectoryController(string path)
-    {
-        this.path = path;
-    }
-
     public override Column[] GetColumns()
         => [
             new("Name"),
@@ -23,10 +18,9 @@ class DirectoryController : Controller
             new("Version")
         ];
 
-    public override (Item[], string) GetItems(string path)
+    public override (Item[], string, int) GetItems(string path)
     {
         var dirInfo = new DirectoryInfo(path);
-        path = dirInfo.FullName;
         var dirItems = dirInfo
             .GetDirectories()
             .Select(DirectoryItem.Create)
@@ -36,10 +30,10 @@ class DirectoryController : Controller
             .GetFiles()
             .Select(FileItem.Create)
             .ToArray();
-        var pos = fromPath != null ? dirItems.TakeWhile(n => n.Name != fromPath).Count() + 1 : 0;
-        fromPath = null;
-        this.path = path;
+        var fromPath = dirInfo.FullName.Length < this.path.Length ? this.path[dirInfo.FullName.Length..].Trim('\\') : null;
+        this.path = dirInfo.FullName; 
         items = [new ParentItem(), .. dirItems, .. fileItems];
+        var oldPos = fromPath != null ? items.TakeWhile(n => n.Name != fromPath).Count() : 0;
         return (items
             .Select((n, idx) =>
                 n switch
@@ -49,7 +43,7 @@ class DirectoryController : Controller
                     FileItem f => new Item(idx, f.Name, n.GetIcon(path), [f.DateTime.ToString("g"), f.Size.FormatSize()]),
                     _ => throw new Exception("Unknown ItemBase")
                 })
-            .ToArray(), path);
+            .ToArray(), path, oldPos);
     }
 
     public override (Controller Controller, Column[]? Columns, string Path, string OldPath) CheckPath(int pos)
@@ -79,8 +73,7 @@ class DirectoryController : Controller
     ItemBase[] items = null!;
     ItemBase[] ViewItems = null!;
 
-    string? fromPath = null;
-    string path;
+    string path = "";
 }
 
 

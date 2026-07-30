@@ -1,5 +1,3 @@
-using CommunityToolkit.WinUI.Controls;
-
 using CsTools;
 using CsTools.Extensions;
 
@@ -7,7 +5,6 @@ using FileCommander.Contexts;
 using FileCommander.Controllers;
 using FileCommander.Data;
 using FileCommander.Icon;
-using FileCommander.Obsoletes;
 
 using Microsoft.UI.Xaml;
 using Microsoft.UI.Xaml.Controls;
@@ -20,7 +17,6 @@ using System.Text.Json;
 
 namespace FileCommander.Controls;
 
-// TODO goto parent: set previous
 // TODO Show/Hide hidden: in Controller 2 arrays:
 // filtered and sorted item[]
 
@@ -30,9 +26,9 @@ namespace FileCommander.Controls;
 // hidden changed -> send event -> request -> (path and) items
 // sort changed -> (path and) items
 
+// TODO hidden items (files and not mounted
 // TODO Sorting
 // TODO restriction
-// TODO hidden items (files and not mounted
 // TODO exif date and version
 // TODO File SystemWatcher with directories
 // TODO Tab control shift tab -> path edit
@@ -101,7 +97,7 @@ public sealed partial class VirtualTable : UserControl
             case "init":
             {
                 var columns = controller.GetColumns();
-                (var items, _) = controller.GetItems("");
+                (var items, _, _) = controller.GetItems("");
                 var itemsResult = new ItemsResult(columns, items, 0);
                 SendResult(args, itemsResult);
                 break;
@@ -131,7 +127,7 @@ public sealed partial class VirtualTable : UserControl
                     {
                         (controller, var cols, var newPath, var oldPath) = controller.CheckPath(pos);
                         var res = controller.GetItems(newPath);
-                        var itemsResult = new ItemsResult(cols, res.Items, 0); // res.Path);
+                        var itemsResult = new ItemsResult(cols, res.Items, res.oldPos);
                         SendResult(args, new ProcessResult(ItemsResult: itemsResult));
                     }
                 }

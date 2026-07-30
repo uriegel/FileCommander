@@ -16,7 +16,7 @@ abstract class Controller
         //return DirectoryController.Get(id, current, view, context);
     }
     public abstract Column[] GetColumns();
-    public abstract (Item[] Items, string Path) GetItems(string path);
+    public abstract (Item[] Items, string Path, int oldPos) GetItems(string path);
     public abstract (Controller Controller, Column[]? Columns, string Path, string OldPath) CheckPath(int pos);
     public virtual bool Process(int pos) => false;
 }

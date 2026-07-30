@@ -27,7 +27,7 @@ class RootController : Controller
             new("Größe")
         ];
 
-    public override (Item[] Items, string Path) GetItems(string path)
+    public override (Item[] Items, string Path, int oldPos) GetItems(string path)
     {
         items =
            [.. DriveInfo
@@ -38,12 +38,12 @@ class RootController : Controller
         return ([.. items.Select((n, idx) => new Item(idx, n.Name, n.GetIcon(), [
             n.Description,
             n.Size.FormatSize()
-          ], !n.IsMounted))], Name);
+          ], !n.IsMounted))], Name, 0);
     }
 
     public override (Controller Controller, Column[]? Columns, string Path, string OldPath) CheckPath(int pos)
     {
-        var controller = new DirectoryController("");
+        var controller = new DirectoryController();
         var columns = controller.GetColumns();
         return (controller, columns, items[pos].Name, Name);
     }
