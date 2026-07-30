@@ -20,9 +20,9 @@ using System.Text.Json;
 
 namespace FileCommander.Controls;
 
+// TODO goto parent: set previous
 // TODO Show/Hide hidden: in Controller 2 arrays:
-// * original items, viewArray, both consisting of ItemType enum in Directory (Parent/Dir/File), but not to javacscript
-// * filtered and sorted item[]
+// filtered and sorted item[]
 
 // Init-> path and items
 // path changed -> send event -> request -> path and items

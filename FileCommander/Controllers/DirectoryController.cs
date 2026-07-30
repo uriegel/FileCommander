@@ -27,27 +27,35 @@ class DirectoryController : Controller
     {
         var dirInfo = new DirectoryInfo(path);
         path = dirInfo.FullName;
-        dirItems = [.. dirInfo
+        var dirItems = dirInfo
             .GetDirectories()
             .Select(DirectoryItem.Create)
-            .OrderBy(n => n.Name)];
-        fileItems = [.. dirInfo
+            .OrderBy(n => n.Name)
+            .ToArray();
+        var fileItems = dirInfo
             .GetFiles()
-            .Select(FileItem.Create)];
+            .Select(FileItem.Create)
+            .ToArray();
         var pos = fromPath != null ? dirItems.TakeWhile(n => n.Name != fromPath).Count() + 1 : 0;
         fromPath = null;
         this.path = path;
-        return ([
-             new Item(0, "..", "iconFromRes/GoUp", []),
-            ..dirItems.Select((n, idx) => new Item(idx + 1, n.Name, n.GetIcon(), [ n.DateTime.ToString("g") ])),
-            ..fileItems.Select((n, idx) => new Item(idx + dirItems.Length + 1, n.Name, n.GetIcon(path), [ n.DateTime.ToString("g"), n.Size.FormatSize() ]))
-        ], path);
+        items = [new ParentItem(), .. dirItems, .. fileItems];
+        return (items
+            .Select((n, idx) =>
+                n switch
+                {
+                    ParentItem p => new Item(idx, p.Name, n.GetIcon(path), []),
+                    DirectoryItem d => new Item(idx, d.Name, n.GetIcon(path), [d.DateTime.ToString("g")]),
+                    FileItem f => new Item(idx, f.Name, n.GetIcon(path), [f.DateTime.ToString("g"), f.Size.FormatSize()]),
+                    _ => throw new Exception("Unknown ItemBase")
+                })
+            .ToArray(), path);
     }
 
     public override (Controller Controller, Column[]? Columns, string Path, string OldPath) CheckPath(int pos)
     {
         return pos != 0
-            ? (this, null, path.AppendPath(dirItems[pos - 1].Name), "")
+            ? (this, null, path.AppendPath(items[pos].Name), "")
             : new DirectoryInfo(path).Parent?.FullName is string newPath
             ? (this, null, newPath, path)
             : NewRootController(); 
@@ -61,49 +69,38 @@ class DirectoryController : Controller
 
     public override bool Process(int pos)
     {
-        //if (pos == 0)
-        //{
-        //    var info = new DirectoryInfo(path);
-        //    if (info.Parent?.FullName is string p)
-        //    {
-        //        path = p;
-        //        fromPath = info.Name;
-        //        return new(NewItems: true);
-        //    }
-        //    else
-        //        return new(NewController: new RootController(null));
-        //}
-        if (pos > dirItems.Length)
+        if (pos >= items.TakeWhile(n => n is not FileItem).Count())
             // TODO process item
             return true;
-        //{
-        //    
-        //    return new(NewItems: true);
         else        
             return false;
     }
 
-    DirectoryItem[] dirItems = null!;
-    FileItem[] fileItems = null!;
+    ItemBase[] items = null!;
+    ItemBase[] ViewItems = null!;
 
     string? fromPath = null;
     string path;
 }
 
-record DirectoryItem(string Name, DateTime DateTime)
-{
-    public static DirectoryItem Create(DirectoryInfo info)
-        => new(info.Name, info.LastWriteTime);
 
-    public string GetIcon() => "iconFromRes/Folder";
+abstract record ItemBase(string Name)
+{
+    public abstract string GetIcon(string path);
 }
-
-record FileItem(string Name, DateTime DateTime, long Size)
+record ParentItem(string Name = "..") : ItemBase(Name)
 {
-    public static FileItem Create(FileInfo info)
-        => new(info.Name, info.LastWriteTime, info.Length);
-
-    public string GetIcon(string path)
+    public override string GetIcon(string path) => "iconFromRes/GoUp";
+}
+record DirectoryItem(string Name, DateTime DateTime) : ItemBase(Name)
+{
+    public static DirectoryItem Create(DirectoryInfo info) => new(info.Name, info.LastWriteTime);
+    public override string GetIcon(string path) => "iconFromRes/Folder";
+}
+record FileItem(string Name, DateTime DateTime, long Size) : ItemBase(Name)
+{
+    public static FileItem Create(FileInfo info) => new(info.Name, info.LastWriteTime, info.Length);
+    public override string GetIcon(string path)
         => $"icon/{(Name.EndsWith(".exe", StringComparison.OrdinalIgnoreCase) ? path.AppendPath(Name) : Name.GetFileExtension())}";
 }
 
