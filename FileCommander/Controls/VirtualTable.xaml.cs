@@ -7,6 +7,7 @@ using FileCommander.Contexts;
 using FileCommander.Controllers;
 using FileCommander.Data;
 using FileCommander.Icon;
+using FileCommander.Obsoletes;
 
 using Microsoft.UI.Xaml;
 using Microsoft.UI.Xaml.Controls;
@@ -20,8 +21,15 @@ using System.Text.Json;
 namespace FileCommander.Controls;
 
 // TODO Show/Hide hidden: in Controller 2 arrays:
-// * original items, 
+// * original items, viewArray, both consisting of ItemType enum in Directory (Parent/Dir/File), but not to javacscript
 // * filtered and sorted item[]
+
+// Init-> path and items
+// path changed -> send event -> request -> path and items
+// onProcess -> path and items
+// hidden changed -> send event -> request -> (path and) items
+// sort changed -> (path and) items
+
 // TODO Sorting
 // TODO restriction
 // TODO hidden items (files and not mounted
@@ -90,28 +98,16 @@ public sealed partial class VirtualTable : UserControl
     {
         switch (path)
         {
-            case "getItems":
+            case "init":
             {
-                var items = controller.GetItems();
-                var ms = new MemoryStream();
-                JsonSerializer.Serialize(ms, items, Json.Defaults);
-                args.Response =
-                    WebView.CoreWebView2.Environment.CreateWebResourceResponse(
-                        ms.AsRandomAccessStream(),
-                        200,
-                        "OK",
-                        "Content-Type: application/json");
+                var columns = controller.GetColumns();
+                (var items, _) = controller.GetItems("");
+                var itemsResult = new ItemsResult(columns, items, 0);
+                SendResult(args, itemsResult);
                 break;
             }
             case "tab":
                 OnTab?.Invoke();
-                break;
-            case "init":
-                // TODO retrieve last path from storage
-                controller = Controller.GetFromPath(null, null);
-                var columns = controller.GetColumns();
-                SendEvent(new(new ColumnsChanged(columns)));
-                args.Response = WebView.CoreWebView2.Environment.CreateWebResourceResponse(null, 200, "OK", null);
                 break;
             case "TODO":
                 var deferral = args.GetDeferral();
@@ -129,20 +125,15 @@ public sealed partial class VirtualTable : UserControl
                 if (path.StartsWith("process"))
                 {
                     var pos = int.Parse(path[8..]);
-                    var res = controller.OnProcess(pos);
-                    if (res.NewController != null)
+                    if (controller.Process(pos))
+                        SendResult(args, new ProcessResult());
+                    else
                     {
-                        this.controller = res.NewController;
-                        SendEvent(new(new ColumnsChanged(controller.GetColumns())));
+                        (controller, var cols, var newPath, var oldPath) = controller.CheckPath(pos);
+                        var res = controller.GetItems(newPath);
+                        var itemsResult = new ItemsResult(cols, res.Items, 0); // res.Path);
+                        SendResult(args, new ProcessResult(ItemsResult: itemsResult));
                     }
-                    var ms = new MemoryStream();
-                    JsonSerializer.Serialize(ms, res, Json.Defaults);
-                    args.Response =
-                        WebView.CoreWebView2.Environment.CreateWebResourceResponse(
-                            ms.AsRandomAccessStream(),
-                            200,
-                            "OK",
-                            "Content-Type: application/json");
                 }
                 else if (path.StartsWith("command"))
                 {
@@ -179,8 +170,17 @@ public sealed partial class VirtualTable : UserControl
                     "Content-Type: image/png");
     }
 
+    void SendResult<T>(CoreWebView2WebResourceRequestedEventArgs args, T t)
+    {
+        var ms = new MemoryStream();
+        JsonSerializer.Serialize(ms, t, Json.Defaults);
+        args.Response = WebView.CoreWebView2.Environment.CreateWebResourceResponse(ms.AsRandomAccessStream(),
+            200, "OK", "Content-Type: application/json");
+    }
+
     void SendEvent(Event evt)
         => WebView.CoreWebView2.PostWebMessageAsJson(JsonSerializer.Serialize(evt, Json.Defaults));
 
-    Controller controller = null!;
+    // TODO retrieve last path from storage
+    Controller controller = Controller.GetFromPath(null, null);
 }

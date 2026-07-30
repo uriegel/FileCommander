@@ -2,7 +2,10 @@
 
 record Item(int Index, string Text, string Icon, string[] Values, bool Hidden = false);
 
-record ItemResult(Item[] Items, int Pos);
+record ItemsResult(
+    Column[]? Columns,
+    Item[] Items, 
+    int Pos);
 
 static class ItemExtensions
 {

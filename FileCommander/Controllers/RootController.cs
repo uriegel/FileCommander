@@ -1,4 +1,6 @@
-﻿using FileCommander.Data;
+﻿using CsTools;
+
+using FileCommander.Data;
 
 using System.IO;
 using System.Linq;
@@ -7,14 +9,16 @@ namespace FileCommander.Controllers;
 
 class RootController : Controller
 {
-    public const string Name = "root";
+    public static string NAME { get => "root"; }
+    
+    public string Name { get; } = NAME;
 
     public static RootController Get(Controller? current)
         => current is RootController rootController
             ? rootController
-            : new RootController(current);
+            : new RootController();
 
-    public RootController(Controller? previous) { }
+    public RootController() { }
 
     public override Column[] GetColumns()
         => [
@@ -23,7 +27,7 @@ class RootController : Controller
             new("Größe")
         ];
 
-    public override ItemResult GetItems()
+    public override (Item[] Items, string Path) GetItems(string path)
     {
         items =
            [.. DriveInfo
@@ -31,17 +35,18 @@ class RootController : Controller
                .Select(RootItem.Create)
                .OrderByDescending(n => n.IsMounted)
                .ThenBy(n => n.Name)];
-        return new([.. items.Select((n, idx) => new Item(idx, n.Name, n.GetIcon(), [
+        return ([.. items.Select((n, idx) => new Item(idx, n.Name, n.GetIcon(), [
             n.Description,
             n.Size.FormatSize()
-          ], !n.IsMounted))], 0);
+          ], !n.IsMounted))], Name);
     }
 
-    public override OnProcessResult OnProcess(int pos)
+    public override (Controller Controller, Column[]? Columns, string Path, string OldPath) CheckPath(int pos)
     {
-        return new(NewController: new DirectoryController(items[pos].Name));
+        var controller = new DirectoryController("");
+        var columns = controller.GetColumns();
+        return (controller, columns, items[pos].Name, Name);
     }
-
     RootItem[] items = [];
 }
 

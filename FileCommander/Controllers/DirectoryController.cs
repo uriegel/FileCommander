@@ -23,7 +23,7 @@ class DirectoryController : Controller
             new("Version")
         ];
 
-    public override ItemResult GetItems()
+    public override (Item[], string) GetItems(string path)
     {
         var dirInfo = new DirectoryInfo(path);
         path = dirInfo.FullName;
@@ -36,33 +36,51 @@ class DirectoryController : Controller
             .Select(FileItem.Create)];
         var pos = fromPath != null ? dirItems.TakeWhile(n => n.Name != fromPath).Count() + 1 : 0;
         fromPath = null;
-        return new([
+        this.path = path;
+        return ([
              new Item(0, "..", "iconFromRes/GoUp", []),
             ..dirItems.Select((n, idx) => new Item(idx + 1, n.Name, n.GetIcon(), [ n.DateTime.ToString("g") ])),
             ..fileItems.Select((n, idx) => new Item(idx + dirItems.Length + 1, n.Name, n.GetIcon(path), [ n.DateTime.ToString("g"), n.Size.FormatSize() ]))
-        ], pos);
+        ], path);
     }
 
-    public override OnProcessResult OnProcess(int pos)
+    public override (Controller Controller, Column[]? Columns, string Path, string OldPath) CheckPath(int pos)
     {
-        if (pos == 0)
+        return pos != 0
+            ? (this, null, path.AppendPath(dirItems[pos - 1].Name), "")
+            : new DirectoryInfo(path).Parent?.FullName is string newPath
+            ? (this, null, newPath, path)
+            : NewRootController(); 
+
+        (Controller, Column[]?, string, string) NewRootController()
         {
-            var info = new DirectoryInfo(path);
-            if (info.Parent?.FullName is string p)
-            {
-                path = p;
-                fromPath = info.Name;
-                return new(NewItems: true);
-            }
-            else
-                return new(NewController: new RootController(null));
+            var controller = new RootController();
+            return (controller, controller.GetColumns(), "", path);
         }
-        else if (pos < dirItems.Length + 1)
-        {
-            path = path.AppendPath(dirItems[pos-1].Name);
-            return new(NewItems: true);
-        }
-        return new OnProcessResult();
+    }
+
+    public override bool Process(int pos)
+    {
+        //if (pos == 0)
+        //{
+        //    var info = new DirectoryInfo(path);
+        //    if (info.Parent?.FullName is string p)
+        //    {
+        //        path = p;
+        //        fromPath = info.Name;
+        //        return new(NewItems: true);
+        //    }
+        //    else
+        //        return new(NewController: new RootController(null));
+        //}
+        if (pos > dirItems.Length)
+            // TODO process item
+            return true;
+        //{
+        //    
+        //    return new(NewItems: true);
+        else        
+            return false;
     }
 
     DirectoryItem[] dirItems = null!;

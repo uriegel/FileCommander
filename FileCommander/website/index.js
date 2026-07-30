@@ -35,14 +35,15 @@ tableView.addEventListener("render-rowitem", evt => {
 tableView.addEventListener("process-selected", async evt => {
     const response = await fetch(`request/process/${evt.detail.pos}`)
     const res = await response.json()
-    if (res.newItems) {
-        const getItems = async () => {
-            const response = await fetch("request/getItems")
-            const items = await response.json()
-            tableView.setItems(items.items)
-            tableView.setPosition(items.pos)
+    if (res.itemsResult) {
+        if (res.itemsResult.columns) {
+            // TODO code replic
+            const cols = res.itemsResult.columns.map(n => n.name)
+            columnCount = cols.length
+            tableView.setColumns(cols)
         }
-        getItems()
+        tableView.setItems(res.itemsResult.items)
+        tableView.setPosition(res.itemsResult.pos)
     }
 })
 
@@ -82,6 +83,14 @@ function onEvent(evt) {
 async function init() {
     window.chrome.webview.addEventListener('message', event => onEvent(event.data))
     const response = await fetch("request/init")
+    const itemsResult = await response.json()
+    if (itemsResult.columns) {
+        const cols = itemsResult.columns.map(n => n.name)
+        columnCount = cols.length
+        tableView.setColumns(cols)
+    }
+    tableView.setItems(itemsResult.items)
+    tableView.setPosition(itemsResult.pos)
 }
 
 
