@@ -17,8 +17,9 @@ using System.Text.Json;
 
 namespace FileCommander.Controls;
 
-// TODO Show/Hide hidden: in Controller 2 arrays:
-// filtered and sorted item[]
+// TODO hidden items (files and not mounted
+// TODO Sorting
+// TODO restriction
 
 // Init-> path and items
 // path changed -> send event -> request -> path and items
@@ -26,9 +27,6 @@ namespace FileCommander.Controls;
 // hidden changed -> send event -> request -> (path and) items
 // sort changed -> (path and) items
 
-// TODO hidden items (files and not mounted
-// TODO Sorting
-// TODO restriction
 // TODO exif date and version
 // TODO File SystemWatcher with directories
 // TODO Tab control shift tab -> path edit
