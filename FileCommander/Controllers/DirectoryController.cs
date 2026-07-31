@@ -3,8 +3,6 @@
 using FileCommander.Contexts;
 using FileCommander.Data;
 
-using Microsoft.UI.Xaml.Shapes;
-
 using System;
 using System.IO;
 using System.Linq;
@@ -66,8 +64,10 @@ class DirectoryController : Controller
 
     public override (Item[] Items, int newPos) Refresh(int pos)
     {
+        var recentItem = viewItems[pos].Name;
         (viewItems, _) = MapViewItems(null);
-        return (MapItems(), 0);
+        var newPos = viewItems.TakeWhile(n => n.Name != recentItem).Count();
+        return (MapItems(), newPos < viewItems.Length ? newPos : 0);
     }
 
     (ItemBase[], int) MapViewItems(string? fromPath)
@@ -85,8 +85,8 @@ class DirectoryController : Controller
                 n switch
                 {
                     ParentItem p => new Item(p.Name, n.GetIcon(path), []),
-                    DirectoryItem d => new Item(d.Name, n.GetIcon(path), [d.DateTime.ToString("g")]),
-                    FileItem f => new Item(f.Name, n.GetIcon(path), [f.DateTime.ToString("g"), f.Size.FormatSize()]),
+                    DirectoryItem d => new Item(d.Name, n.GetIcon(path), [d.DateTime.ToString("g")], d.IsHidden),
+                    FileItem f => new Item(f.Name, n.GetIcon(path), [f.DateTime.ToString("g"), f.Size.FormatSize()], f.IsHidden),
                     _ => throw new Exception("Unknown ItemBase")
                 })];
 

@@ -17,19 +17,13 @@ using System.Text.Json;
 
 namespace FileCommander.Controls;
 
-// TODO in TableView: GetPosition
-// TODO in TableView: Styling from outside
-// TODO ShowHidden: consider selected item 
-
-// TODO hidden items (files and not mounted) styling
 // TODO Sorting
 // TODO restriction
 
 // TODO request/reload
-// TODO request/refresh
 
 // OK Init-> path and items
-// path changed -> send event -> request reload -> path and items (reload)
+// Ok path changed -> send event -> request reload -> path and items (reload)
 // OK onProcess -> path and items
 // OK hidden changed -> send event -> request no relaod, just mapping -> (path and) items (refresh)
 // sort changed -> (path and) items

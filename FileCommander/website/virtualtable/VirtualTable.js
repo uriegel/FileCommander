@@ -1,9 +1,12 @@
 import './Scrollbar.js'
 
-// TODO set columns: remove old columns, reset scrollbar
-// TODO set columns: sorting items by sort function
-// TODO set items: remove old items, reset scrollbar
-// TODO css style for item row from css: call method to transfer it o the shadow dom
+// TODO GetPosition
+// TODO Columns: right aligned
+// TODO Columns: adapt cols
+// TODO columns: sorting items by sort function
+// TODO columns: custom rendering for sub sorting
+// TODO css style for item row from css: call method to transfer it to the shadow dom
+
 // TODO scrollbar hidden: transition
 // TODO scrollbar active transition
 
@@ -208,6 +211,20 @@ export class VirtualTable extends HTMLElement {
         this.currentPosition = newPos
     }
 
+    getPosition() {
+        return this.currentPosition
+    }
+
+    async setStylesheet(cssUrl) {
+        const res = await fetch(cssUrl)
+        const cssText = await res.text()
+        // Create style element
+        const style = document.createElement('style')
+        style.textContent = cssText
+        // Append style to shadow root
+        this.shadow.append(style)
+    }
+
     measure() {
         var tr = this.createRowItem()
         this.measureRowItem(tr)
@@ -351,7 +368,9 @@ export class VirtualTable extends HTMLElement {
     }
 
     onMouseDown(evt) {
-        const index = Math.floor((evt.layerY - this.tableHead.clientHeight) / this.itemHeight)
+        const rect = this.table.getBoundingClientRect()
+        const y = evt.clientY - rect.top
+        const index = Math.floor((y - this.tableHead.clientHeight) / this.itemHeight)
         const elements = Array.from(this.tableBody.children)
         let element = elements[this.currentPosition - this.offset]
         if (element)

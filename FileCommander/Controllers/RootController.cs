@@ -37,7 +37,7 @@ class RootController : Controller
                .ThenBy(n => n.Name)];
         return ([.. items.Select(n => new Item(n.Name, n.GetIcon(), [
             n.Description,
-            n.Size.FormatSize()
+            n.Size.FormatSize().EmptyWhen0()
           ], !n.IsMounted))], Name, 0);
     }
 
@@ -68,3 +68,7 @@ record RootItem(string Name, string Description, long Size, bool IsMounted, bool
             : "Drive");
 }
 
+static class ItemExtensions2
+{
+    public static string EmptyWhen0(this string value) => value == "0" ? "" : value;
+}

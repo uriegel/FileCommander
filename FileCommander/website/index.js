@@ -4,6 +4,7 @@ let columnCount = 0
 
 const tableView = document.getElementById("virtual-table")
 const fill = document.getElementById("fill")
+tableView.setStylesheet("styles/tableview.css")
 
 tableView.addEventListener("create-rowitem", evt => {
     const template = document.getElementById('item')
@@ -22,6 +23,10 @@ tableView.addEventListener("measure-rowitem", evt => {
 })
 tableView.addEventListener("render-rowitem", evt => {
     const tr = evt.detail.tr
+    if (evt.detail.item.hidden)
+        tr.classList.add("isHidden")
+    else
+        tr.classList.remove("isHidden")
     const img = tr.querySelector('#img')
     img.src = evt.detail.item.icon
     const sp = tr.querySelector('#text')
@@ -67,7 +72,7 @@ init()
 async function onEvent(evt) {
     console.log("Event", evt)
     if (evt.refresh) {
-        const response = await fetch(`request/refresh/${0}`)
+        const response = await fetch(`request/refresh/${tableView.getPosition()}`)
         const res = await response.json()
         if (res.itemsResult) {
             tableView.setItems(res.itemsResult.items)

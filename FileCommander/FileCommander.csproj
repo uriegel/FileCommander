@@ -28,6 +28,7 @@
 		<None Remove="Resources\QuestionMark.ico" />
 		<None Remove="Resources\Warning.ico" />
 		<None Remove="Resources\WindowsDrive.ico" />
+		<None Remove="website\styles\tableview.css" />
 	</ItemGroup>
 
     <ItemGroup>
@@ -89,7 +90,6 @@
     </Page>
   </ItemGroup>
   <ItemGroup>
-    <Folder Include="website\" />
     <Folder Include="Views\" />
   </ItemGroup>
   <ItemGroup>
