@@ -24,7 +24,7 @@ class RootController : Controller
         => [
             new("Name"),
             new("Bezeichnung"),
-            new("Größe")
+            new("Größe", true)
         ];
 
     public override (Item[] Items, string Path, int oldPos) GetItems(string path)

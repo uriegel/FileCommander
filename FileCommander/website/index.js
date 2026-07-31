@@ -43,7 +43,7 @@ tableView.addEventListener("process-selected", async evt => {
     if (res.itemsResult) {
         if (res.itemsResult.columns) {
             // TODO code replic
-            const cols = res.itemsResult.columns.map(n => n.name)
+            const cols = res.itemsResult.columns
             columnCount = cols.length
             tableView.setColumns(cols)
         }
@@ -86,7 +86,7 @@ async function init() {
     const response = await fetch("request/init")
     const itemsResult = await response.json()
     if (itemsResult.columns) {
-        const cols = itemsResult.columns.map(n => n.name)
+        const cols = itemsResult.columns
         columnCount = cols.length
         tableView.setColumns(cols)
     }

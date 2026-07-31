@@ -15,7 +15,7 @@ class DirectoryController : Controller
         => [
             new("Name"),
             new("Datum"),
-            new("Größe"),
+            new("Größe", true),
             new("Version")
         ];
 

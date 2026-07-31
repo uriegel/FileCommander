@@ -1,3 +1,3 @@
 ﻿namespace FileCommander.Data;
 
-record Column(string Name);
+record Column(string Text, bool? IsRightAligned = null);
