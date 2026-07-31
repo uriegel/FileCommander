@@ -17,6 +17,7 @@ abstract class Controller
     }
     public abstract Column[] GetColumns();
     public abstract (Item[] Items, string Path, int oldPos) GetItems(string path);
+    public virtual (Item[]? Items, int newPos) Refresh(int pos) => (null, 0);
     public abstract (Controller Controller, Column[]? Columns, string Path, string OldPath) CheckPath(int pos);
     public virtual bool Process(int pos) => false;
 }

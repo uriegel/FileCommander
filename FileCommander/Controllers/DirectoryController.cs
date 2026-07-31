@@ -36,15 +36,8 @@ class DirectoryController : Controller
         var fromPath = dirInfo.FullName.Length < this.path.Length ? this.path[dirInfo.FullName.Length..].Trim('\\') : null;
         this.path = dirInfo.FullName; 
         items = [new ParentItem(), .. dirItems, .. fileItems];
-        (viewItems, var oldPos) = MapItems(fromPath);
-        return (viewItems.Select((n, idx) =>
-                n switch
-                {
-                    ParentItem p => new Item(idx, p.Name, n.GetIcon(path), []),
-                    DirectoryItem d => new Item(idx, d.Name, n.GetIcon(path), [d.DateTime.ToString("g")]),
-                    FileItem f => new Item(idx, f.Name, n.GetIcon(path), [f.DateTime.ToString("g"), f.Size.FormatSize()]),
-                    _ => throw new Exception("Unknown ItemBase")
-                }).ToArray(), path, oldPos);  
+        (viewItems, var oldPos) = MapViewItems(fromPath);
+        return (MapItems(), path, oldPos);  
     }
 
     public override (Controller Controller, Column[]? Columns, string Path, string OldPath) CheckPath(int pos)
@@ -71,7 +64,13 @@ class DirectoryController : Controller
             return false;
     }
 
-    (ItemBase[], int) MapItems(string? fromPath)
+    public override (Item[] Items, int newPos) Refresh(int pos)
+    {
+        (viewItems, _) = MapViewItems(null);
+        return (MapItems(), 0);
+    }
+
+    (ItemBase[], int) MapViewItems(string? fromPath)
     {
         var filtered = items
             .Where(n => MainContext.Instance.ShowHidden || !n.IsHidden)
@@ -79,6 +78,18 @@ class DirectoryController : Controller
         var oldPos = fromPath != null ? filtered.TakeWhile(n => n.Name != fromPath).Count() : 0;
         return (filtered, oldPos);
     }
+
+    Item[] MapItems()
+        => [.. viewItems.Select(n =>
+
+                n switch
+                {
+                    ParentItem p => new Item(p.Name, n.GetIcon(path), []),
+                    DirectoryItem d => new Item(d.Name, n.GetIcon(path), [d.DateTime.ToString("g")]),
+                    FileItem f => new Item(f.Name, n.GetIcon(path), [f.DateTime.ToString("g"), f.Size.FormatSize()]),
+                    _ => throw new Exception("Unknown ItemBase")
+                })];
+
 
     ItemBase[] items = null!;
     ItemBase[] viewItems = null!;

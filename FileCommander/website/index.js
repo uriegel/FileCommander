@@ -64,19 +64,15 @@ document.addEventListener("keydown", evt => onKeyDown(evt))
 
 init()
 
-function onEvent(evt) {
+async function onEvent(evt) {
     console.log("Event", evt)
-    if (evt.columnsChanged) {
-        const cols = evt.columnsChanged.columns.map(n => n.name)
-        columnCount = cols.length
-        tableView.setColumns(cols)
-        const getItems = async () => {
-            const response = await fetch("request/getItems")
-            const items = await response.json()
-            tableView.setItems(items.items)
-            tableView.setPosition(items.pos)
+    if (evt.refresh) {
+        const response = await fetch(`request/refresh/${0}`)
+        const res = await response.json()
+        if (res.itemsResult) {
+            tableView.setItems(res.itemsResult.items)
+            tableView.setPosition(res.itemsResult.pos)
         }
-        getItems()
     }
 }
 

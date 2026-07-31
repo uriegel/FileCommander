@@ -1,9 +1,8 @@
 ﻿namespace FileCommander.Data;
 
 record Event(
-    ColumnsChanged? ColumnsChanged = null
+    Refresh? Refresh = null
 );
 
-record ColumnsChanged(Column[]? Columns = null);
+record Refresh();
 
-record Column(string Name);

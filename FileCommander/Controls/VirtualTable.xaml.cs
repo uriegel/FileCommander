@@ -17,15 +17,23 @@ using System.Text.Json;
 
 namespace FileCommander.Controls;
 
-// TODO hidden items (files and not mounted
+// TODO in TableView: GetPosition
+// TODO in TableView: Styling from outside
+// TODO ShowHidden: consider selected item 
+
+// TODO hidden items (files and not mounted) styling
 // TODO Sorting
 // TODO restriction
 
-// Init-> path and items
-// path changed -> send event -> request -> path and items
-// onProcess -> path and items
-// hidden changed -> send event -> request -> (path and) items
+// TODO request/reload
+// TODO request/refresh
+
+// OK Init-> path and items
+// path changed -> send event -> request reload -> path and items (reload)
+// OK onProcess -> path and items
+// OK hidden changed -> send event -> request no relaod, just mapping -> (path and) items (refresh)
 // sort changed -> (path and) items
+// Refresh in menu -> send event -> reload
 
 // TODO exif date and version
 // TODO File SystemWatcher with directories
@@ -49,6 +57,7 @@ public sealed partial class VirtualTable : UserControl
         WebView.CoreWebView2.AddWebResourceRequestedFilter("https:*", CoreWebView2WebResourceContext.All);
         WebView.CoreWebView2.WebResourceRequested += CoreWebView2_WebResourceRequested; ;
         WebView.Source = new Uri("https://localhost/index.html");
+        MainContext.Instance.PropertyChanged += MainContext_PropertyChanged;
     }
 
     void CoreWebView2_WebResourceRequested(CoreWebView2 sender, CoreWebView2WebResourceRequestedEventArgs args)
@@ -88,6 +97,16 @@ public sealed partial class VirtualTable : UserControl
         }
     }
 
+    void MainContext_PropertyChanged(object? sender, System.ComponentModel.PropertyChangedEventArgs e)
+    {
+        switch (e.PropertyName)
+        {
+            case nameof(MainContext.ShowHidden):
+                SendEvent(new(Refresh: new()));
+                break;
+        }
+    }
+
     async void ServeRequest(string path, CoreWebView2WebResourceRequestedEventArgs args)
     {
         switch (path)
@@ -116,30 +135,38 @@ public sealed partial class VirtualTable : UserControl
                 break;
             default:
             {
-                if (path.StartsWith("process"))
-                {
-                    var pos = int.Parse(path[8..]);
-                    if (controller.Process(pos))
-                        SendResult(args, new ProcessResult());
-                    else
+                    if (path.StartsWith("process"))
                     {
-                        (controller, var cols, var newPath, var oldPath) = controller.CheckPath(pos);
-                        var res = controller.GetItems(newPath);
-                        var itemsResult = new ItemsResult(cols, res.Items, res.oldPos);
+                        var pos = int.Parse(path[8..]);
+                        if (controller.Process(pos))
+                            SendResult(args, new ProcessResult());
+                        else
+                        {
+                            (controller, var cols, var newPath, var oldPath) = controller.CheckPath(pos);
+                            var res = controller.GetItems(newPath);
+                            var itemsResult = new ItemsResult(cols, res.Items, res.oldPos);
+                            SendResult(args, new ProcessResult(ItemsResult: itemsResult));
+                        }
+                    }
+                    else if (path.StartsWith("refresh"))
+                    {
+                        var pos = int.Parse(path[8..]);
+                        var (items, newPos) = controller.Refresh(pos);
+                        var itemsResult = items != null ? new ItemsResult(null, items, newPos) : null;
                         SendResult(args, new ProcessResult(ItemsResult: itemsResult));
                     }
-                }
-                else if (path.StartsWith("command"))
-                {
-                    var cmd = path[8..];
-                    switch (cmd)
+                    else if (path.StartsWith("command"))
                     {
-                        case "toggleHidden":
-                            MainContext.Instance.ShowHidden = !MainContext.Instance.ShowHidden;
-                            MainContext.Instance.ShowHiddenCommand.Execute(null);
-                            break;
+                        var cmd = path[8..];
+                        switch (cmd)
+                        {
+                            case "toggleHidden":
+                                MainContext.Instance.ShowHidden = !MainContext.Instance.ShowHidden;
+                                MainContext.Instance.ShowHiddenCommand.Execute(null);
+                                SendResult(args, new ProcessResult());
+                                break;
+                        }
                     }
-                }
                 break;
             }
         }

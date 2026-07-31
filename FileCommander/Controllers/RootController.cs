@@ -35,7 +35,7 @@ class RootController : Controller
                .Select(RootItem.Create)
                .OrderByDescending(n => n.IsMounted)
                .ThenBy(n => n.Name)];
-        return ([.. items.Select((n, idx) => new Item(idx, n.Name, n.GetIcon(), [
+        return ([.. items.Select(n => new Item(n.Name, n.GetIcon(), [
             n.Description,
             n.Size.FormatSize()
           ], !n.IsMounted))], Name, 0);
@@ -47,6 +47,7 @@ class RootController : Controller
         var columns = controller.GetColumns();
         return (controller, columns, items[pos].Name, Name);
     }
+
     RootItem[] items = [];
 }
 
