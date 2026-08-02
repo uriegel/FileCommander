@@ -1,13 +1,12 @@
 import './Scrollbar.js'
-
-// TODO Columns: adapt cols
-// TODO columns: sorting items by sort function
-// TODO columns: custom rendering for sub sorting
+import { ColumnsHeader } from "./ColumnsHeader.js"
 
 // TODO scrollbar hidden: transition
 // TODO scrollbar active transition
-// TODO scrollbar active margin right 
-
+// TODO scrollbar active margin right transition
+// TODO Columns: initial column widths (always set to prevent jumps when adapting columns frist time)
+// TODO Styling with color filters
+// TODO Styling columns
 
 export class VirtualTable extends HTMLElement {
     #offset = 0
@@ -18,7 +17,6 @@ export class VirtualTable extends HTMLElement {
         this.currentPosition = 0
         this.visualItemsCount = 0
         this.items = []
-        this.columns = []
 
         const style = document.createElement("style")
         document.head.appendChild(style)
@@ -47,9 +45,9 @@ export class VirtualTable extends HTMLElement {
             --vtc-scrollbar-grip-color: rgb(209, 209, 209); 
             --vtc-scrollbar-grip-hover-color: #bbb;
             --vtc-scrollbar-right-margin: 15px;
-            --vtc-caption-color: white;
+            --vtc-caption-color: gray;
             --vtc-caption-background-color: #efefef;
-            --vtc-caption-background-hover-color: #0063ff;
+            --vtc-caption-background-hover-color: lightgray;
             --vtc-caption-separator-color: white;
         }
         @media (prefers-color-scheme: dark) {
@@ -81,6 +79,7 @@ export class VirtualTable extends HTMLElement {
         this.table = document.createElement("table")
         this.tableHead = document.createElement("thead")
         this.tableHeadRow = document.createElement("tr")
+        this.columnsHeader = new ColumnsHeader(this.tableHeadRow)
         this.tableHead.appendChild(this.tableHeadRow)
         this.table.appendChild(this.tableHead)
         this.tableBody = document.createElement("tbody")
@@ -158,7 +157,41 @@ export class VirtualTable extends HTMLElement {
             }
             th:first-child {
                 border-left-width: 0px;
-            }                  
+            }
+            th.sortable, th.sortable span {
+                background-color: transparent;
+                transition: background-color 0.3s;
+            }
+            th.sortable:hover:not(:has(span:hover))  {
+                background-color: var(--vtc-caption-background-hover-color);
+            }
+            th.sortable span:hover {
+                background-color: var(--vtc-caption-background-hover-color);
+            }
+            .sortable .sortAscending:before, .sortable.sortAscending:before {
+                position: relative;
+                bottom: 11px;
+                border-left: 4px solid transparent;
+                border-right: 4px solid transparent;
+                border-bottom: 6px solid var(--vtc-caption-color);
+                content: '';
+                margin-right: 5px;
+            }
+            .sortable .sortDescending:before, .sortable.sortDescending:before {
+                position: relative;
+                top: 10px;
+                border-left: 4px solid transparent;
+                border-right: 4px solid transparent;
+                border-top: 6px solid var(--vtc-caption-color);
+                content: '';
+                margin-right: 5px;
+            }
+            th .subColumns {
+                display: flex;
+            }
+            th .subColumnName {
+                flex-grow: 1;
+            }
             #root:focus tr.isCurrent {
                 outline-color: var(--vtc-current-focus-color);
             }`
@@ -167,18 +200,7 @@ export class VirtualTable extends HTMLElement {
     }
 
     setColumns(columns) {
-        this.columns = columns
-        while (this.tableHeadRow.lastElementChild)
-            this.tableHeadRow.removeChild(this.tableHeadRow.lastElementChild)
-        columns.forEach(item => {
-            const th = document.createElement("th")
-            th.textContent = item.text
-            if (item.isRightAligned)
-                th.classList.add("rightAligned")
-            else
-                th.classList.remove("rightAligned")
-            this.tableHeadRow.appendChild(th)
-        })
+        this.columnsHeader.setColumns(columns)
         this.scrollbar.setHeightOffset(this.tableHeadRow.clientHeight)
     }
 
@@ -281,7 +303,7 @@ export class VirtualTable extends HTMLElement {
             this.dispatchEvent(event)
             const tds = Array.from(tr.children)
             tds.forEach((td, idx) => {
-                if (this.columns[idx].isRightAligned)
+                if (this.columnsHeader.isRightAligned(idx))
                     td.classList.add("rightAligned")
                 else
                     td.classList.remove("rightAligned")
@@ -303,7 +325,7 @@ export class VirtualTable extends HTMLElement {
             this.renderRowItem(recycled, this.items[this.offset + this.visualItemsCount])
             this.tableBody.appendChild(recycled)
         } else {
-            if (this.offset < 0)
+            if (this.offset <= 0)
                 return
             this.offset--
             const recycled = this.tableBody.lastElementChild

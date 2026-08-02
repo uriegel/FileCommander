@@ -17,24 +17,19 @@ using System.Text.Json;
 
 namespace FileCommander.Controls;
 
-// TODO Sorting
+// TODO Refresh in menu -> send event -> reload
+
+// TODO Sorting: sort changed -> (path and) items
 // TODO restriction
 
-// TODO request/reload
-
-// OK Init-> path and items
-// Ok path changed -> send event -> request reload -> path and items (reload)
-// OK onProcess -> path and items
-// OK hidden changed -> send event -> request no relaod, just mapping -> (path and) items (refresh)
-// sort changed -> (path and) items
-// Refresh in menu -> send event -> reload
+// TODO Save/Reload Options
 
 // TODO exif date and version
 // TODO File SystemWatcher with directories
 // TODO Tab control shift tab -> path edit
 // TODO path control
 //      * styled like javascript
-//      * optional in javascript
+//      * optional in javascript if not possible in XAML
 // TODO Grid Splitter (maybe WinUITools)
 // TODO SetSelections
 // TODO Home folder (later Favorites, Remotes)

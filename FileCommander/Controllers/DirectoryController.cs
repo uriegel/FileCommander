@@ -13,7 +13,7 @@ class DirectoryController : Controller
 {
     public override Column[] GetColumns()
         => [
-            new("Name"),
+            new("Name", SubColumn: "Erw."),
             new("Datum"),
             new("Größe", true),
             new("Version")

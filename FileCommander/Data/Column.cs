@@ -1,3 +1,5 @@
-﻿namespace FileCommander.Data;
+﻿using System.Data.Common;
 
-record Column(string Text, bool? IsRightAligned = null);
+namespace FileCommander.Data;
+
+record Column(string Text, bool? IsRightAligned = null, string? SubColumn = null);

@@ -5,6 +5,7 @@ let columnCount = 0
 const tableView = document.getElementById("virtual-table")
 const fill = document.getElementById("fill")
 tableView.setStylesheet("styles/tableview.css")
+tableView.focus()
 
 tableView.addEventListener("create-rowitem", evt => {
     const template = document.getElementById('item')
@@ -41,12 +42,7 @@ tableView.addEventListener("process-selected", async evt => {
     const response = await fetch(`request/process/${evt.detail.pos}`)
     const res = await response.json()
     if (res.itemsResult) {
-        if (res.itemsResult.columns) {
-            // TODO code replic
-            const cols = res.itemsResult.columns
-            columnCount = cols.length
-            tableView.setColumns(cols)
-        }
+        checkColumns(res.itemsResult.columns)
         tableView.setItems(res.itemsResult.items)
         tableView.setPosition(res.itemsResult.pos)
     }
@@ -85,14 +81,17 @@ async function init() {
     window.chrome.webview.addEventListener('message', event => onEvent(event.data))
     const response = await fetch("request/init")
     const itemsResult = await response.json()
-    if (itemsResult.columns) {
-        const cols = itemsResult.columns
-        columnCount = cols.length
-        tableView.setColumns(cols)
-    }
+    checkColumns(itemsResult.columns)
     tableView.setItems(itemsResult.items)
     tableView.setPosition(itemsResult.pos)
 }
 
+function checkColumns(columns) {
+    if (columns) {
+        columnCount = columns.length
+        tableView.setColumns(columns)
+    }
+}
 
-tableView.focus()
+
+
