@@ -22,7 +22,7 @@ namespace FileCommander.Controls;
 // TODO Sorting: sort changed -> (path and) items
 // TODO restriction
 
-// TODO Save/Reload Options
+// TODO Save/Reload Options https://learn.microsoft.com/en-us/windows/apps/develop/data/store-and-retrieve-app-data
 
 // TODO exif date and version
 // TODO File SystemWatcher with directories
