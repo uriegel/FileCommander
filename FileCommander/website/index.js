@@ -59,6 +59,11 @@ async function onKeyDown(evt) {
         evt.stopPropagation()
         await fetch("request/command/toggleHidden")
     }
+    else if (evt.ctrlKey && evt.key == "r") {
+        evt.preventDefault();
+        evt.stopPropagation()
+        await fetch("request/command/refresh")
+    }
 }
 
 document.addEventListener("keydown", evt => onKeyDown(evt))
@@ -69,6 +74,14 @@ async function onEvent(evt) {
     console.log("Event", evt)
     if (evt.refresh) {
         const response = await fetch(`request/refresh/${tableView.getPosition()}`)
+        const res = await response.json()
+        if (res.itemsResult) {
+            tableView.setItems(res.itemsResult.items)
+            tableView.setPosition(res.itemsResult.pos)
+        }
+    }
+    if (evt.reload) {
+        const response = await fetch(`request/reload/${tableView.getPosition()}`)
         const res = await response.json()
         if (res.itemsResult) {
             tableView.setItems(res.itemsResult.items)

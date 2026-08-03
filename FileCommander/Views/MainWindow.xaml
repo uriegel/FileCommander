@@ -11,13 +11,17 @@
     <Grid Name="MainGrid">
         <Grid.Resources>
             <ResourceDictionary>
-                <XamlUICommand x:Name="ShowHiddenCommand" Label="Versteckte Dateien" Description="Versteckte Dateien werden ebenfalls angezeigt"
-                               ExecuteRequested="ShowHiddenCommand_ExecuteRequested">
+                <XamlUICommand x:Name="ShowHiddenCommand" Label="Versteckte Dateien" Description="Versteckte Dateien werden ebenfalls angezeigt">
                     <!--<XamlUICommand.IconSource>
                         <SymbolIconSource Symbol="Hide"/>
                     </XamlUICommand.IconSource>-->
                     <XamlUICommand.KeyboardAccelerators>
                         <KeyboardAccelerator Key="H" Modifiers="Control"/>
+                    </XamlUICommand.KeyboardAccelerators>
+                </XamlUICommand>
+                <XamlUICommand x:Name="RefreshCommand" Label="Aktualisieren" Description="Alle Einträge neu ermitteln" ExecuteRequested="RefreshCommand_ExecuteRequested">
+                    <XamlUICommand.KeyboardAccelerators>
+                        <KeyboardAccelerator Key="R" Modifiers="Control"/>
                     </XamlUICommand.KeyboardAccelerators>
                 </XamlUICommand>
             </ResourceDictionary>
@@ -46,11 +50,9 @@
                 <AppBarButton.Flyout>
                     <MenuFlyout Placement="BottomEdgeAlignedLeft">
                         <ToggleMenuFlyoutItem Command="{StaticResource ShowHiddenCommand}" IsChecked="{Binding ShowHidden, Mode=TwoWay}" />
-                        <MenuFlyoutItem Text="Bookmarks" />
-                        <MenuFlyoutItem Text="Open Terminal"/>
+                        <MenuFlyoutItem Command="{StaticResource RefreshCommand}" />
                         <MenuFlyoutSeparator/>
                         <MenuFlyoutItem Text="Settings" />
-                        <MenuFlyoutItem Text="About" />
                     </MenuFlyout>
                 </AppBarButton.Flyout>
             </AppBarButton>

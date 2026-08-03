@@ -1,10 +1,7 @@
 import './Scrollbar.js'
 import { ColumnsHeader } from "./ColumnsHeader.js"
 
-// TODO scrollbar hidden: transition
-// TODO scrollbar active transition
-// TODO scrollbar active margin right transition
-// TODO Columns: initial column widths (always set to prevent jumps when adapting columns frist time)
+// TODO scrollbar page up/down
 // TODO Styling with color filters
 // TODO Styling columns
 
@@ -79,7 +76,7 @@ export class VirtualTable extends HTMLElement {
         this.table = document.createElement("table")
         this.tableHead = document.createElement("thead")
         this.tableHeadRow = document.createElement("tr")
-        this.columnsHeader = new ColumnsHeader(this.tableHeadRow)
+        this.columnsHeader = new ColumnsHeader(this.tableHeadRow, evt => this.onSort(evt), evt => this.onColumnWidthChange(evt))
         this.tableHead.appendChild(this.tableHeadRow)
         this.table.appendChild(this.tableHead)
         this.tableBody = document.createElement("tbody")
@@ -158,6 +155,9 @@ export class VirtualTable extends HTMLElement {
             th:first-child {
                 border-left-width: 0px;
             }
+            #root:has(#scrollbar:hover) tr td:last-child, #root:has(#grip:active) tr td:last-child {
+                padding-right: calc(3px + var(--vtc-scrollbar-right-margin));
+            }
             th.sortable, th.sortable span {
                 background-color: transparent;
                 transition: background-color 0.3s;
@@ -202,6 +202,18 @@ export class VirtualTable extends HTMLElement {
     setColumns(columns) {
         this.columnsHeader.setColumns(columns)
         this.scrollbar.setHeightOffset(this.tableHeadRow.clientHeight)
+    }
+
+    setColumnWidths(widths) {
+        this.columnsHeader.setWidths(widths)
+    }
+
+    setOnSort(cb) {
+        this.onSort = cb
+    }
+
+    setOnColumnWidthChange(cb) {
+        this.onColumnWidthChange = cb
     }
 
     setItems(items, pos) {
@@ -432,6 +444,8 @@ export class VirtualTable extends HTMLElement {
     }
 
     onSelected() {
+        if (this.currentPosition == Infinity || this.currentPosition < 0)
+            return
         const event = new CustomEvent('process-selected', {
             bubbles: false,
             cancelable: false,

@@ -20,6 +20,7 @@ public sealed partial class MainWindow : Window
         this.InitializeComponent();
         MainGrid.DataContext = MainContext.Instance;
         MainContext.Instance.ShowHiddenCommand = ShowHiddenCommand;
+        MainContext.Instance.RefreshCommand = RefreshCommand;
 
         // Assumes "this" is a XAML Window. In projects that don't use 
         // WinUI 1.3 or later, use interop APIs to get the AppWindow.
@@ -149,10 +150,8 @@ public sealed partial class MainWindow : Window
         }
     }
 
-    void ShowHiddenCommand_ExecuteRequested(XamlUICommand sender, ExecuteRequestedEventArgs args)
-    {
-
-    }
+    void RefreshCommand_ExecuteRequested(XamlUICommand sender, ExecuteRequestedEventArgs args)
+        => activeView?.Refresh();
 
     FolderView GetOtherView() => activeView == LeftView ? RightView : LeftView;
 

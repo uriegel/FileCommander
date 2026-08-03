@@ -17,10 +17,10 @@ using System.Text.Json;
 
 namespace FileCommander.Controls;
 
-// TODO Refresh in menu -> send event -> reload
-
 // TODO Sorting: sort changed -> (path and) items
+// TODO Status bar
 // TODO restriction
+// TODO Save history
 
 // TODO Save/Reload Options https://learn.microsoft.com/en-us/windows/apps/develop/data/store-and-retrieve-app-data
 
@@ -39,6 +39,7 @@ public sealed partial class VirtualTable : UserControl
 
     public VirtualTable() => InitializeComponent();
 
+    public void Refresh() => SendEvent(new(Reload: new()));
     async void Grid_Loaded(object sender, RoutedEventArgs e)
     {
         await WebView.EnsureCoreWebView2Async();
@@ -144,6 +145,13 @@ public sealed partial class VirtualTable : UserControl
                         var itemsResult = items != null ? new ItemsResult(null, items, newPos) : null;
                         SendResult(args, new ProcessResult(ItemsResult: itemsResult));
                     }
+                    else if (path.StartsWith("reload"))
+                    {
+                        var pos = int.Parse(path[7..]);
+                        var (items, newPos) = controller.Reload(pos);
+                        var itemsResult = items != null ? new ItemsResult(null, items, newPos) : null;
+                        SendResult(args, new ProcessResult(ItemsResult: itemsResult));
+                    }
                     else if (path.StartsWith("command"))
                     {
                         var cmd = path[8..];
@@ -152,6 +160,10 @@ public sealed partial class VirtualTable : UserControl
                             case "toggleHidden":
                                 MainContext.Instance.ShowHidden = !MainContext.Instance.ShowHidden;
                                 MainContext.Instance.ShowHiddenCommand.Execute(null);
+                                SendResult(args, new ProcessResult());
+                                break;
+                            case "refresh":
+                                MainContext.Instance.RefreshCommand.Execute(null);
                                 SendResult(args, new ProcessResult());
                                 break;
                         }

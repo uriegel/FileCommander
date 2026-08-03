@@ -17,6 +17,7 @@ export class Scrollbar extends HTMLElement {
         this.id = "scrollbar"
         this.grip = document.createElement("div")
         this.grip.id = "grip"
+        this.addEventListener("mousedown", evt => this.onPageMouseDown(evt))
         this.grip.addEventListener("mousedown", evt => this.onGripMouseDown(evt))
         this.appendChild(this.grip)
 
@@ -37,6 +38,10 @@ export class Scrollbar extends HTMLElement {
                 transition: transform 0.3s, Opacity 0.3s;
                 transform-origin: right top;
                 bottom: 0px;    
+            }
+            #scrollbar.hidden {
+                transform: scale(0);
+                opacity: 0;            
             }
             #grip {
                 position: absolute;
@@ -72,6 +77,40 @@ export class Scrollbar extends HTMLElement {
 
     setHeightOffset(headerHeight) {
         this.style.setProperty('height', `calc(100% - ${headerHeight}px)`);
+    }
+
+    onPageMouseDown(evt) {
+        evt.preventDefault()
+        evt.stopPropagation()
+        const action = () => {
+            let newPosition = this.#scrollPosition
+            if (evt.offsetY <= this.scrollbarGripTop) {
+                if (evt.offsetY < this.scrollbarGripTop)
+                    newPosition -= this.displayCount
+                this.scrollPosition = Math.max(newPosition, 0)
+                this.emitScrollPosition(this.scrollPosition)
+            } else {
+                if (evt.offsetY > this.scrollbarGripTop + this.gripHeight)
+                    newPosition += this.displayCount
+                this.scrollPosition = Math.min(this.range - 1, newPosition)
+                this.emitScrollPosition(this.scrollPosition)
+            }
+        }
+
+        const mouseRepeat = action => {
+            action()
+            let interval = 0
+            const timeout = setTimeout(() => interval = setInterval(() => action(), 50), 600)
+            const mouseUp = () => {
+                window.removeEventListener("mouseup", mouseUp)
+                clearTimeout(timeout)
+                if (interval)
+                    clearInterval(interval)
+            }
+            window.addEventListener("mouseup", mouseUp)
+        }
+
+        mouseRepeat(() => action())
     }
 
     onGripMouseDown(evt) {
@@ -123,7 +162,11 @@ export class Scrollbar extends HTMLElement {
 
     setRange() {
         const range = Math.max(0, this.count - this.displayCount)
-        this.style.setProperty('display', range > 0 ? '' : 'none')
+        console.log("range", range)
+        if (range > 0)
+            this.classList.remove('hidden')
+        else
+            this.classList.add('hidden')
         return range
     }
 
@@ -135,7 +178,6 @@ export class Scrollbar extends HTMLElement {
     getScrollbarGripTop() {
         return (this.offsetHeight - this.gripHeight) * (this.scrollPosition / this.range)
     }
-
 }
 
 customElements.define("scroll-bar", Scrollbar)

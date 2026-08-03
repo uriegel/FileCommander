@@ -70,6 +70,14 @@ class DirectoryController : Controller
         return (MapItems(), newPos < viewItems.Length ? newPos : 0);
     }
 
+    public override (Item[] Items, int newPos) Reload(int pos)
+    {
+        var recentItem = viewItems[pos].Name;
+        var (items, _, _) = GetItems(path);
+        var newPos = items.TakeWhile(n => n.Text != recentItem).Count();
+        return (items, newPos < items.Length ? newPos : 0);
+    }
+
     (ItemBase[], int) MapViewItems(string? fromPath)
     {
         var filtered = items

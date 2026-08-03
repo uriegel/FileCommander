@@ -1,24 +1,22 @@
-﻿export class ColumnsHeader
-{
-    constructor(tableHeadRow)
-    {
+﻿export class ColumnsHeader {
+    constructor(tableHeadRow, sort, onColumnWidthChange) {
         this.tableHeadRow = tableHeadRow
         this.tableHeadRow.addEventListener("mousemove", evt => this.onMouseMove(evt))
         this.tableHeadRow.addEventListener("mousedown", evt => this.onMouseDown(evt))
         this.sortIndex = -1
         this.sortDescending = true // to initial turn to false
+        this.sort = sort
+        this.onColumnWidthChange = onColumnWidthChange
     }
 
-    setColumns(columns)
-    {
+    setColumns(columns) {
         this.columns = columns
         while (this.tableHeadRow.lastElementChild)
             this.tableHeadRow.removeChild(this.tableHeadRow.lastElementChild)
         columns.forEach((item, idx) => {
             const th = document.createElement("th")
             th.onclick = evt => this.onColumnClick(idx, evt)
-            if (item.subColumn)
-            {
+            if (item.subColumn) {
                 const div = document.createElement("div")
                 div.classList.add("subColumns")
                 const col = document.createElement("span")
@@ -30,23 +28,26 @@
                 subcol.classList.add("subColumn")
                 div.appendChild(subcol)
                 th.appendChild(div)
-            }
-            else
+            } else
                 th.textContent = item.text
             if (item.isRightAligned)
                 th.classList.add("rightAligned")
             else
                 th.classList.remove("rightAligned")
-            if (item.sort)
+            if (item.sortable)
                 th.classList.add("sortable")
             this.tableHeadRow.appendChild(th)
         })
     }
 
+    setWidths(widths) {
+        const ths = Array.from(this.tableHeadRow.children)
+        ths.forEach((th, idx) => th.style.width = `${widths[idx]}%`)
+    }
+
     isRightAligned(idx) { return this.columns[idx].isRightAligned }
 
-    onMouseMove(evt)
-    {
+    onMouseMove(evt) {
         const element = evt.target.tagName == "TH" ? evt.target : evt.target.parentElement?.parentElement
         const thWidth = element.clientWidth + element.clientLeft
         const mouseX = evt.offsetX + element.clientLeft
@@ -56,8 +57,7 @@
             (mouseX < 3 || mouseX > thWidth - 4)
             && (evt.pageX - trRect.x > 4)
             && (evt.pageX < absoluteRight - 4)
-        if (dr && evt.target.tagName != "TH")
-        {
+        if (dr && evt.target.tagName != "TH") {
             const first = evt.target.style.flexGrow == "1"
             if (first && mouseX > thWidth - 4 || !first && mouseX < 3)
                 dr = false
@@ -66,8 +66,7 @@
         document.body.style.cursor = dr ? 'ew-resize' : 'auto'
     }
 
-    onMouseDown(evt)
-    {
+    onMouseDown(evt) {
         if (!this.draggingReady)
             return
         this.dragging = true
@@ -99,12 +98,12 @@
             const getCombinedWidth = (column, nextColumn) => {
                 const firstWidth =
                     column.style.width
-                    ? parseFloat(column.style.width.substring(0, column.style.width.length - 1))
-                    : 100 / this.columns.length
+                        ? parseFloat(column.style.width.substring(0, column.style.width.length - 1))
+                        : 100 / this.columns.length
                 const secondWidth =
                     nextColumn.style.width
-                    ? parseFloat(nextColumn.style.width.substring(0, nextColumn.style.width.length - 1))
-                    : 100 / this.columns.length
+                        ? parseFloat(nextColumn.style.width.substring(0, nextColumn.style.width.length - 1))
+                        : 100 / this.columns.length
                 return firstWidth + secondWidth
             }
 
@@ -125,20 +124,20 @@
 
             const preventClickOnResetting = () => setTimeout(() => this.dragging = false)
 
-
             const getWidths = () => {
                 const ths = Array.from(this.tableHeadRow.children)
                 return ths.map(th =>
                     th.style.width
                         ? parseFloat(th.style.width.substring(0, th.style.width.length - 1))
-                        : 100 / columns.length
+                        : 100 / this.columns.length
                 )
             }
 
             window.removeEventListener('mousemove', onmove)
             window.removeEventListener('mouseup', onup)
             document.body.style.cursor = 'auto'
-            //setColumnWidths(getWidths())
+            if (this.onColumnWidthChange)
+                this.onColumnWidthChange(getWidths())
             preventClickOnResetting()
             evt.preventDefault()
             evt.stopPropagation()
@@ -150,19 +149,15 @@
         evt.stopPropagation()
     }
 
-    onColumnClick(idx, evt)
-    {
+    onColumnClick(idx, evt) {
         if (this.dragging)
             return
-        if (this.columns[idx].sort)
-        {
+        if (this.columns[idx].sortable) {
             const ths = Array.from(this.tableHeadRow.children)
-            if (this.sortIndex != -1)
-            {
+            if (this.sortIndex != -1) {
                 if (!this.columns[this.sortIndex].subColumn)
                     ths[this.sortIndex].classList.remove(this.sortDescending ? "sortDescending" : "sortAscending")
-                else
-                {
+                else {
                     if (this.subColumn)
                         ths[this.sortIndex].firstChild.lastElementChild.classList.remove(this.sortDescending ? "sortDescending" : "sortAscending")
                     else
@@ -170,25 +165,23 @@
                 }
             }
             this.sortDescending = !this.sortDescending
+            this.subColumn = false
             if (!this.columns[idx].subColumn)
                 ths[idx].classList.add(this.sortDescending ? "sortDescending" : "sortAscending")
-            else
-            {
-                if (evt.originalTarget.classList.contains("subColumn"))
-                {
+            else {
+                if (evt.originalTarget.classList.contains("subColumn")) {
                     this.subColumn = true
                     evt.originalTarget.classList.add(this.sortDescending ? "sortDescending" : "sortAscending")
-                }
-                else
-                {
-                    this.subColumn = false
+                } else
                     evt.originalTarget.classList.add(this.sortDescending ? "sortDescending" : "sortAscending")
-                }
             }
-            this.columns[idx].sort({
-            subColumn: this.subColumn || undefined,
-                descending: this.sortDescending
-            })
+
+            if (this.sort)
+                this.sort({
+                    index: idx,
+                    subColumn: this.subColumn || undefined,
+                    descending: this.sortDescending
+                })
             this.sortIndex = idx
         }
     }

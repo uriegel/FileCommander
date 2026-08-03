@@ -17,6 +17,9 @@ public sealed partial class FolderView : UserControl
         VirtualTable.OnTab += () => OnTab?.Invoke();
     }
 
+    public void Refresh()
+        => VirtualTable.Refresh();
+
     void TextBox_GotFocus(object sender, RoutedEventArgs e)
     {
 

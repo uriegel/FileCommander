@@ -10,6 +10,7 @@ class MainContext : INotifyPropertyChanged
     public event PropertyChangedEventHandler? PropertyChanged;
 
     public ICommand ShowHiddenCommand { get; set; } = null!;
+    public ICommand RefreshCommand { get; set; } = null!;
 
     public bool ShowHidden
     {
