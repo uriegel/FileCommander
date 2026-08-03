@@ -48,7 +48,7 @@ class RootController : Controller
         return (controller, columns, items[pos].Name, Name);
     }
 
-    public override (Item[]? Items, int newPos) Reload(int pos)
+    public override (Item[] Items, int newPos) Reload(int pos)
     {
         var (items, _, _) = GetItems("");
         return (items, pos);

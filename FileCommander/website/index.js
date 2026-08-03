@@ -114,7 +114,7 @@ function onColumnWidthChange(cols) {
 }
 
 async function onSort(e) {
-    const response = await fetch(`request/sort?column=${e.index}&descending=${e.descending}${e.subColumn ? "&subcolumn=true" : ""}`)
+    const response = await fetch(`request/sort?column=${e.index}&descending=${e.descending}${e.subColumn ? "&subcolumn=true" : ""}&pos=${tableView.getPosition()}`)
     const res = await response.json()
     if (res.itemsResult) {
         tableView.setItems(res.itemsResult.items)

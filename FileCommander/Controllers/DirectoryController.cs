@@ -78,11 +78,11 @@ class DirectoryController : Controller
         return (items, newPos < items.Length ? newPos : 0);
     }
 
-    public override (Item[]? Items, int newPos) Sort(int index, bool descending, bool subcolumn)
+    public override (Item[]? Items, int newPos) Sort(int index, bool descending, bool subcolumn, int pos)
     {
         sortIndex = index;
         sortDescending = descending;
-        return Reload(0);
+        return Reload(pos);
     }
 
     (ItemBase[], int) MapViewItems(string? fromPath)
@@ -95,7 +95,7 @@ class DirectoryController : Controller
                 DirectoryItem => 1,
                 _ => 2,
             })
-            .ThenByDirection(n => n.Name, false)
+            .ThenByDirection(n => n.Name, sortDescending)
             .ToArray();
         var oldPos = fromPath != null ? filtered.TakeWhile(n => n.Name != fromPath).Count() : 0;
         return (filtered, oldPos);

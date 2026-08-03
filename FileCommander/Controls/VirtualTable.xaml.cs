@@ -116,10 +116,13 @@ public sealed partial class VirtualTable : UserControl
             case "sort":
             {
                 var query = MakeQuery(args.Request.Uri);
-                var index = query.TryGetValue("column", out var res) ? res.ParseInt() : 0;
+                var index = query.TryGetValue("column", out var res) ? res.ParseInt() ?? 0 : 0;
                 var desc = query.TryGetValue("descending", out var descVal) ? descVal == "true" : false;
                 var subcol = query.TryGetValue("subcolumn", out var colVal) ? colVal == "true" : false;
-                SendResult(args, new ProcessResult());
+                var pos = query.TryGetValue("pos", out var resPos) ? resPos.ParseInt() ?? 0 : 0;
+                (var items, var newPos) = controller.Sort(index, desc, subcol, pos);
+                var itemsResult = items != null ? new ItemsResult(null, items, newPos) : null;
+                SendResult(args, new ProcessResult(ItemsResult: itemsResult));
                 break;
             }
             case "tab":
