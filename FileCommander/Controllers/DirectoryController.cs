@@ -78,10 +78,24 @@ class DirectoryController : Controller
         return (items, newPos < items.Length ? newPos : 0);
     }
 
+    public override (Item[]? Items, int newPos) Sort(int index, bool descending, bool subcolumn)
+    {
+        sortIndex = index;
+        sortDescending = descending;
+        return Reload(0);
+    }
+
     (ItemBase[], int) MapViewItems(string? fromPath)
     {
         var filtered = items
             .Where(n => MainContext.Instance.ShowHidden || !n.IsHidden)
+            .OrderBy(n => n switch
+            {
+                ParentItem => 0,
+                DirectoryItem => 1,
+                _ => 2,
+            })
+            .ThenByDirection(n => n.Name, false)
             .ToArray();
         var oldPos = fromPath != null ? filtered.TakeWhile(n => n.Name != fromPath).Count() : 0;
         return (filtered, oldPos);
@@ -103,6 +117,8 @@ class DirectoryController : Controller
     ItemBase[] viewItems = null!;
 
     string path = "";
+    int sortIndex = -1;
+    bool sortDescending = false;
 }
 
 abstract record ItemBase(string Name, bool IsHidden)
@@ -129,4 +145,18 @@ static class ItemExtensions
 {
     public static bool IsHidden(this FileSystemInfo info)
         => (info.Attributes & FileAttributes.Hidden) == FileAttributes.Hidden || info.Name.StartsWith('.');
+
+    // TODO To CsTools
+    public static IOrderedEnumerable<TSource> ThenByDirection<TSource, TKey>(
+            this IOrderedEnumerable<TSource> source,
+            Func<TSource, TKey> keySelector,
+            bool descending)
+    {
+        if (source == null) throw new ArgumentNullException(nameof(source));
+        if (keySelector == null) throw new ArgumentNullException(nameof(keySelector));
+
+        return descending
+            ? source.ThenByDescending(keySelector)
+            : source.ThenBy(keySelector);
+    }
 }
