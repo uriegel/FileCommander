@@ -13,10 +13,10 @@ class DirectoryController : Controller
 {
     public override Column[] GetColumns()
         => [
-            new("Name", SubColumn: "Erw."),
-            new("Datum"),
-            new("Größe", true),
-            new("Version")
+            new("Name", SubColumn: "Erw.", Sortable: true),
+            new("Datum", Sortable: true),
+            new("Größe", true, Sortable: true),
+            new("Version", Sortable: true)
         ];
 
     public override (Item[], string, int) GetItems(string path)

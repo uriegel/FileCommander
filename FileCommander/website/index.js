@@ -5,6 +5,8 @@ let columnCount = 0
 const tableView = document.getElementById("virtual-table")
 const fill = document.getElementById("fill")
 tableView.setStylesheet("styles/tableview.css")
+tableView.setOnColumnWidthChange(onColumnWidthChange)
+tableView.setOnSort(onSort)
 tableView.focus()
 
 tableView.addEventListener("create-rowitem", evt => {
@@ -106,5 +108,17 @@ function checkColumns(columns) {
     }
 }
 
+function onColumnWidthChange(cols) {
+    console.log("On width change", cols)
+    //localStorage.setItem("columnWidths", JSON.stringify(cols))
+}
 
+async function onSort(e) {
+    const response = await fetch(`request/sort?column=${e.index}&descending=${e.descending}${e.subColumn ? "&subcolumn=true" : ""}`)
+    const res = await response.json()
+    if (res.itemsResult) {
+        tableView.setItems(res.itemsResult.items)
+        tableView.setPosition(res.itemsResult.pos)
+    }
+}
 

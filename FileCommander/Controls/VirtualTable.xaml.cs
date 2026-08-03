@@ -5,13 +5,17 @@ using FileCommander.Contexts;
 using FileCommander.Controllers;
 using FileCommander.Data;
 using FileCommander.Icon;
+using FileCommander.Obsoletes;
 
 using Microsoft.UI.Xaml;
 using Microsoft.UI.Xaml.Controls;
 using Microsoft.Web.WebView2.Core;
 
 using System;
+using System.Collections.Generic;
+using System.Collections.Immutable;
 using System.IO;
+using System.Linq;
 using System.Reflection;
 using System.Text.Json;
 
@@ -19,7 +23,7 @@ namespace FileCommander.Controls;
 
 // TODO Sorting: sort changed -> (path and) items
 // TODO Status bar
-// TODO restriction
+// TODO restriction in index.js
 // TODO Save history
 
 // TODO Save/Reload Options https://learn.microsoft.com/en-us/windows/apps/develop/data/store-and-retrieve-app-data
@@ -109,6 +113,15 @@ public sealed partial class VirtualTable : UserControl
                 SendResult(args, itemsResult);
                 break;
             }
+            case "sort":
+            {
+                var query = MakeQuery(args.Request.Uri);
+                var index = query.TryGetValue("column", out var res) ? res.ParseInt() : 0;
+                var desc = query.TryGetValue("descending", out var descVal) ? descVal == "true" : false;
+                var subcol = query.TryGetValue("subcolumn", out var colVal) ? colVal == "true" : false;
+                SendResult(args, new ProcessResult());
+                break;
+            }
             case "tab":
                 OnTab?.Invoke();
                 break;
@@ -125,49 +138,49 @@ public sealed partial class VirtualTable : UserControl
                 break;
             default:
             {
-                    if (path.StartsWith("process"))
+                if (path.StartsWith("process"))
+                {
+                    var pos = int.Parse(path[8..]);
+                    if (controller.Process(pos))
+                        SendResult(args, new ProcessResult());
+                    else
                     {
-                        var pos = int.Parse(path[8..]);
-                        if (controller.Process(pos))
+                        (controller, var cols, var newPath, var oldPath) = controller.CheckPath(pos);
+                        var res = controller.GetItems(newPath);
+                        var itemsResult = new ItemsResult(cols, res.Items, res.oldPos);
+                        SendResult(args, new ProcessResult(ItemsResult: itemsResult));
+                    }
+                }
+                else if (path.StartsWith("refresh"))
+                {
+                    var pos = int.Parse(path[8..]);
+                    var (items, newPos) = controller.Refresh(pos);
+                    var itemsResult = items != null ? new ItemsResult(null, items, newPos) : null;
+                    SendResult(args, new ProcessResult(ItemsResult: itemsResult));
+                }
+                else if (path.StartsWith("reload"))
+                {
+                    var pos = int.Parse(path[7..]);
+                    var (items, newPos) = controller.Reload(pos);
+                    var itemsResult = items != null ? new ItemsResult(null, items, newPos) : null;
+                    SendResult(args, new ProcessResult(ItemsResult: itemsResult));
+                }
+                else if (path.StartsWith("command"))
+                {
+                    var cmd = path[8..];
+                    switch (cmd)
+                    {
+                        case "toggleHidden":
+                            MainContext.Instance.ShowHidden = !MainContext.Instance.ShowHidden;
+                            MainContext.Instance.ShowHiddenCommand.Execute(null);
                             SendResult(args, new ProcessResult());
-                        else
-                        {
-                            (controller, var cols, var newPath, var oldPath) = controller.CheckPath(pos);
-                            var res = controller.GetItems(newPath);
-                            var itemsResult = new ItemsResult(cols, res.Items, res.oldPos);
-                            SendResult(args, new ProcessResult(ItemsResult: itemsResult));
-                        }
+                            break;
+                        case "refresh":
+                            MainContext.Instance.RefreshCommand.Execute(null);
+                            SendResult(args, new ProcessResult());
+                            break;
                     }
-                    else if (path.StartsWith("refresh"))
-                    {
-                        var pos = int.Parse(path[8..]);
-                        var (items, newPos) = controller.Refresh(pos);
-                        var itemsResult = items != null ? new ItemsResult(null, items, newPos) : null;
-                        SendResult(args, new ProcessResult(ItemsResult: itemsResult));
-                    }
-                    else if (path.StartsWith("reload"))
-                    {
-                        var pos = int.Parse(path[7..]);
-                        var (items, newPos) = controller.Reload(pos);
-                        var itemsResult = items != null ? new ItemsResult(null, items, newPos) : null;
-                        SendResult(args, new ProcessResult(ItemsResult: itemsResult));
-                    }
-                    else if (path.StartsWith("command"))
-                    {
-                        var cmd = path[8..];
-                        switch (cmd)
-                        {
-                            case "toggleHidden":
-                                MainContext.Instance.ShowHidden = !MainContext.Instance.ShowHidden;
-                                MainContext.Instance.ShowHiddenCommand.Execute(null);
-                                SendResult(args, new ProcessResult());
-                                break;
-                            case "refresh":
-                                MainContext.Instance.RefreshCommand.Execute(null);
-                                SendResult(args, new ProcessResult());
-                                break;
-                        }
-                    }
+                }
                 break;
             }
         }
@@ -202,6 +215,19 @@ public sealed partial class VirtualTable : UserControl
 
     void SendEvent(Event evt)
         => WebView.CoreWebView2.PostWebMessageAsJson(JsonSerializer.Serialize(evt, Json.Defaults));
+
+    // TODO to CsTools
+    static ImmutableDictionary<string, string> MakeQuery(string url)
+        => url.SubstringAfter('?')
+            .Split('&', StringSplitOptions.RemoveEmptyEntries | StringSplitOptions.TrimEntries)
+            .Select(MakeQueryParam)
+            .ToImmutableDictionary(StringComparer.OrdinalIgnoreCase);
+
+    static KeyValuePair<string, string> MakeQueryParam(string line)
+        => new(
+            line.SubstringUntil('='),
+            Uri.UnescapeDataString(line.SubstringAfter('=').Trim())
+        );
 
     // TODO retrieve last path from storage
     Controller controller = Controller.GetFromPath(null, null);

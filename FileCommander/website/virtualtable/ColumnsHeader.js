@@ -169,11 +169,11 @@
             if (!this.columns[idx].subColumn)
                 ths[idx].classList.add(this.sortDescending ? "sortDescending" : "sortAscending")
             else {
-                if (evt.originalTarget.classList.contains("subColumn")) {
+                if (evt.target.classList.contains("subColumn")) {
                     this.subColumn = true
-                    evt.originalTarget.classList.add(this.sortDescending ? "sortDescending" : "sortAscending")
+                    evt.target.classList.add(this.sortDescending ? "sortDescending" : "sortAscending")
                 } else
-                    evt.originalTarget.classList.add(this.sortDescending ? "sortDescending" : "sortAscending")
+                    evt.target.classList.add(this.sortDescending ? "sortDescending" : "sortAscending")
             }
 
             if (this.sort)
