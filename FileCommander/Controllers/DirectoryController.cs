@@ -62,6 +62,8 @@ class DirectoryController : Controller
             return false;
     }
 
+    public override string OnPosition(int pos) => path.AppendPath(viewItems[pos].Name);
+
     public override (Item[] Items, int newPos) Refresh(int pos)
     {
         var recentItem = viewItems[pos].Name;

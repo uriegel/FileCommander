@@ -18,6 +18,7 @@ abstract class Controller
     }
     public abstract Column[] GetColumns();
     public abstract (Item[] Items, string Path, int oldPos) GetItems(string path);
+    public abstract string OnPosition(int pos);
     public virtual (Item[]? Items, int newPos) Refresh(int pos) => (null, 0);
     public abstract (Item[] Items, int newPos) Reload(int pos);
     public virtual (Item[]? Items, int newPos) Sort(int index, bool descending, bool subcolumn, int pos) => (null, 0);

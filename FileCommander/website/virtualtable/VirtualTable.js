@@ -7,6 +7,7 @@ import { ColumnsHeader } from "./ColumnsHeader.js"
 
 export class VirtualTable extends HTMLElement {
     #offset = 0
+    #currentPosition = 0
 
     constructor() {
         super()
@@ -52,6 +53,15 @@ export class VirtualTable extends HTMLElement {
                 --vtc-caption-background-color: #212121;
             }
         }`
+    }
+
+    get currentPosition() {
+        return this.#currentPosition
+    }
+
+    set currentPosition(val) {
+        this.#currentPosition = val
+        this.onPositionChanged()
     }
 
     set offset(val) {
@@ -441,6 +451,17 @@ export class VirtualTable extends HTMLElement {
         this.offset = evt.detail.pos
         if (scroll)
             this.scrollToOffset()
+    }
+
+    onPositionChanged() {
+        if (this.currentPosition == Infinity || this.currentPosition < 0)
+            return
+        const event = new CustomEvent('position-changed', {
+            bubbles: false,
+            cancelable: false,
+            detail: { pos: this.currentPosition }
+        })
+        this.dispatchEvent(event)
     }
 
     onSelected() {

@@ -40,6 +40,11 @@ tableView.addEventListener("render-rowitem", evt => {
     }
 })
 
+tableView.addEventListener("position-changed", async evt => {
+    const response = await fetch(`request/onposition/${evt.detail.pos}`)
+    const res = await response.json()
+})
+
 tableView.addEventListener("process-selected", async evt => {
     const response = await fetch(`request/process/${evt.detail.pos}`)
     const res = await response.json()

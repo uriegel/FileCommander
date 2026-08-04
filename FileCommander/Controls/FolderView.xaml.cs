@@ -1,5 +1,4 @@
 using System;
-using System.Threading.Tasks;
 
 using FileCommander.Contexts;
 
@@ -19,6 +18,7 @@ public sealed partial class FolderView : UserControl
     {
         InitializeComponent();
         DataContext = Context;
+        VirtualTable.SetContext(Context);
         VirtualTable.OnTab += () => OnTab?.Invoke();
     }
 

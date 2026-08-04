@@ -21,7 +21,7 @@ using System.Text.Json;
 
 namespace FileCommander.Controls;
 
-// TODO Status bar
+// TODO Status bar: files, directories
 // TODO restriction in index.js
 // TODO Save history
 
@@ -43,6 +43,8 @@ public sealed partial class VirtualTable : UserControl
     public VirtualTable() => InitializeComponent();
 
     public void Refresh() => SendEvent(new(Reload: new()));
+
+    public void SetContext(FolderContext context) => this.context = context;
     async void Grid_Loaded(object sender, RoutedEventArgs e)
     {
         await WebView.EnsureCoreWebView2Async();
@@ -153,6 +155,11 @@ public sealed partial class VirtualTable : UserControl
                         SendResult(args, new ProcessResult(ItemsResult: itemsResult));
                     }
                 }
+                if (path.StartsWith("onposition"))
+                {
+                    var pos = int.Parse(path[11..]);
+                    context.SelectedPath = controller.OnPosition(pos);
+                }
                 else if (path.StartsWith("refresh"))
                 {
                     var pos = int.Parse(path[8..]);
@@ -233,4 +240,5 @@ public sealed partial class VirtualTable : UserControl
 
     // TODO retrieve last path from storage
     Controller controller = Controller.GetFromPath(null, null);
+    FolderContext context = null!;
 }

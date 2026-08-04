@@ -47,7 +47,9 @@ class RootController : Controller
         var columns = controller.GetColumns();
         return (controller, columns, items[pos].Name, Name);
     }
-
+    
+    public override string OnPosition(int pos) => items[pos].Name;
+    
     public override (Item[] Items, int newPos) Reload(int pos)
     {
         var (items, _, _) = GetItems("");
