@@ -1,6 +1,7 @@
-:root  {
+:root {
     --vtc-current-color: blue;
     --vtc-current-focus-color: blue;
+    --restriction-background-color: white;
 }
 
 body {
@@ -29,7 +30,32 @@ body {
 @media (prefers-color-scheme: dark) {
     :root {
         color: lightgray;
-        background-color: #2f2f2f; 
+        background-color: #2f2f2f;
+        --restriction-background-color: #222;
     }
 }
 
+#restriction {
+    width: 0%;
+    opacity: 0;
+    bottom: 10px;
+    height: 0px;
+    position: absolute;
+    left: 5px;
+    border-width: 1px;
+    border-radius: 5px;
+    padding: 1px 3px;
+    border-style: solid;
+    border-color: gray;
+    outline-style: none;
+    color: var(--vtc-color);
+    background-color: var(--restriction-background-color);
+    box-shadow: 3px 5px 12px 3px rgba(136, 136, 136, 0.55);
+    transition: opacity 0.5s, width 0.5s, height 0.5s;
+}
+
+#restriction.show {
+    width: 70%;
+    height: 18px;
+    opacity: 1;
+}

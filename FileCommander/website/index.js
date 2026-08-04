@@ -4,6 +4,7 @@ let columnCount = 0
 
 const tableView = document.getElementById("virtual-table")
 const fill = document.getElementById("fill")
+const restriction = document.getElementById("restriction")
 tableView.setStylesheet("styles/tableview.css")
 tableView.setOnColumnWidthChange(onColumnWidthChange)
 tableView.setOnSort(onSort)
@@ -71,6 +72,20 @@ async function onKeyDown(evt) {
         evt.stopPropagation()
         await fetch("request/command/refresh")
     }
+    else if (evt.key == "Escape") {
+        restriction.value = ""
+        restriction.classList.remove("show")
+    }
+    else if (evt.key == "Backspace") {
+        restriction.value = restriction.value.slice(0, -1)
+        if (!restriction.value) 
+            restriction.classList.remove("show")
+    }
+    else {
+        if (!restriction.value) 
+            restriction.classList.add("show")
+        restriction.value += evt.key
+    }
 }
 
 document.addEventListener("keydown", evt => onKeyDown(evt))
@@ -117,6 +132,17 @@ function onColumnWidthChange(cols) {
     console.log("On width change", cols)
     //localStorage.setItem("columnWidths", JSON.stringify(cols))
 }
+
+function checkRestricted(key) {
+    const restrictedItems = restrictionView.current?.checkKey(key)
+    if (restrictedItems) {
+        virtualTable.current?.setPosition(0)
+        setItems(restrictedItems)
+        return true
+    } else
+        return false
+}
+
 
 async function onSort(e) {
     const response = await fetch(`request/sort?column=${e.index}&descending=${e.descending}${e.subColumn ? "&subcolumn=true" : ""}&pos=${tableView.getPosition()}`)
