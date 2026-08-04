@@ -1,7 +1,5 @@
 ﻿using System.ComponentModel;
 
-using CsTools;
-
 namespace FileCommander.Contexts;
 
 public class FolderContext : INotifyPropertyChanged

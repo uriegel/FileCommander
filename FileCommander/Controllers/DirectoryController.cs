@@ -1,12 +1,14 @@
-﻿using System;
+﻿using CsTools.Extensions;
+
+using FileCommander.Contexts;
+using FileCommander.Data;
+
+using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 
-using CsTools.Extensions;
-
-using FileCommander.Contexts;
-using FileCommander.Data;
+using static System.Net.WebRequestMethods;
 
 namespace FileCommander.Controllers;
 
@@ -20,7 +22,7 @@ class DirectoryController : Controller
             new("Version", Sortable: true)
         ];
 
-    public override (Item[], string, int) GetItems(string path)
+    public override (Item[] Items, string Path, int oldPos, int dirCount, int fileCount) GetItems(string path)
     {
         var dirInfo = new DirectoryInfo(path);
         var dirItems = dirInfo
@@ -35,7 +37,7 @@ class DirectoryController : Controller
         this.path = dirInfo.FullName; 
         items = [new ParentItem(), .. dirItems, .. fileItems];
         (viewItems, var oldPos) = MapViewItems(fromPath);
-        return (MapItems(), path, oldPos);  
+        return (MapItems(), path, oldPos, viewItems.Count(n => n is DirectoryItem), viewItems.Count(n => n is FileItem));  
     }
 
     public override (Controller Controller, Column[]? Columns, string Path, string OldPath) CheckPath(int pos)
@@ -64,20 +66,20 @@ class DirectoryController : Controller
 
     public override string OnPosition(int pos) => path.AppendPath(viewItems[pos].Name);
 
-    public override (Item[] Items, int newPos) Refresh(int pos)
+    public override (Item[] Items, int newPos, int dirs, int files) Refresh(int pos)
     {
         var recentItem = viewItems[pos].Name;
         (viewItems, _) = MapViewItems(null);
         var newPos = viewItems.TakeWhile(n => n.Name != recentItem).Count();
-        return (MapItems(), newPos < viewItems.Length ? newPos : 0);
+        return (MapItems(), newPos < viewItems.Length ? newPos : 0, viewItems.Count(n => n is DirectoryItem), viewItems.Count(n => n is FileItem));
     }
 
-    public override (Item[] Items, int newPos) Reload(int pos)
+    public override (Item[] Items, int newPos, int dirs, int files) Reload(int pos)
     {
         var recentItem = viewItems[pos].Name;
-        var (items, _, _) = GetItems(path);
+        var (items, _, _, dirs, files) = GetItems(path);
         var newPos = items.TakeWhile(n => n.Text != recentItem).Count();
-        return (items, newPos < items.Length ? newPos : 0);
+        return (items, newPos < items.Length ? newPos : 0, dirs, files);
     }
 
     public override (Item[]? Items, int newPos) Sort(int index, bool descending, bool subcolumn, int pos)
@@ -85,7 +87,8 @@ class DirectoryController : Controller
         sortIndex = index;
         sortDescending = descending;
         sortSubcolumn = subcolumn;
-        return Reload(pos);
+        var (items, newPos, _, _) = Refresh(pos);
+        return (items, newPos);
     }
 
     (ItemBase[], int) MapViewItems(string? fromPath)

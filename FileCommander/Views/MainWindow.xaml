@@ -72,10 +72,14 @@
                         <ColumnDefinition  />
                         <ColumnDefinition Width="auto"/>
                         <ColumnDefinition Width="auto"/>
+                        <ColumnDefinition Width="auto"/>
+                        <ColumnDefinition Width="auto"/>
                     </Grid.ColumnDefinitions>
                     <TextBlock FontSize="12" Margin="5, 0" Text="{Binding SelectedPath}"></TextBlock>
-                    <TextBlock FontSize="12" Grid.Column="1" Margin="5, 0">10 Verz.</TextBlock>
-                    <TextBlock FontSize="12" Grid.Column="2" Margin="5, 0">23 Dateien</TextBlock>
+                    <TextBlock FontSize="12" Grid.Column="1" Margin="5, 0, 0, 0" Text="{Binding CurrentDirectoryCount}"></TextBlock>
+                    <TextBlock FontSize="12" Grid.Column="2" Margin="2, 0">Verz.</TextBlock>
+                    <TextBlock FontSize="12" Grid.Column="3" Margin="5, 0, 0, 0" Text="{Binding CurrentFileCount}"></TextBlock>
+                    <TextBlock FontSize="12" Grid.Column="4" Margin="2, 0, 10, 0">Dateien</TextBlock>
                 </Grid>
             </Border>
             <Grid KeyDown="Grid_KeyDown">

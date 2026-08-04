@@ -17,7 +17,10 @@ using System.Collections.Immutable;
 using System.IO;
 using System.Linq;
 using System.Reflection;
+using System.Security.AccessControl;
 using System.Text.Json;
+
+using static System.Net.WebRequestMethods;
 
 namespace FileCommander.Controls;
 
@@ -109,7 +112,9 @@ public sealed partial class VirtualTable : UserControl
             case "init":
             {
                 var columns = controller.GetColumns();
-                (var items, _, _) = controller.GetItems("");
+                (var items, _, _, var dirs, var files) = controller.GetItems("");
+                context.CurrentFileCount = files;
+                context.CurrentDirectoryCount = dirs;
                 var itemsResult = new ItemsResult(columns, items, 0);
                 SendResult(args, itemsResult);
                 break;
@@ -151,6 +156,8 @@ public sealed partial class VirtualTable : UserControl
                     {
                         (controller, var cols, var newPath, var oldPath) = controller.CheckPath(pos);
                         var res = controller.GetItems(newPath);
+                        context.CurrentFileCount = res.fileCount;
+                        context.CurrentDirectoryCount = res.dirCount;
                         var itemsResult = new ItemsResult(cols, res.Items, res.oldPos);
                         SendResult(args, new ProcessResult(ItemsResult: itemsResult));
                     }
@@ -163,14 +170,21 @@ public sealed partial class VirtualTable : UserControl
                 else if (path.StartsWith("refresh"))
                 {
                     var pos = int.Parse(path[8..]);
-                    var (items, newPos) = controller.Refresh(pos);
+                    var (items, newPos, dirs, files) = controller.Refresh(pos);
+                    if (items != null)
+                    {
+                        context.CurrentFileCount = files;
+                        context.CurrentDirectoryCount = dirs;
+                    }
                     var itemsResult = items != null ? new ItemsResult(null, items, newPos) : null;
                     SendResult(args, new ProcessResult(ItemsResult: itemsResult));
                 }
                 else if (path.StartsWith("reload"))
                 {
                     var pos = int.Parse(path[7..]);
-                    var (items, newPos) = controller.Reload(pos);
+                    var (items, newPos, dirs, files) = controller.Reload(pos);
+                    context.CurrentFileCount = files;
+                    context.CurrentDirectoryCount = dirs;
                     var itemsResult = items != null ? new ItemsResult(null, items, newPos) : null;
                     SendResult(args, new ProcessResult(ItemsResult: itemsResult));
                 }
