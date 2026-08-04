@@ -8,8 +8,6 @@ using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 
-using static System.Net.WebRequestMethods;
-
 namespace FileCommander.Controllers;
 
 class DirectoryController : Controller

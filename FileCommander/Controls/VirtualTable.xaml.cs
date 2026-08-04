@@ -5,7 +5,6 @@ using FileCommander.Contexts;
 using FileCommander.Controllers;
 using FileCommander.Data;
 using FileCommander.Icon;
-using FileCommander.Obsoletes;
 
 using Microsoft.UI.Xaml;
 using Microsoft.UI.Xaml.Controls;
@@ -17,14 +16,11 @@ using System.Collections.Immutable;
 using System.IO;
 using System.Linq;
 using System.Reflection;
-using System.Security.AccessControl;
 using System.Text.Json;
 
-using static System.Net.WebRequestMethods;
 
 namespace FileCommander.Controls;
 
-// TODO Status bar: files, directories
 // TODO restriction in index.js
 // TODO Save history
 
@@ -38,6 +34,7 @@ namespace FileCommander.Controls;
 //      * optional in javascript if not possible in XAML
 // TODO Grid Splitter (maybe WinUITools)
 // TODO SetSelections
+// TODO Viewers
 // TODO Home folder (later Favorites, Remotes)
 public sealed partial class VirtualTable : UserControl
 {
