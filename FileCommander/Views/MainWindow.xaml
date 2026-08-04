@@ -66,6 +66,18 @@
         </Grid>
 
         <controls:DockPanel Grid.Row="1">
+            <Border controls:DockPanel.Dock="Bottom" BorderThickness="1" BorderBrush="LightGray">
+                <Grid>
+                    <Grid.ColumnDefinitions>
+                        <ColumnDefinition  />
+                        <ColumnDefinition Width="auto"/>
+                        <ColumnDefinition Width="auto"/>
+                    </Grid.ColumnDefinitions>
+                    <TextBlock FontSize="12" Margin="5, 0" Text="{Binding SelectedPath}"></TextBlock>
+                    <TextBlock FontSize="12" Grid.Column="1" Margin="5, 0">10 Verz.</TextBlock>
+                    <TextBlock FontSize="12" Grid.Column="2" Margin="5, 0">23 Dateien</TextBlock>
+                </Grid>
+            </Border>
             <Grid KeyDown="Grid_KeyDown">
                 <Grid.ColumnDefinitions>
                     <ColumnDefinition Width="*" MinWidth="15" />

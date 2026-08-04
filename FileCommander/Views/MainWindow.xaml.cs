@@ -43,6 +43,7 @@ public sealed partial class MainWindow : Window
         RightView.OnTab += () => LeftView.Focus(FocusState.Keyboard);
 
         activeView = LeftView;
+        MainContext.Instance.ChangeFolderContext(LeftView.Context);
         Focus();
 
         async void Focus()
@@ -134,11 +135,13 @@ public sealed partial class MainWindow : Window
     void LeftView_GotFocus(object sender, RoutedEventArgs e)
     {
         activeView = sender as FolderView;
+        MainContext.Instance.ChangeFolderContext(LeftView.Context);
     }
 
     void RightView_GotFocus(object sender, RoutedEventArgs e)
     {
         activeView = sender as FolderView;
+        MainContext.Instance.ChangeFolderContext(RightView.Context);
     }
 
     void Grid_KeyDown(object sender, Microsoft.UI.Xaml.Input.KeyRoutedEventArgs e)

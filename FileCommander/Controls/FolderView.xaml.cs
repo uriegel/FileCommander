@@ -1,6 +1,8 @@
 using System;
 using System.Threading.Tasks;
 
+using FileCommander.Contexts;
+
 using Microsoft.UI.Xaml;
 using Microsoft.UI.Xaml.Controls;
 using Microsoft.UI.Xaml.Input;
@@ -11,9 +13,12 @@ public sealed partial class FolderView : UserControl
 {
     public event Action? OnTab;
 
+    public FolderContext Context { get; } = new FolderContext();
+
     public FolderView()
     {
         InitializeComponent();
+        DataContext = Context;
         VirtualTable.OnTab += () => OnTab?.Invoke();
     }
 
