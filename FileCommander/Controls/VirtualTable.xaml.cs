@@ -21,7 +21,6 @@ using System.Text.Json;
 
 namespace FileCommander.Controls;
 
-// TODO Sorting: sort changed -> (path and) items
 // TODO Status bar
 // TODO restriction in index.js
 // TODO Save history

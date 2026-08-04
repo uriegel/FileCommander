@@ -70,7 +70,6 @@ export class VirtualTable extends HTMLElement {
         this.root.id = "root"
         this.root.setAttribute("tabindex", "0")
         this.root.addEventListener("keydown", evt => this.onKeyDown(evt))
-        this.root.addEventListener("dblclick", () => this.onSelected())
         this.root.addEventListener("wheel", evt => this.onWheel(evt))
         this.table = document.createElement("table")
         this.tableHead = document.createElement("thead")
@@ -80,6 +79,7 @@ export class VirtualTable extends HTMLElement {
         this.table.appendChild(this.tableHead)
         this.tableBody = document.createElement("tbody")
         this.tableBody.addEventListener("mousedown", evt => this.onMouseDown(evt))
+        this.tableBody.addEventListener("dblclick", () => this.onSelected())
         this.table.appendChild(this.tableBody)
         this.root.appendChild(this.table)
         this.scrollbar = document.createElement("scroll-bar")
