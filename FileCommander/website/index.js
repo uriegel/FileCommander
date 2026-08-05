@@ -40,13 +40,14 @@ tableView.addEventListener("render-rowitem", evt => {
 })
 
 tableView.addEventListener("position-changed", async evt => {
-    const response = await fetch(`request/onposition/${evt.detail.pos}`)
+    const response = await fetch(`request/onposition/${getPosition(evt.detail.pos)}`)
 })
 
 tableView.addEventListener("process-selected", async evt => {
-    const response = await fetch(`request/process/${evt.detail.pos}`)
+    const response = await fetch(`request/process/${getPosition(evt.detail.pos)}`)
     const res = await response.json()
     if (res.itemsResult) {
+        stopRestriction()
         checkColumns(res.itemsResult.columns)
         tableView.setItems(res.itemsResult.items)
         tableView.setPosition(res.itemsResult.pos)
@@ -69,27 +70,31 @@ async function onKeyDown(evt) {
         evt.stopPropagation()
         await fetch("request/command/refresh")
     }
-    else if (evt.key == "Escape") {
-        restriction.value = ""
-        tableView.setItems(unrestrictedItems, 0)
-        restriction.classList.remove("show")
-    }
+    else if (evt.key == "Escape") 
+        stopRestriction()
     else if (evt.key == "Backspace") {
         restriction.value = restriction.value.slice(0, -1)
-        if (!restriction.value) {
-            tableView.setItems(unrestrictedItems, 0)
-            unrestrictedItems = null
-            restriction.classList.remove("show")
+        if (!restriction.value)
+            stopRestriction()
+        else {
+            const restricted = unrestrictedItems.filter(n => n.text.toLowerCase().startsWith(restriction.value))
+            tableView.setItems(restricted, 0)
         }
     }
     else if (evt.key.length == 1) {
         if (!unrestrictedItems) {
             const items = tableView.getItems()
-            const restricted = items.filter(n => n.text.toLowerCase().startsWith(evt.key.toLowerCase()))
+            const restricted = items.filter(n => n.text.toLowerCase().startsWith(evt.key))
             if (restricted.length > 0) {
                 unrestrictedItems = items
                 tableView.setItems(restricted, 0)
                 restriction.classList.add("show")
+                restriction.value += evt.key
+            }
+        } else {
+            const restricted = unrestrictedItems.filter(n => n.text.toLowerCase().startsWith(restriction.value + evt.key))
+            if (restricted.length > 0) {
+                tableView.setItems(restricted, 0)
                 restriction.value += evt.key
             }
         }
@@ -103,7 +108,8 @@ init()
 async function onEvent(evt) {
     console.log("Event", evt)
     if (evt.refresh) {
-        const response = await fetch(`request/refresh/${tableView.getPosition()}`)
+        stopRestriction() 
+        const response = await fetch(`request/refresh/${getPosition()}`)
         const res = await response.json()
         if (res.itemsResult) {
             tableView.setItems(res.itemsResult.items)
@@ -111,7 +117,8 @@ async function onEvent(evt) {
         }
     }
     if (evt.reload) {
-        const response = await fetch(`request/reload/${tableView.getPosition()}`)
+        stopRestriction()
+        const response = await fetch(`request/reload/${getPosition()}`)
         const res = await response.json()
         if (res.itemsResult) {
             tableView.setItems(res.itemsResult.items)
@@ -141,18 +148,29 @@ function onColumnWidthChange(cols) {
     //localStorage.setItem("columnWidths", JSON.stringify(cols))
 }
 
-function checkRestricted(key) {
-    const restrictedItems = restrictionView.current?.checkKey(key)
-    if (restrictedItems) {
-        virtualTable.current?.setPosition(0)
-        setItems(restrictedItems)
-        return true
-    } else
-        return false
+function getPosition(pos) {
+    if (!pos)
+        pos = tableView.getPosition()
+    if (!unrestrictedItems)
+        return pos;
+    else {
+        const text = tableView.getItems()[pos].text
+        console.log("Text", text)
+        return unrestrictedItems.findIndex(n => n.text == text)
+    }
 }
 
+function stopRestriction() {
+    if (unrestrictedItems) {
+        restriction.value = ""
+        tableView.setItems(unrestrictedItems, 0)
+        unrestrictedItems = null
+        restriction.classList.remove("show")
+    }
+}
 
 async function onSort(e) {
+    stopRestriction()
     const response = await fetch(`request/sort?column=${e.index}&descending=${e.descending}${e.subColumn ? "&subcolumn=true" : ""}&pos=${tableView.getPosition()}`)
     const res = await response.json()
     if (res.itemsResult) {

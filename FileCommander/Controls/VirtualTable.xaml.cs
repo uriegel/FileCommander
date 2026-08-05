@@ -21,7 +21,6 @@ using System.Text.Json;
 
 namespace FileCommander.Controls;
 
-// TODO restriction in index.js
 // TODO Save history
 
 // TODO Save/Reload Options https://learn.microsoft.com/en-us/windows/apps/develop/data/store-and-retrieve-app-data
