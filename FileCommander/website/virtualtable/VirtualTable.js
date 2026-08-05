@@ -247,6 +247,8 @@ export class VirtualTable extends HTMLElement {
             })
     }
 
+    getItems() { return this.items }
+
     setPosition(newPos) {
         const up = newPos < this.currentPosition
         newPos = up ? Math.max(newPos, 0) : Math.min(newPos, this.items.length - 1)

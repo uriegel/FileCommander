@@ -163,6 +163,7 @@ public sealed partial class VirtualTable : UserControl
                 {
                     var pos = int.Parse(path[11..]);
                     context.SelectedPath = controller.OnPosition(pos);
+                    SendResult(args, new ProcessResult());
                 }
                 else if (path.StartsWith("refresh"))
                 {

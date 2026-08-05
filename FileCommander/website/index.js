@@ -1,7 +1,5 @@
 ﻿import './virtualtable/index.js'
 
-let columnCount = 0
-
 const tableView = document.getElementById("virtual-table")
 const fill = document.getElementById("fill")
 const restriction = document.getElementById("restriction")
@@ -43,7 +41,6 @@ tableView.addEventListener("render-rowitem", evt => {
 
 tableView.addEventListener("position-changed", async evt => {
     const response = await fetch(`request/onposition/${evt.detail.pos}`)
-    const res = await response.json()
 })
 
 tableView.addEventListener("process-selected", async evt => {
@@ -74,17 +71,28 @@ async function onKeyDown(evt) {
     }
     else if (evt.key == "Escape") {
         restriction.value = ""
+        tableView.setItems(unrestrictedItems, 0)
         restriction.classList.remove("show")
     }
     else if (evt.key == "Backspace") {
         restriction.value = restriction.value.slice(0, -1)
-        if (!restriction.value) 
+        if (!restriction.value) {
+            tableView.setItems(unrestrictedItems, 0)
+            unrestrictedItems = null
             restriction.classList.remove("show")
+        }
     }
-    else {
-        if (!restriction.value) 
-            restriction.classList.add("show")
-        restriction.value += evt.key
+    else if (evt.key.length == 1) {
+        if (!unrestrictedItems) {
+            const items = tableView.getItems()
+            const restricted = items.filter(n => n.text.toLowerCase().startsWith(evt.key.toLowerCase()))
+            if (restricted.length > 0) {
+                unrestrictedItems = items
+                tableView.setItems(restricted, 0)
+                restriction.classList.add("show")
+                restriction.value += evt.key
+            }
+        }
     }
 }
 
@@ -153,3 +161,5 @@ async function onSort(e) {
     }
 }
 
+var columnCount = 0
+var unrestrictedItems
