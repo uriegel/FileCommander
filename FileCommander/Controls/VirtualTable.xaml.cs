@@ -18,11 +18,11 @@ using System.Linq;
 using System.Reflection;
 using System.Text.Json;
 
-
+    
 namespace FileCommander.Controls;
 
-// TODO PathEdit: enter change path (with exception)
 // TODO PathEdit: reflect path changes
+// TODO PathEdit: enter change path with Controller change
 
 // TODO Save history
 
@@ -43,6 +43,9 @@ public sealed partial class VirtualTable : UserControl
     public void Refresh() => SendEvent(new(Reload: new()));
 
     public void SetContext(FolderContext context) => this.context = context;
+    internal void SendEvent(Event evt)
+        => WebView.CoreWebView2.PostWebMessageAsJson(JsonSerializer.Serialize(evt, Json.Defaults));
+
     async void Grid_Loaded(object sender, RoutedEventArgs e)
     {
         await WebView.EnsureCoreWebView2Async();
@@ -100,7 +103,7 @@ public sealed partial class VirtualTable : UserControl
         }
     }
 
-    async void ServeRequest(string path, CoreWebView2WebResourceRequestedEventArgs args)
+    void ServeRequest(string path, CoreWebView2WebResourceRequestedEventArgs args)
     {
         switch (path)
         {
@@ -132,17 +135,29 @@ public sealed partial class VirtualTable : UserControl
                 OnTab?.Invoke(query.TryGetValue("shift", out _));
                 break;
             }
-            case "TODO":
-                var deferral = args.GetDeferral();
-                try
-                {
-                    // args.Response = await ...()
-                }
-                finally
-                {
-                    deferral.Complete();
-                }
+            case "changePath":
+            {
+                var query = MakeQuery(args.Request.Uri);
+                var newpath = query.TryGetValue("path", out var res) ? res ?? "" : "";
+                var (items, p, newPos, dirs, files) = controller.GetItems(newpath);
+                path = p;
+                context.CurrentFileCount = files;
+                context.CurrentDirectoryCount = dirs;
+                var itemsResult = items != null ? new ItemsResult(null, items, newPos) : null;
+                SendResult(args, new ProcessResult(ItemsResult: itemsResult));
                 break;
+            }
+            //case "TODO":
+            //    var deferral = args.GetDeferral();
+            //    try
+            //    {
+            //        // args.Response = await ...()
+            //    }
+            //    finally
+            //    {
+            //        deferral.Complete();
+            //    }
+            //    break;
             default:
             {
                 if (path.StartsWith("process"))
@@ -234,9 +249,6 @@ public sealed partial class VirtualTable : UserControl
         args.Response = WebView.CoreWebView2.Environment.CreateWebResourceResponse(ms.AsRandomAccessStream(),
             200, "OK", "Content-Type: application/json");
     }
-
-    void SendEvent(Event evt)
-        => WebView.CoreWebView2.PostWebMessageAsJson(JsonSerializer.Serialize(evt, Json.Defaults));
 
     // TODO to CsTools
     static ImmutableDictionary<string, string> MakeQuery(string url)

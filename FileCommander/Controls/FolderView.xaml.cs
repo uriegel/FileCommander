@@ -1,6 +1,7 @@
 using System;
 
 using FileCommander.Contexts;
+using FileCommander.Data;
 
 using Microsoft.UI.Xaml;
 using Microsoft.UI.Xaml.Controls;
@@ -24,7 +25,10 @@ public sealed partial class FolderView : UserControl
         VirtualTable.OnTab += ctrl =>
         {
             if (ctrl)
+            {
+                PathTextBox.SelectAll();
                 PathTextBox.Focus(FocusState.Keyboard);
+            }
             else
                 OnTab?.Invoke();
         };
@@ -35,8 +39,16 @@ public sealed partial class FolderView : UserControl
 
     void TextBox_KeyDown(object sender, KeyRoutedEventArgs e)
     {
-        e.Handled = true;
         if (e.Key == VirtualKey.Tab)
+        {
             VirtualTable.Focus(FocusState.Keyboard);
+            e.Handled = true;
+        }
+        else if (e.Key == VirtualKey.Enter)
+        {
+            VirtualTable.SendEvent(new Data.Event(ChangePath: new ChangePath(PathTextBox.Text)));
+            VirtualTable.Focus(FocusState.Keyboard);
+            e.Handled = true;
+        }
     }
 }

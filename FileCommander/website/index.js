@@ -129,6 +129,13 @@ async function onEvent(evt) {
             tableView.setPosition(res.itemsResult.pos)
         }
     }
+    if (evt.changePath) {
+        stopRestriction()
+        const response = await fetch(`request/changePath?path=${evt.changePath.path}`)
+        const res = await response.json()
+        if (res.itemsResult) 
+            tableView.setItems(res.itemsResult.items)
+    }
 }
 
 async function init() {
