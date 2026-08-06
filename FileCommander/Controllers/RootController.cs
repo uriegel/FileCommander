@@ -1,5 +1,6 @@
 ﻿using CsTools;
 
+using FileCommander.Contexts;
 using FileCommander.Data;
 
 using System.IO;
@@ -15,12 +16,12 @@ class RootController : Controller
     
     public string Name { get; } = NAME;
 
-    public static RootController Get(Controller? current)
+    public static RootController Get(Controller? current, FolderContext context)
         => current is RootController rootController
             ? rootController
-            : new RootController();
+            : new RootController(context);
 
-    public RootController() { }
+    public RootController(FolderContext context) : base(context) { }
 
     public override Column[] GetColumns()
         => [
@@ -29,7 +30,7 @@ class RootController : Controller
             new("Größe", true)
         ];
 
-    public override (Item[] Items, string Path, int oldPos, int dirCount, int fileCount) GetItems(string path)
+    public override (Item[] Items, string Path, int oldPos, int dirCount, int fileCount) GetItems(string path, bool controllerChanged)
     {
         items =
            [.. DriveInfo
@@ -37,6 +38,7 @@ class RootController : Controller
                .Select(RootItem.Create)
                .OrderByDescending(n => n.IsMounted)
                .ThenBy(n => n.Name)];
+        Context.CurrentPath = Name;
         return ([.. items.Select(n => new Item(n.Name, n.GetIcon(), [
             n.Description,
             n.Size.FormatSize().EmptyWhen0()
@@ -45,7 +47,7 @@ class RootController : Controller
 
     public override (Controller Controller, Column[]? Columns, string Path, string OldPath) CheckPath(int pos)
     {
-        var controller = new DirectoryController();
+        var controller = new DirectoryController(Context);
         var columns = controller.GetColumns();
         return (controller, columns, items[pos].Name, Name);
     }
@@ -54,7 +56,7 @@ class RootController : Controller
     
     public override (Item[] Items, int newPos, int dirs, int files) Reload(int pos)
     {
-        var (items, _, _, dirs, files) = GetItems("");
+        var (items, _, _, dirs, files) = GetItems("", false);
         return (items, pos, dirs, files);
     }
 

@@ -20,8 +20,8 @@ public sealed partial class FolderView : UserControl
     public FolderView()
     {
         InitializeComponent();
-        DataContext = Context;
         VirtualTable.SetContext(Context);
+        DataContext = Context;
         VirtualTable.OnTab += ctrl =>
         {
             if (ctrl)

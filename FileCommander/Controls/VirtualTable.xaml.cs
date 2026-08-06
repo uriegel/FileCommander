@@ -21,9 +21,6 @@ using System.Text.Json;
     
 namespace FileCommander.Controls;
 
-// TODO PathEdit: reflect path changes
-// TODO PathEdit: enter change path with Controller change
-
 // TODO Save history
 
 // TODO Save/Reload Options https://learn.microsoft.com/en-us/windows/apps/develop/data/store-and-retrieve-app-data
@@ -42,7 +39,13 @@ public sealed partial class VirtualTable : UserControl
 
     public void Refresh() => SendEvent(new(Reload: new()));
 
-    public void SetContext(FolderContext context) => this.context = context;
+    public void SetContext(FolderContext context)
+    {
+        this.context = context;
+        // TODO retrieve last path from storage
+        controller = Controller.GetFromPath(null, null, context);
+    }
+
     internal void SendEvent(Event evt)
         => WebView.CoreWebView2.PostWebMessageAsJson(JsonSerializer.Serialize(evt, Json.Defaults));
 
@@ -110,7 +113,7 @@ public sealed partial class VirtualTable : UserControl
             case "init":
             {
                 var columns = controller.GetColumns();
-                (var items, _, _, var dirs, var files) = controller.GetItems("");
+                (var items, _, _, var dirs, var files) = controller.GetItems("", true);
                 context.CurrentFileCount = files;
                 context.CurrentDirectoryCount = dirs;
                 var itemsResult = new ItemsResult(columns, items, 0);
@@ -139,7 +142,8 @@ public sealed partial class VirtualTable : UserControl
             {
                 var query = MakeQuery(args.Request.Uri);
                 var newpath = query.TryGetValue("path", out var res) ? res ?? "" : "";
-                var (items, p, newPos, dirs, files) = controller.GetItems(newpath);
+                controller = Controller.GetFromPath(newpath, controller, context);
+                var (items, p, newPos, dirs, files) = controller.GetItems(newpath, false);
                 path = p;
                 context.CurrentFileCount = files;
                 context.CurrentDirectoryCount = dirs;
@@ -167,8 +171,9 @@ public sealed partial class VirtualTable : UserControl
                         SendResult(args, new ProcessResult());
                     else
                     {
-                        (controller, var cols, var newPath, var oldPath) = controller.CheckPath(pos);
-                        var res = controller.GetItems(newPath);
+                        var (controller, cols, newPath, _) = this.controller.CheckPath(pos);
+                        var res = controller.GetItems(newPath, controller != this.controller);
+                        this.controller = controller;
                         context.CurrentFileCount = res.fileCount;
                         context.CurrentDirectoryCount = res.dirCount;
                         var itemsResult = new ItemsResult(cols, res.Items, res.oldPos);
@@ -263,7 +268,6 @@ public sealed partial class VirtualTable : UserControl
             Uri.UnescapeDataString(line.SubstringAfter('=').Trim())
         );
 
-    // TODO retrieve last path from storage
-    Controller controller = Controller.GetFromPath(null, null);
+    Controller controller = null!;
     FolderContext context = null!;
 }

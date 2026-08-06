@@ -12,6 +12,13 @@ namespace FileCommander.Controllers;
 
 class DirectoryController : Controller
 {
+    public static DirectoryController Get(Controller? current, FolderContext context)
+    => current is DirectoryController dirController
+        ? dirController
+        : new DirectoryController(context);
+
+    public DirectoryController(FolderContext context) : base(context) { }
+
     public override Column[] GetColumns()
         => [
             new("Name", SubColumn: "Erw.", Sortable: true),
@@ -20,7 +27,7 @@ class DirectoryController : Controller
             new("Version", Sortable: true)
         ];
 
-    public override (Item[] Items, string Path, int oldPos, int dirCount, int fileCount) GetItems(string path)
+    public override (Item[] Items, string Path, int oldPos, int dirCount, int fileCount) GetItems(string path, bool controllerChanged)
     {
         var dirInfo = new DirectoryInfo(path);
         var dirItems = dirInfo
@@ -31,8 +38,8 @@ class DirectoryController : Controller
             .GetFiles()
             .Select(FileItem.Create)
             .ToArray();
-        var fromPath = dirInfo.FullName.Length < this.path.Length ? this.path[dirInfo.FullName.Length..].Trim('\\') : null;
-        this.path = dirInfo.FullName; 
+        var fromPath = !controllerChanged && dirInfo.FullName.Length < Context.CurrentPath.Length ? Context.CurrentPath[dirInfo.FullName.Length..].Trim('\\') : null;
+        Context.CurrentPath = dirInfo.FullName; 
         items = [new ParentItem(), .. dirItems, .. fileItems];
         (viewItems, var oldPos) = MapViewItems(fromPath);
         return (MapItems(), path, oldPos, viewItems.Count(n => n is DirectoryItem), viewItems.Count(n => n is FileItem));  
@@ -41,15 +48,15 @@ class DirectoryController : Controller
     public override (Controller Controller, Column[]? Columns, string Path, string OldPath) CheckPath(int pos)
     {
         return pos != 0
-            ? (this, null, path.AppendPath(viewItems[pos].Name), "")
-            : new DirectoryInfo(path).Parent?.FullName is string newPath
-            ? (this, null, newPath, path)
+            ? (this, null, Context.CurrentPath.AppendPath(viewItems[pos].Name), "")
+            : new DirectoryInfo(Context.CurrentPath).Parent?.FullName is string newPath
+            ? (this, null, newPath, Context.CurrentPath)
             : NewRootController(); 
 
         (Controller, Column[]?, string, string) NewRootController()
         {
-            var controller = new RootController();
-            return (controller, controller.GetColumns(), "", path);
+            var controller = new RootController(Context);
+            return (controller, controller.GetColumns(), "", Context.CurrentPath);
         }
     }
 
@@ -63,7 +70,7 @@ class DirectoryController : Controller
     }
 
     public override string OnPosition(int pos) 
-        => pos < viewItems.Length ? path.AppendPath(viewItems[pos].Name) : path;
+        => pos < viewItems.Length ? Context.CurrentPath.AppendPath(viewItems[pos].Name) : Context.CurrentPath;
 
     public override (Item[] Items, int newPos, int dirs, int files) Refresh(int pos)
     {
@@ -76,7 +83,7 @@ class DirectoryController : Controller
     public override (Item[] Items, int newPos, int dirs, int files) Reload(int pos)
     {
         var recentItem = viewItems[pos].Name;
-        var (items, _, _, dirs, files) = GetItems(path);
+        var (items, _, _, dirs, files) = GetItems(Context.CurrentPath, false);
         var newPos = items.TakeWhile(n => n.Text != recentItem).Count();
         return (items, newPos < items.Length ? newPos : 0, dirs, files);
     }
@@ -105,9 +112,9 @@ class DirectoryController : Controller
 
                 n switch
                 {
-                    ParentItem p => new Item(p.Name, n.GetIcon(path), []),
-                    DirectoryItem d => new Item(d.Name, n.GetIcon(path), [d.DateTime.ToString("g")], d.IsHidden),
-                    FileItem f => new Item(f.Name, n.GetIcon(path), [f.DateTime.ToString("g"), f.Size.FormatSize()], f.IsHidden),
+                    ParentItem p => new Item(p.Name, n.GetIcon(Context.CurrentPath), []),
+                    DirectoryItem d => new Item(d.Name, n.GetIcon(Context.CurrentPath), [d.DateTime.ToString("g")], d.IsHidden),
+                    FileItem f => new Item(f.Name, n.GetIcon(Context.CurrentPath), [f.DateTime.ToString("g"), f.Size.FormatSize()], f.IsHidden),
                     _ => throw new Exception("Unknown ItemBase")
                 })];
 
@@ -115,7 +122,6 @@ class DirectoryController : Controller
     ItemBase[] items = null!;
     ItemBase[] viewItems = null!;
 
-    string path = "";
     int sortIndex = -1;
     bool sortDescending = false;
     bool sortSubcolumn = false;
