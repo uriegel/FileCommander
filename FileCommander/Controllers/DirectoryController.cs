@@ -62,7 +62,8 @@ class DirectoryController : Controller
             return false;
     }
 
-    public override string OnPosition(int pos) => path.AppendPath(viewItems[pos].Name);
+    public override string OnPosition(int pos) 
+        => pos < viewItems.Length ? path.AppendPath(viewItems[pos].Name) : path;
 
     public override (Item[] Items, int newPos, int dirs, int files) Refresh(int pos)
     {
