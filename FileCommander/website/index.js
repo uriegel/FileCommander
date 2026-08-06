@@ -54,11 +54,15 @@ tableView.addEventListener("process-selected", async evt => {
     }
 })
 
+/**
+ * 
+ * @param {MouseEvent} evt
+ */
 async function onKeyDown(evt) {
     if (evt.key == "Tab") {
         evt.preventDefault()
         evt.stopPropagation()
-        const response = await fetch("request/tab")
+        const response = await fetch(`request/tab${evt.shiftKey ? "?shift=true" : ""}`)
     }
     else if (evt.ctrlKey && evt.key == "h") {
         evt.preventDefault();

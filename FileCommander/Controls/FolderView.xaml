@@ -14,9 +14,10 @@
             <RowDefinition Height="auto" />
             <RowDefinition Height="*" />
         </Grid.RowDefinitions>
-        <TextBox x:Name="PathTextBox" KeyDown="TextBox_KeyDown" TabIndex="2" 
-          Text="{Binding CurrentPath}"
-          GotFocus="TextBox_GotFocus" BorderThickness="0" FontSize="12"  />
+        <TextBox x:Name="PathTextBox" KeyDown="TextBox_KeyDown" 
+                 MinHeight="0"
+                Height="20"
+          Text="{Binding CurrentPath}" Margin="0" Padding="0" BorderThickness="0" FontSize="12"  />
         <controls:VirtualTable Grid.Row="1" x:Name="VirtualTable" TabIndex="1"/>
     </Grid>
 </UserControl>

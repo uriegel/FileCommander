@@ -21,23 +21,22 @@ using System.Text.Json;
 
 namespace FileCommander.Controls;
 
+// TODO PathEdit: enter change path (with exception)
+// TODO PathEdit: reflect path changes
+
 // TODO Save history
 
 // TODO Save/Reload Options https://learn.microsoft.com/en-us/windows/apps/develop/data/store-and-retrieve-app-data
 
 // TODO exif date and version
 // TODO File SystemWatcher with directories
-// TODO Tab control shift tab -> path edit
-// TODO path control
-//      * styled like javascript
-//      * optional in javascript if not possible in XAML
 // TODO Grid Splitter (maybe WinUITools)
 // TODO SetSelections
 // TODO Viewers
 // TODO Home folder (later Favorites, Remotes)
 public sealed partial class VirtualTable : UserControl
 {
-    public event Action? OnTab;
+    public event Action<bool>? OnTab;
 
     public VirtualTable() => InitializeComponent();
 
@@ -128,8 +127,11 @@ public sealed partial class VirtualTable : UserControl
                 break;
             }
             case "tab":
-                OnTab?.Invoke();
+            {
+                var query = MakeQuery(args.Request.Uri);
+                OnTab?.Invoke(query.TryGetValue("shift", out _));
                 break;
+            }
             case "TODO":
                 var deferral = args.GetDeferral();
                 try
