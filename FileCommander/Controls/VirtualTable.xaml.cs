@@ -13,6 +13,7 @@ using Microsoft.Web.WebView2.Core;
 using System;
 using System.Collections.Generic;
 using System.Collections.Immutable;
+using System.ComponentModel;
 using System.IO;
 using System.Linq;
 using System.Reflection;
@@ -44,6 +45,7 @@ public sealed partial class VirtualTable : UserControl
         this.context = context;
         // TODO retrieve last path from storage
         controller = Controller.GetFromPath(null, null, context);
+        context.PropertyChanged += Context_PropertyChanged; ;
     }
 
     internal void SendEvent(Event evt)
@@ -59,6 +61,18 @@ public sealed partial class VirtualTable : UserControl
         MainContext.Instance.PropertyChanged += MainContext_PropertyChanged;
     }
 
+    void Context_PropertyChanged(object? sender, PropertyChangedEventArgs e)
+    {
+        switch (e.PropertyName)
+        {
+            case nameof(FolderContext.CurrentPath):
+                if (history[^1] != context.CurrentPath)
+                    history.Add(context.CurrentPath);
+                historyPosition = history.Count - 1;
+                break;
+        }
+    }
+    
     void CoreWebView2_WebResourceRequested(CoreWebView2 sender, CoreWebView2WebResourceRequestedEventArgs args)
     {
         try
@@ -270,4 +284,6 @@ public sealed partial class VirtualTable : UserControl
 
     Controller controller = null!;
     FolderContext context = null!;
+    readonly List<string> history = [];
+    int historyPosition = -1;
 }
