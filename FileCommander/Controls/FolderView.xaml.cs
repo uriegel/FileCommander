@@ -1,5 +1,3 @@
-using System;
-
 using FileCommander.Contexts;
 using FileCommander.Data;
 
@@ -7,21 +5,29 @@ using Microsoft.UI.Xaml;
 using Microsoft.UI.Xaml.Controls;
 using Microsoft.UI.Xaml.Input;
 
+using System;
+
 using Windows.System;
 
 namespace FileCommander.Controls;
 
 public sealed partial class FolderView : UserControl
 {
+    public static readonly DependencyProperty IdProperty = DependencyProperty.Register(
+        nameof(Id), typeof(string), typeof(FolderView), new PropertyMetadata(""));
+    public string Id
+    {
+        get => (string)GetValue(IdProperty);
+        set => SetValue(IdProperty, value);
+    }
+
     public event Action? OnTab;
 
-    public FolderContext Context { get; } = new FolderContext();
+    public FolderContext Context { get; private set; } = null!;
 
     public FolderView()
     {
         InitializeComponent();
-        VirtualTable.SetContext(Context);
-        DataContext = Context;
         VirtualTable.OnTab += ctrl =>
         {
             if (ctrl)
@@ -36,6 +42,13 @@ public sealed partial class FolderView : UserControl
 
     public void Refresh()
         => VirtualTable.Refresh();
+
+    void UserControl_Loaded(object _, RoutedEventArgs e)
+    {
+        Context = new FolderContext(Id);
+        VirtualTable.SetContext(Context);
+        DataContext = Context;
+    }
 
     void TextBox_KeyDown(object sender, KeyRoutedEventArgs e)
     {

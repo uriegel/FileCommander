@@ -1,3 +1,5 @@
+using ClrWinApi;
+
 using FileCommander.Contexts;
 using FileCommander.Controls;
 
@@ -10,6 +12,8 @@ using System;
 using System.Threading.Tasks;
 
 using Windows.ApplicationModel;
+using Windows.Graphics;
+using Windows.Storage;
 
 namespace FileCommander;
 
@@ -18,6 +22,21 @@ public sealed partial class MainWindow : Window
     public MainWindow()
     {
         this.InitializeComponent();
+        
+        var settings = ApplicationData.Current.LocalSettings.Values;
+        if (settings?.ContainsKey("WindowX") == true)
+        {
+            if (IsWindowVisible())
+                AppWindow.MoveAndResize(new RectInt32(
+                    (int)settings["WindowX"],
+                    (int)settings["WindowY"],
+                    (int)settings["WindowWidth"],
+                    (int)settings["WindowHeight"]));
+
+            if ((bool)settings["WindowMaximized"])
+                ((OverlappedPresenter)AppWindow.Presenter).Maximize();
+        }
+        
         MainGrid.DataContext = MainContext.Instance;
         MainContext.Instance.ShowHiddenCommand = ShowHiddenCommand;
         MainContext.Instance.RefreshCommand = RefreshCommand;
@@ -157,6 +176,37 @@ public sealed partial class MainWindow : Window
         => activeView?.Refresh();
 
     FolderView GetOtherView() => activeView == LeftView ? RightView : LeftView;
+
+    void Window_Closed(object sender, WindowEventArgs args)
+    {
+        var settings = ApplicationData.Current.LocalSettings.Values;
+
+        var presenter = (OverlappedPresenter)AppWindow.Presenter;
+
+        if (presenter.State != OverlappedPresenterState.Maximized)
+        {
+            // Save these values in your settings
+            settings["WindowX"] = AppWindow.Position.X;
+            settings["WindowY"] = AppWindow.Position.Y;
+            settings["WindowWidth"] = AppWindow.Size.Width;
+            settings["WindowHeight"] = AppWindow.Size.Height;
+        }
+
+        settings["WindowMaximized"] =
+            presenter.State == OverlappedPresenterState.Maximized;
+    } 
+
+    bool IsWindowVisible()
+    {
+        var rect = new Rect()
+        { 
+            Left = AppWindow.Position.X, 
+            Top = AppWindow.Position.Y, 
+            Right= AppWindow.Position.X + AppWindow.Size.Width, 
+            Bottom = AppWindow.Position.Y + AppWindow.Size.Height 
+        };
+        return Api.MonitorFromRect(ref rect, MonitorDefaultTo.Null) != 0;
+    }
 
     FolderView? activeView;
 }

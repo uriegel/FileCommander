@@ -13,19 +13,15 @@ using Microsoft.Web.WebView2.Core;
 using System;
 using System.Collections.Generic;
 using System.Collections.Immutable;
-using System.ComponentModel;
 using System.IO;
 using System.Linq;
 using System.Reflection;
 using System.Text.Json;
 
-    
-namespace FileCommander.Controls;
+using Windows.Storage;
 
-// TODO Save/Reload Options https://learn.microsoft.com/en-us/windows/apps/develop/data/store-and-retrieve-app-data
-// TODO Window bounds and position
-// TODO LatestPath
-// TODO Column withs
+
+namespace FileCommander.Controls;
 
 // TODO exif date and version
 // TODO File SystemWatcher with directories
@@ -44,8 +40,7 @@ public sealed partial class VirtualTable : UserControl
     public void SetContext(FolderContext context)
     {
         this.context = context;
-        // TODO retrieve last path from storage
-        controller = Controller.GetFromPath(null, null, context);
+        controller = Controller.GetInitial(context);
     }
 
     internal void SendEvent(Event evt)
@@ -114,8 +109,11 @@ public sealed partial class VirtualTable : UserControl
         {
             case "init":
             {
+                var settings = ApplicationData.Current.LocalSettings.Values;
+                var key = $"{context.Id}-latestPath";
+                var initpath = settings.ContainsKey(key) ? (string)settings[key] : "";
                 var columns = controller.GetColumns();
-                (var items, _, _, var dirs, var files) = controller.GetItems("", true);
+                (var items, _, _, var dirs, var files) = controller.GetItems(initpath, true);
                 context.CurrentFileCount = files;
                 context.CurrentDirectoryCount = dirs;
                 var itemsResult = new ItemsResult(columns, items, 0);

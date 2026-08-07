@@ -2,13 +2,18 @@
 using System.Collections.Generic;
 using System.ComponentModel;
 
+using Windows.Storage;
+
 namespace FileCommander.Contexts;
 
 public class FolderContext : INotifyPropertyChanged
 {
     public event PropertyChangedEventHandler? PropertyChanged;
 
+    public string Id { get; set; }
     public bool IsLeft { get; set; }
+
+    public FolderContext(string id) => Id = id;
 
     public string CurrentPath
     {
@@ -18,6 +23,9 @@ public class FolderContext : INotifyPropertyChanged
             if (field != value)
             {
                 field = value;
+                var settings = ApplicationData.Current.LocalSettings.Values;
+                settings[$"{Id}-latestPath"] = value;
+
                 OnChanged(nameof(CurrentPath));
             }
         }

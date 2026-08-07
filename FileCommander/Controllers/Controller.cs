@@ -1,14 +1,21 @@
 ﻿using FileCommander.Contexts;
 using FileCommander.Data;
 
-using System.IO;
-using System.Reflection;
+using Windows.Storage;
 
 namespace FileCommander.Controllers;
 
 abstract class Controller
 {
     public FolderContext Context { get; } = null!;
+
+    public static Controller GetInitial(FolderContext context)
+    {
+        var settings = ApplicationData.Current.LocalSettings.Values;
+        var key = $"{context.Id}-latestPath";
+        var path = settings.ContainsKey(key) ? (string)settings[key] : null;
+        return GetFromPath(path, null, context);
+    }
 
     public static Controller GetFromPath(string? path, Controller? current, FolderContext context)
     {

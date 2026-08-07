@@ -6,7 +6,8 @@
     xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
     xmlns:controls="using:CommunityToolkit.WinUI.Controls" 
     xmlns:controls1="using:FileCommander.Controls"
-    mc:Ignorable="d">
+    mc:Ignorable="d"
+    Closed="Window_Closed">
 
     <Grid Name="MainGrid">
         <Grid.Resources>
@@ -88,13 +89,13 @@
                     <ColumnDefinition Width="5" />
                     <ColumnDefinition Width="*" MinWidth="15" />
                 </Grid.ColumnDefinitions>
-                <controls1:FolderView x:Name="LeftView" Grid.Column="0" 
+                <controls1:FolderView x:Name="LeftView" Id="LeftView" Grid.Column="0" 
                                  HorizontalAlignment="Stretch"
                                  GotFocus="LeftView_GotFocus">
                 </controls1:FolderView>
                 <Border Grid.Column="1" Width="5" HorizontalAlignment="Stretch" 
                           Background="Transparent"/>
-                <controls1:FolderView x:Name="RightView" Grid.Column="2" 
+                <controls1:FolderView x:Name="RightView" Id="RightView" Grid.Column="2" 
                                  HorizontalAlignment="Stretch"
                                  GotFocus="RightView_GotFocus">
                 </controls1:FolderView>
