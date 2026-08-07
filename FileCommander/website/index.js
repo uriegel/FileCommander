@@ -56,7 +56,7 @@ tableView.addEventListener("process-selected", async evt => {
 
 /**
  * 
- * @param {MouseEvent} evt
+ * @param {KeyboardEvent} evt
  */
 async function onKeyDown(evt) {
     if (evt.key == "Tab") {
@@ -77,12 +77,20 @@ async function onKeyDown(evt) {
     else if (evt.key == "Escape") 
         stopRestriction()
     else if (evt.key == "Backspace") {
-        restriction.value = restriction.value.slice(0, -1)
-        if (!restriction.value)
-            stopRestriction()
+        if (!unrestrictedItems) {
+            const response = await fetch(`request/history?forward=${evt.shiftKey}`)
+            const itemsResult = await response.json()
+            checkColumns(itemsResult.columns)
+            tableView.setItems(itemsResult.items)
+        }
         else {
-            const restricted = unrestrictedItems.filter(n => n.text.toLowerCase().startsWith(restriction.value))
-            tableView.setItems(restricted, 0)
+            restriction.value = restriction.value.slice(0, -1)
+            if (!restriction.value)
+                stopRestriction()
+            else {
+                const restricted = unrestrictedItems.filter(n => n.text.toLowerCase().startsWith(restriction.value))
+                tableView.setItems(restricted, 0)
+            }
         }
     }
     else if (evt.key.length == 1) {

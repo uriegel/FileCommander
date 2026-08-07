@@ -8,9 +8,8 @@ namespace FileCommander.Controllers;
 
 abstract class Controller
 {
-    public FolderContext Context { get; } 
+    public FolderContext Context { get; } = null!;
 
-    //public abstract string Name { get; } 
     public static Controller GetFromPath(string? path, Controller? current, FolderContext context)
     {
         if (path == null || path == "/.." || path.Length == 0 || path == RootController.NAME)
@@ -21,8 +20,15 @@ abstract class Controller
 
     protected Controller(FolderContext context) => Context = context; 
 
+    protected void SetNewPath(string path, bool fromHistory = false)
+    {
+        if (!fromHistory)
+            Context.AddHistory(path);
+        Context.CurrentPath = path;
+    }
+
     public abstract Column[] GetColumns();
-    public abstract (Item[] Items, string Path, int oldPos, int dirCount, int fileCount) GetItems(string path, bool controllerChanged);
+    public abstract (Item[] Items, string Path, int oldPos, int dirCount, int fileCount) GetItems(string path, bool controllerChanged, bool fromHistory = false);
     public abstract string OnPosition(int pos);
     public virtual (Item[]? Items, int newPos, int dirs, int files) Refresh(int pos) => (null, 0, 0, 0);
     public abstract (Item[] Items, int newPos, int dirs, int files) Reload(int pos);

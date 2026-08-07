@@ -5,6 +5,7 @@ using FileCommander.Data;
 
 using System.IO;
 using System.Linq;
+using System.Runtime;
 
 using static System.Net.WebRequestMethods;
 
@@ -30,7 +31,7 @@ class RootController : Controller
             new("Größe", true)
         ];
 
-    public override (Item[] Items, string Path, int oldPos, int dirCount, int fileCount) GetItems(string path, bool controllerChanged)
+    public override (Item[] Items, string Path, int oldPos, int dirCount, int fileCount) GetItems(string path, bool controllerChanged, bool fromHistory = false)
     {
         items =
            [.. DriveInfo
@@ -38,7 +39,7 @@ class RootController : Controller
                .Select(RootItem.Create)
                .OrderByDescending(n => n.IsMounted)
                .ThenBy(n => n.Name)];
-        Context.CurrentPath = Name;
+        SetNewPath(Name, fromHistory);
         return ([.. items.Select(n => new Item(n.Name, n.GetIcon(), [
             n.Description,
             n.Size.FormatSize().EmptyWhen0()

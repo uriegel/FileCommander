@@ -1,9 +1,13 @@
-﻿using System.ComponentModel;
+﻿using System;
+using System.Collections.Generic;
+using System.ComponentModel;
 
 namespace FileCommander.Contexts;
 
 public class FolderContext : INotifyPropertyChanged
 {
+    public event PropertyChangedEventHandler? PropertyChanged;
+
     public bool IsLeft { get; set; }
 
     public string CurrentPath
@@ -56,7 +60,7 @@ public class FolderContext : INotifyPropertyChanged
                 OnChanged(nameof(SelectedPath));
             }
         }
-    } = "Das ist der selektierte Pfad aus dem FolderContext";  //string.Empty;
+    } = string.Empty;
 
     //public string Restriction
     //{
@@ -99,7 +103,24 @@ public class FolderContext : INotifyPropertyChanged
 
     //public bool IsEditing { get; set; }
 
+    public void AddHistory(string path)
+    {
+        if (history.Count == 0 || history[^1] != path)
+            history.Add(path);
+        historyPosition = history.Count - 1;
+    }
+
+    public string? GetHistory()
+    {
+        if (history.Count <= 1)
+            return null;
+        var newPath = history[historyPosition - 1];
+        historyPosition = Math.Max(0, historyPosition - 1);
+        return newPath;
+    }
+
     void OnChanged(string name) => PropertyChanged?.Invoke(this, new(name));
 
-    public event PropertyChangedEventHandler? PropertyChanged;
+    readonly List<string> history = [];
+    int historyPosition = -1;
 }

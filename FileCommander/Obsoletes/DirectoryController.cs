@@ -70,7 +70,6 @@ class DirectoryController : IDisposable
                         .GetFiles()
                         .Select(FileItem.Create)
                         .ToArray();
-        //context.CurrentPath = dirInfo.FullName;
         //Application.Settings.SetString($"path-{Id}", dirInfo.FullName);
         return files;
         //return [

@@ -45,7 +45,6 @@ public sealed partial class VirtualTable : UserControl
         this.context = context;
         // TODO retrieve last path from storage
         controller = Controller.GetFromPath(null, null, context);
-        context.PropertyChanged += Context_PropertyChanged; ;
     }
 
     internal void SendEvent(Event evt)
@@ -59,18 +58,6 @@ public sealed partial class VirtualTable : UserControl
         WebView.CoreWebView2.WebResourceRequested += CoreWebView2_WebResourceRequested; ;
         WebView.Source = new Uri("https://localhost/index.html");
         MainContext.Instance.PropertyChanged += MainContext_PropertyChanged;
-    }
-
-    void Context_PropertyChanged(object? sender, PropertyChangedEventArgs e)
-    {
-        switch (e.PropertyName)
-        {
-            case nameof(FolderContext.CurrentPath):
-                if (history[^1] != context.CurrentPath)
-                    history.Add(context.CurrentPath);
-                historyPosition = history.Count - 1;
-                break;
-        }
     }
     
     void CoreWebView2_WebResourceRequested(CoreWebView2 sender, CoreWebView2WebResourceRequestedEventArgs args)
@@ -158,11 +145,26 @@ public sealed partial class VirtualTable : UserControl
                 var newpath = query.TryGetValue("path", out var res) ? res ?? "" : "";
                 controller = Controller.GetFromPath(newpath, controller, context);
                 var (items, p, newPos, dirs, files) = controller.GetItems(newpath, false);
-                path = p;
                 context.CurrentFileCount = files;
                 context.CurrentDirectoryCount = dirs;
                 var itemsResult = items != null ? new ItemsResult(null, items, newPos) : null;
                 SendResult(args, new ProcessResult(ItemsResult: itemsResult));
+                break;
+            }
+            case "history":
+            {
+                var query = MakeQuery(args.Request.Uri);
+                var newPath = context.GetHistory();
+                    ItemsResult? itemsResult = null;
+                if (newPath != null)
+                {
+                    controller = Controller.GetFromPath(newPath, controller, context);
+                    var (items, p, newPos, dirs, files) = controller.GetItems(newPath, false, true);
+                    context.CurrentFileCount = files;
+                    context.CurrentDirectoryCount = dirs;
+                    itemsResult = items != null ? new ItemsResult(null, items, newPos) : null;
+                }
+                SendResult(args, itemsResult);
                 break;
             }
             //case "TODO":
@@ -284,6 +286,4 @@ public sealed partial class VirtualTable : UserControl
 
     Controller controller = null!;
     FolderContext context = null!;
-    readonly List<string> history = [];
-    int historyPosition = -1;
 }

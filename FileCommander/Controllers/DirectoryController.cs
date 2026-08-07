@@ -27,7 +27,7 @@ class DirectoryController : Controller
             new("Version", Sortable: true)
         ];
 
-    public override (Item[] Items, string Path, int oldPos, int dirCount, int fileCount) GetItems(string path, bool controllerChanged)
+    public override (Item[] Items, string Path, int oldPos, int dirCount, int fileCount) GetItems(string path, bool controllerChanged, bool fromHistory = false)
     {
         var dirInfo = new DirectoryInfo(path);
         var dirItems = dirInfo
@@ -39,7 +39,8 @@ class DirectoryController : Controller
             .Select(FileItem.Create)
             .ToArray();
         var fromPath = !controllerChanged && dirInfo.FullName.Length < Context.CurrentPath.Length ? Context.CurrentPath[dirInfo.FullName.Length..].Trim('\\') : null;
-        Context.CurrentPath = dirInfo.FullName; 
+        SetNewPath(dirInfo.FullName, fromHistory);
+        // TODO AddHistory if not from history (baseclass should handle this)
         items = [new ParentItem(), .. dirItems, .. fileItems];
         (viewItems, var oldPos) = MapViewItems(fromPath);
         return (MapItems(), path, oldPos, viewItems.Count(n => n is DirectoryItem), viewItems.Count(n => n is FileItem));  
