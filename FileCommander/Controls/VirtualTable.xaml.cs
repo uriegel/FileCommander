@@ -22,9 +22,10 @@ using System.Text.Json;
     
 namespace FileCommander.Controls;
 
-// TODO Save history
-
 // TODO Save/Reload Options https://learn.microsoft.com/en-us/windows/apps/develop/data/store-and-retrieve-app-data
+// TODO Window bounds and position
+// TODO LatestPath
+// TODO Column withs
 
 // TODO exif date and version
 // TODO File SystemWatcher with directories
@@ -154,8 +155,8 @@ public sealed partial class VirtualTable : UserControl
             case "history":
             {
                 var query = MakeQuery(args.Request.Uri);
-                var newPath = context.GetHistory();
-                    ItemsResult? itemsResult = null;
+                var newPath = context.GetHistory(query.TryGetValue("forward", out var val) && val == "true");
+                ItemsResult? itemsResult = null;
                 if (newPath != null)
                 {
                     controller = Controller.GetFromPath(newPath, controller, context);

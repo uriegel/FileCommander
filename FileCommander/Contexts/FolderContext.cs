@@ -110,13 +110,14 @@ public class FolderContext : INotifyPropertyChanged
         historyPosition = history.Count - 1;
     }
 
-    public string? GetHistory()
+    public string? GetHistory(bool forward)
     {
-        if (history.Count <= 1)
+        if (history.Count == 0)
             return null;
-        var newPath = history[historyPosition - 1];
-        historyPosition = Math.Max(0, historyPosition - 1);
-        return newPath;
+        historyPosition = forward 
+            ? Math.Min(history.Count - 1, historyPosition + 1)
+            : Math.Max(0, historyPosition - 1);
+        return history[historyPosition];
     }
 
     void OnChanged(string name) => PropertyChanged?.Invoke(this, new(name));
