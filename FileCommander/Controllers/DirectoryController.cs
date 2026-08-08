@@ -1,4 +1,5 @@
-﻿using CsTools.Extensions;
+﻿using CsTools;
+using CsTools.Extensions;
 
 using FileCommander.Contexts;
 using FileCommander.Data;
@@ -27,7 +28,8 @@ class DirectoryController : Controller
             new("Version", Sortable: true)
         ];
 
-    public override (Item[] Items, string Path, int oldPos, int dirCount, int fileCount) GetItems(string path, bool controllerChanged, bool fromHistory = false)
+    public override (Item[] Items, int oldPos, int dirCount, int fileCount) GetItems(
+        string path, bool controllerChanged, Action<Event>? sendEvent, bool fromHistory = false)
     {
         var dirInfo = new DirectoryInfo(path);
         var dirItems = dirInfo
@@ -40,10 +42,11 @@ class DirectoryController : Controller
             .ToArray();
         var fromPath = !controllerChanged && dirInfo.FullName.Length < Context.CurrentPath.Length ? Context.CurrentPath[dirInfo.FullName.Length..].Trim('\\') : null;
         SetNewPath(dirInfo.FullName, fromHistory);
-        // TODO AddHistory if not from history (baseclass should handle this)
         items = [new ParentItem(), .. dirItems, .. fileItems];
+        extendedFileInfos = new();
+        extendedFileInfos.Get(Context.CurrentPath, items.SelectFilterNull(n => n as FileItem), sendEvent);
         (viewItems, var oldPos) = MapViewItems(fromPath);
-        return (MapItems(), path, oldPos, viewItems.Count(n => n is DirectoryItem), viewItems.Count(n => n is FileItem));  
+        return (MapItems(), oldPos, viewItems.Count(n => n is DirectoryItem), viewItems.Count(n => n is FileItem));  
     }
 
     public override (Controller Controller, Column[]? Columns, string Path, string OldPath) CheckPath(int pos)
@@ -81,10 +84,10 @@ class DirectoryController : Controller
         return (MapItems(), newPos < viewItems.Length ? newPos : 0, viewItems.Count(n => n is DirectoryItem), viewItems.Count(n => n is FileItem));
     }
 
-    public override (Item[] Items, int newPos, int dirs, int files) Reload(int pos)
+    public override (Item[] Items, int newPos, int dirs, int files) Reload(int pos, Action<Event>? sendEvent)
     {
         var recentItem = viewItems[pos].Name;
-        var (items, _, _, dirs, files) = GetItems(Context.CurrentPath, false);
+        var (items, _, dirs, files) = GetItems(Context.CurrentPath, false, sendEvent);
         var newPos = items.TakeWhile(n => n.Text != recentItem).Count();
         return (items, newPos < items.Length ? newPos : 0, dirs, files);
     }
@@ -114,11 +117,10 @@ class DirectoryController : Controller
                 n switch
                 {
                     ParentItem p => new Item(p.Name, n.GetIcon(Context.CurrentPath), []),
-                    DirectoryItem d => new Item(d.Name, n.GetIcon(Context.CurrentPath), [d.DateTime.ToString("g")], d.IsHidden),
-                    FileItem f => new Item(f.Name, n.GetIcon(Context.CurrentPath), [f.DateTime.ToString("g"), f.Size.FormatSize()], f.IsHidden),
+                    DirectoryItem d => new Item(d.Name, n.GetIcon(Context.CurrentPath), [d.DateTime.ToString("g")], null, d.IsHidden),
+                    FileItem f => Item.Get(f, Context.CurrentPath),
                     _ => throw new Exception("Unknown ItemBase")
                 })];
-
 
     ItemBase[] items = null!;
     ItemBase[] viewItems = null!;
@@ -126,6 +128,8 @@ class DirectoryController : Controller
     int sortIndex = -1;
     bool sortDescending = false;
     bool sortSubcolumn = false;
+
+    ExtendedFileInfos? extendedFileInfos;
 }
 
 abstract record ItemBase(string Name, bool IsHidden)
@@ -143,6 +147,7 @@ record DirectoryItem(string Name, bool IsHidden, DateTime DateTime) : ItemBase(N
 }
 record FileItem(string Name, bool IsVisible, DateTime DateTime, long Size) : ItemBase(Name, IsVisible)
 {
+    public ExifData? ExifData { get; set; }
     public static FileItem Create(FileInfo info) => new(info.Name, info.IsHidden(), info.LastWriteTime, info.Length);
     public override string GetIcon(string path)
         => $"icon/{(Name.EndsWith(".exe", StringComparison.OrdinalIgnoreCase) ? path.AppendPath(Name) : Name.GetFileExtension())}";

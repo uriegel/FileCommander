@@ -1,6 +1,8 @@
 ﻿using FileCommander.Contexts;
 using FileCommander.Data;
 
+using System;
+
 using Windows.Storage;
 
 namespace FileCommander.Controllers;
@@ -35,10 +37,11 @@ abstract class Controller
     }
 
     public abstract Column[] GetColumns();
-    public abstract (Item[] Items, string Path, int oldPos, int dirCount, int fileCount) GetItems(string path, bool controllerChanged, bool fromHistory = false);
+    public abstract (Item[] Items, int oldPos, int dirCount, int fileCount) GetItems(
+        string path, bool controllerChanged, Action<Event>? sendEvent, bool fromHistory = false);
     public abstract string OnPosition(int pos);
     public virtual (Item[]? Items, int newPos, int dirs, int files) Refresh(int pos) => (null, 0, 0, 0);
-    public abstract (Item[] Items, int newPos, int dirs, int files) Reload(int pos);
+    public abstract (Item[] Items, int newPos, int dirs, int files) Reload(int pos, Action<Event>? sendEvent);
     public virtual (Item[]? Items, int newPos) Sort(int index, bool descending, bool subcolumn, int pos) => (null, 0);
     public abstract (Controller Controller, Column[]? Columns, string Path, string OldPath) CheckPath(int pos);
     public virtual bool Process(int pos) => false;

@@ -3,6 +3,7 @@
 using FileCommander.Contexts;
 using FileCommander.Data;
 
+using System;
 using System.IO;
 using System.Linq;
 using System.Runtime;
@@ -31,7 +32,8 @@ class RootController : Controller
             new("Größe", true)
         ];
 
-    public override (Item[] Items, string Path, int oldPos, int dirCount, int fileCount) GetItems(string path, bool controllerChanged, bool fromHistory = false)
+    public override (Item[] Items, int oldPos, int dirCount, int fileCount) GetItems(
+        string path, bool controllerChanged, Action<Event>? sendEvent, bool fromHistory = false)
     {
         items =
            [.. DriveInfo
@@ -43,7 +45,7 @@ class RootController : Controller
         return ([.. items.Select(n => new Item(n.Name, n.GetIcon(), [
             n.Description,
             n.Size.FormatSize().EmptyWhen0()
-          ], !n.IsMounted))], Name, 0, items.Length, 0);
+          ], null, !n.IsMounted))], 0, items.Length, 0);
     }
 
     public override (Controller Controller, Column[]? Columns, string Path, string OldPath) CheckPath(int pos)
@@ -55,9 +57,9 @@ class RootController : Controller
     
     public override string OnPosition(int pos) => items[pos].Name;
     
-    public override (Item[] Items, int newPos, int dirs, int files) Reload(int pos)
+    public override (Item[] Items, int newPos, int dirs, int files) Reload(int pos, Action<Event>? sendEvent)
     {
-        var (items, _, _, dirs, files) = GetItems("", false);
+        var (items, _, dirs, files) = GetItems("", false, sendEvent);
         return (items, pos, dirs, files);
     }
 

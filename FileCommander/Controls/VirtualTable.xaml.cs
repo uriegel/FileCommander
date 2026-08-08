@@ -113,7 +113,7 @@ public sealed partial class VirtualTable : UserControl
                 var key = $"{context.Id}-latestPath";
                 var initpath = settings.ContainsKey(key) ? (string)settings[key] : "";
                 var columns = controller.GetColumns();
-                (var items, _, _, var dirs, var files) = controller.GetItems(initpath, true);
+                (var items, _, var dirs, var files) = controller.GetItems(initpath, true, SendEvent);
                 context.CurrentFileCount = files;
                 context.CurrentDirectoryCount = dirs;
                 var itemsResult = new ItemsResult(columns, items, 0);
@@ -143,7 +143,7 @@ public sealed partial class VirtualTable : UserControl
                 var query = MakeQuery(args.Request.Uri);
                 var newpath = query.TryGetValue("path", out var res) ? res ?? "" : "";
                 controller = Controller.GetFromPath(newpath, controller, context);
-                var (items, p, newPos, dirs, files) = controller.GetItems(newpath, false);
+                var (items, newPos, dirs, files) = controller.GetItems(newpath, false, SendEvent);
                 context.CurrentFileCount = files;
                 context.CurrentDirectoryCount = dirs;
                 var itemsResult = items != null ? new ItemsResult(null, items, newPos) : null;
@@ -158,7 +158,7 @@ public sealed partial class VirtualTable : UserControl
                 if (newPath != null)
                 {
                     controller = Controller.GetFromPath(newPath, controller, context);
-                    var (items, p, newPos, dirs, files) = controller.GetItems(newPath, false, true);
+                    var (items, newPos, dirs, files) = controller.GetItems(newPath, false, SendEvent, true);
                     context.CurrentFileCount = files;
                     context.CurrentDirectoryCount = dirs;
                     itemsResult = items != null ? new ItemsResult(null, items, newPos) : null;
@@ -187,7 +187,7 @@ public sealed partial class VirtualTable : UserControl
                     else
                     {
                         var (controller, cols, newPath, _) = this.controller.CheckPath(pos);
-                        var res = controller.GetItems(newPath, controller != this.controller);
+                        var res = controller.GetItems(newPath, controller != this.controller, SendEvent);
                         this.controller = controller;
                         context.CurrentFileCount = res.fileCount;
                         context.CurrentDirectoryCount = res.dirCount;
@@ -216,7 +216,7 @@ public sealed partial class VirtualTable : UserControl
                 else if (path.StartsWith("reload"))
                 {
                     var pos = int.Parse(path[7..]);
-                    var (items, newPos, dirs, files) = controller.Reload(pos);
+                    var (items, newPos, dirs, files) = controller.Reload(pos, SendEvent);
                     context.CurrentFileCount = files;
                     context.CurrentDirectoryCount = dirs;
                     var itemsResult = items != null ? new ItemsResult(null, items, newPos) : null;

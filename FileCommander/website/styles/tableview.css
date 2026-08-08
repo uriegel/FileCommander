@@ -1,3 +1,6 @@
 ﻿tr.isHidden > td {
     opacity: 0.5;
 }
+tr.exif > td:nth-child(2) {
+    color: blue;
+}

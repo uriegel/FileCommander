@@ -29,13 +29,20 @@ tableView.addEventListener("render-rowitem", evt => {
         tr.classList.add("isHidden")
     else
         tr.classList.remove("isHidden")
+    if (evt.detail.item?.exifValue?.date)
+        tr.classList.add("exif")
+    else
+        tr.classList.remove("exif")
     const img = tr.querySelector('#img')
     img.src = evt.detail.item.icon
     const sp = tr.querySelector('#text')
     sp.textContent = evt.detail.item.text
     for (let i = 0; i < columnCount - 1; i++) {
         const element = tr.querySelector(`#item${i}`)
-        element.textContent = evt.detail.item.values[i]
+        if (i == 0 && evt.detail.item?.exifValue?.date) 
+            element.textContent = evt.detail.item?.exifValue?.date
+        else
+            element.textContent = evt.detail.item.values[i]
     }
 })
 
@@ -49,7 +56,7 @@ tableView.addEventListener("process-selected", async evt => {
     if (res.itemsResult) {
         stopRestriction()
         checkColumns(res.itemsResult.columns)
-        tableView.setItems(res.itemsResult.items)
+        setItems(res.itemsResult.items)
         tableView.setPosition(res.itemsResult.pos)
     }
 })
@@ -81,7 +88,7 @@ async function onKeyDown(evt) {
             const response = await fetch(`request/history?forward=${evt.shiftKey}`)
             const itemsResult = await response.json()
             checkColumns(itemsResult.columns)
-            tableView.setItems(itemsResult.items)
+            setItems(itemsResult.items)
         }
         else {
             restriction.value = restriction.value.slice(0, -1)
@@ -121,19 +128,14 @@ async function onEvent(evt) {
     console.log("Event", evt)
     if (evt.refresh) {
         stopRestriction() 
-        const response = await fetch(`request/refresh/${getPosition()}`)
-        const res = await response.json()
-        if (res.itemsResult) {
-            tableView.setItems(res.itemsResult.items)
-            tableView.setPosition(res.itemsResult.pos)
-        }
+        await refresh()
     }
     if (evt.reload) {
         stopRestriction()
         const response = await fetch(`request/reload/${getPosition()}`)
         const res = await response.json()
         if (res.itemsResult) {
-            tableView.setItems(res.itemsResult.items)
+            setItems(res.itemsResult.items)
             tableView.setPosition(res.itemsResult.pos)
         }
     }
@@ -142,7 +144,7 @@ async function onEvent(evt) {
         const response = await fetch(`request/changePath?path=${evt.changePath.path}`)
         const res = await response.json()
         if (res.itemsResult) 
-            tableView.setItems(res.itemsResult.items)
+            setItems(res.itemsResult.items)
     }
 }
 
@@ -151,7 +153,7 @@ async function init() {
     const response = await fetch("request/init")
     const itemsResult = await response.json()
     checkColumns(itemsResult.columns)
-    tableView.setItems(itemsResult.items)
+    setItems(itemsResult.items)
     tableView.setPosition(itemsResult.pos)
 }
 
@@ -197,6 +199,42 @@ async function onSort(e) {
         tableView.setPosition(res.itemsResult.pos)
     }
 }
+
+async function refresh() {
+    const response = await fetch(`request/refresh/${getPosition()}`)
+    const res = await response.json()
+    if (res.itemsResult) {
+        tableView.setItems(res.itemsResult.items)
+        tableView.setPosition(res.itemsResult.pos)
+    }
+}
+
+async function setItems(items) {
+    tableView.setItems(items)
+
+    while (true) {
+        await delayAsync(200)
+        await refresh()
+        await delayAsync(200)
+        await refresh()
+        await delayAsync(200)
+        await refresh()
+
+
+
+        break
+    }
+    // only when extended items are available
+    // refresh extended util finished   
+}
+
+function delayAsync(ms) {
+    return new Promise(res => {
+        setTimeout(res, ms)
+    })
+}
+
+
 
 var columnCount = 0
 var unrestrictedItems

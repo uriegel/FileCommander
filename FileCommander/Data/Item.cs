@@ -1,6 +1,23 @@
-﻿namespace FileCommander.Data;
+﻿using CsTools;
 
-record Item(string Text, string Icon, string[] Values, bool Hidden = false);
+using FileCommander.Controllers;
+
+namespace FileCommander.Data;
+
+record Item(string Text, string Icon, string[] Values, ExifValue? ExifValue = null, bool Hidden = false)
+{
+    public static Item Get(FileItem item, string path)
+        => new(item.Name, item.GetIcon(path), [item.DateTime.ToString("g"), item.Size.FormatSize()], ExifValue.Create(item.ExifData), item.IsHidden);
+};
+
+record ExifValue(string? Date, double? Latitude, double? Longitude)
+{
+    public static ExifValue? Create(ExifData? data)
+        => data is null
+            ? null
+            : new ExifValue(data.DateTime?.ToString("g"), data.Latitude, data.Longitude);
+
+}
 
 record ItemsResult(
     Column[]? Columns,
@@ -30,3 +47,4 @@ static class ItemExtensions
         return sizeStr;
     }
 }
+
