@@ -33,7 +33,7 @@ class RootController : Controller
         ];
 
     public override (Item[] Items, int oldPos, int dirCount, int fileCount) GetItems(
-        string path, bool controllerChanged, Action<Event>? sendEvent, bool fromHistory = false)
+        string path, bool controllerChanged, bool fromHistory = false)
     {
         items =
            [.. DriveInfo
@@ -57,9 +57,9 @@ class RootController : Controller
     
     public override string OnPosition(int pos) => items[pos].Name;
     
-    public override (Item[] Items, int newPos, int dirs, int files) Reload(int pos, Action<Event>? sendEvent)
+    public override (Item[] Items, int newPos, int dirs, int files) Reload(int pos)
     {
-        var (items, _, dirs, files) = GetItems("", false, sendEvent);
+        var (items, _, dirs, files) = GetItems("", false);
         return (items, pos, dirs, files);
     }
 

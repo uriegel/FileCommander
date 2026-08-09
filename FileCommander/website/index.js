@@ -212,6 +212,8 @@ async function refresh() {
 async function setItems(items) {
     tableView.setItems(items)
 
+
+    const response = await fetch(`request/refresh/${getPosition()}`)
     while (true) {
         await delayAsync(200)
         await refresh()

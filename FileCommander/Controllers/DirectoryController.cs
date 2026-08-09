@@ -1,11 +1,9 @@
-﻿using CsTools;
-using CsTools.Extensions;
+﻿using CsTools.Extensions;
 
 using FileCommander.Contexts;
 using FileCommander.Data;
 
 using System;
-using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 
@@ -29,7 +27,7 @@ class DirectoryController : Controller
         ];
 
     public override (Item[] Items, int oldPos, int dirCount, int fileCount) GetItems(
-        string path, bool controllerChanged, Action<Event>? sendEvent, bool fromHistory = false)
+        string path, bool controllerChanged, bool fromHistory = false)
     {
         var dirInfo = new DirectoryInfo(path);
         var dirItems = dirInfo
@@ -43,8 +41,9 @@ class DirectoryController : Controller
         var fromPath = !controllerChanged && dirInfo.FullName.Length < Context.CurrentPath.Length ? Context.CurrentPath[dirInfo.FullName.Length..].Trim('\\') : null;
         SetNewPath(dirInfo.FullName, fromHistory);
         items = [new ParentItem(), .. dirItems, .. fileItems];
-        extendedFileInfos = new();
-        extendedFileInfos.Get(Context.CurrentPath, items.SelectFilterNull(n => n as FileItem), sendEvent);
+        changes = new();
+        extendedFileInfos?.Dispose();
+        extendedFileInfos = new(changes, Context.CurrentPath, items.SelectFilterNull(n => n as FileItem));
         (viewItems, var oldPos) = MapViewItems(fromPath);
         return (MapItems(), oldPos, viewItems.Count(n => n is DirectoryItem), viewItems.Count(n => n is FileItem));  
     }
@@ -84,10 +83,10 @@ class DirectoryController : Controller
         return (MapItems(), newPos < viewItems.Length ? newPos : 0, viewItems.Count(n => n is DirectoryItem), viewItems.Count(n => n is FileItem));
     }
 
-    public override (Item[] Items, int newPos, int dirs, int files) Reload(int pos, Action<Event>? sendEvent)
+    public override (Item[] Items, int newPos, int dirs, int files) Reload(int pos)
     {
         var recentItem = viewItems[pos].Name;
-        var (items, _, dirs, files) = GetItems(Context.CurrentPath, false, sendEvent);
+        var (items, _, dirs, files) = GetItems(Context.CurrentPath, false);
         var newPos = items.TakeWhile(n => n.Text != recentItem).Count();
         return (items, newPos < items.Length ? newPos : 0, dirs, files);
     }
@@ -130,94 +129,6 @@ class DirectoryController : Controller
     bool sortSubcolumn = false;
 
     ExtendedFileInfos? extendedFileInfos;
+    FileChanges changes = null!;
 }
 
-abstract record ItemBase(string Name, bool IsHidden)
-{
-    public abstract string GetIcon(string path);
-}
-record ParentItem() : ItemBase("..", false)
-{
-    public override string GetIcon(string path) => "iconFromRes/GoUp";
-}
-record DirectoryItem(string Name, bool IsHidden, DateTime DateTime) : ItemBase(Name, IsHidden)
-{
-    public static DirectoryItem Create(DirectoryInfo info) => new(info.Name, info.IsHidden(), info.LastWriteTime);
-    public override string GetIcon(string path) => "iconFromRes/Folder";
-}
-record FileItem(string Name, bool IsVisible, DateTime DateTime, long Size) : ItemBase(Name, IsVisible)
-{
-    public ExifData? ExifData { get; set; }
-    public static FileItem Create(FileInfo info) => new(info.Name, info.IsHidden(), info.LastWriteTime, info.Length);
-    public override string GetIcon(string path)
-        => $"icon/{(Name.EndsWith(".exe", StringComparison.OrdinalIgnoreCase) ? path.AppendPath(Name) : Name.GetFileExtension())}";
-}
-
-static class ItemExtensions
-{
-    public static bool IsHidden(this FileSystemInfo info)
-        => (info.Attributes & FileAttributes.Hidden) == FileAttributes.Hidden || info.Name.StartsWith('.');
-}
-
-class ItemsComparer(int sortIndex, bool subColumn,  bool descending) : IComparer<ItemBase>
-{
-    public int Compare(ItemBase? x, ItemBase? y)
-    {
-        // Parent item always first
-        int tx = x switch
-        {
-            ParentItem => 0,
-            DirectoryItem => 1,
-            _ => 2
-        };
-
-        int ty = y switch
-        {
-            ParentItem => 0,
-            DirectoryItem => 1,
-            _ => 2
-        };
-
-        int result = tx.CompareTo(ty);
-        if (result != 0)
-            return result;
-
-        result = (sortIndex, subColumn) switch
-        {
-            (0, false) => StringComparer.CurrentCultureIgnoreCase.Compare(x!.Name, y!.Name),
-            (0, true) => StringComparer.CurrentCultureIgnoreCase.Compare(x!.Name.GetFileExtension(), y!.Name.GetFileExtension()),
-            (1, _) => CompareDate(x!, y!),
-            (2, _) => CompareSize(x!, y!),
-            _ => 0
-        };
-
-        return descending ? -result : result;
-    }
-
-    static int CompareDate(ItemBase x, ItemBase y)
-    {
-        DateTime dx = x switch
-        {
-            DirectoryItem d => d.DateTime,
-            FileItem f => f.DateTime,
-            _ => DateTime.MinValue
-        };
-
-        DateTime dy = y switch
-        {
-            DirectoryItem d => d.DateTime,
-            FileItem f => f.DateTime,
-            _ => DateTime.MinValue
-        };
-
-        return dx.CompareTo(dy);
-    }
-
-    static int CompareSize(ItemBase x, ItemBase y)
-    {
-        long sx = x is FileItem f1 ? f1.Size : -1;
-        long sy = y is FileItem f2 ? f2.Size : -1;
-
-        return sx.CompareTo(sy);
-    }
-}

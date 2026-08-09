@@ -7,35 +7,45 @@ using System;
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.Linq;
-using System.Reflection.Metadata.Ecma335;
+using System.Threading;
 using System.Threading.Tasks;
 
 namespace FileCommander.Controllers;
 
 // TODO: after getItems call refresh?extended=true
     // => extended items and finished true/false
-// TODO: Cancellation
 // TODO: When restriction
 
 
-class ExtendedFileInfos
+class ExtendedFileInfos : IDisposable
 {
-    public async void Get(string path, IEnumerable<FileItem> items, Action<Event>? SendEvent)
+    public ExtendedFileInfos(FileChanges changes, string path, IEnumerable<FileItem> items)
     {
+        this.changes = changes;
+        task = Task.Run(() => GetAsync(path, items));
+    }
+
+    public async Task GetAsync(string path, IEnumerable<FileItem> items)
+    {
+        var stoppwatch = Stopwatch.StartNew();
         var extendedItems = GetExtendedFileItems(items);
         if (extendedItems.Length > 0)
             await foreach (var extendedItem in extendedItems.ToAsyncEnumerable()) 
             {
+                if (cancellation.IsCancellationRequested)
+                    return;
                 if (extendedItem.Exif)
                 {
-                    var info = await Task.Run(() =>
-                    {
-                        return ExifReader.GetExifData(path.AppendPath(extendedItem.Item.Name));
-                    });
+                    var info = ExifReader.GetExifData(path.AppendPath(extendedItem.Item.Name));
                     if (info != null)
+                    {
                         extendedItem.Item.ExifData = info;
+                        await changes.AddChangedItemAsync(Item.Get(extendedItem.Item, path));
+                    }
                 }
             }
+        var timeNeeded = stoppwatch.Elapsed;
+        Debug.WriteLine($"Get extended needed {timeNeeded.TotalMilliseconds} ms for {extendedItems.Length} items");
     }
 
     static ExtendedFileItem[] GetExtendedFileItems(IEnumerable<FileItem> items)
@@ -45,18 +55,56 @@ class ExtendedFileInfos
     static bool IsExif(FileItem item)
     {
         var ext = item.Name.GetFileExtension();
-        return string.CompareOrdinal(item.Name.GetFileExtension(), ".jpg") == 0
-           || string.CompareOrdinal(item.Name.GetFileExtension(), ".png") == 0;
+        return string.CompareOrdinal(ext, ".jpg") == 0
+           || string.CompareOrdinal(ext, ".png") == 0;
     }
 
     static bool IsVersion(FileItem item)
     {
         var ext = item.Name.GetFileExtension();
-        return string.CompareOrdinal(item.Name.GetFileExtension(), ".exe") == 0
-           || string.CompareOrdinal(item.Name.GetFileExtension(), ".dll") == 0;
+        return string.CompareOrdinal(ext, ".exe") == 0
+           || string.CompareOrdinal(ext, ".dll") == 0;
     }
 
-    Task? task;
+    readonly FileChanges changes;
+    readonly CancellationTokenSource cancellation = new();
+    readonly Task task;
+
+    #region IDisposable 
+
+    public void Dispose()
+    {
+        // Ändere diesen Code nicht. Füge Bereinigungscode in der Methode "Dispose(bool disposing)" ein.
+        Dispose(disposing: true);
+        GC.SuppressFinalize(this);
+    }
+
+    protected virtual void Dispose(bool disposing)
+    {
+        if (!disposedValue)
+        {
+            if (disposing)
+            {
+                // Verwalteten Zustand (verwaltete Objekte) bereinigen
+                cancellation.Cancel();
+            }
+
+            // Nicht verwaltete Ressourcen (nicht verwaltete Objekte) freigeben und Finalizer überschreiben
+            // Große Felder auf NULL setzen
+            disposedValue = true;
+        }
+    }
+
+    // Finalizer nur überschreiben, wenn "Dispose(bool disposing)" Code für die Freigabe nicht verwalteter Ressourcen enthält
+    // ~ExtendedFileInfos()
+    // {
+    //     // Ändere diesen Code nicht. Füge Bereinigungscode in der Methode "Dispose(bool disposing)" ein.
+    //     Dispose(disposing: false);
+    // }
+
+    bool disposedValue;
+
+    #endregion
 }
 
 record ExtendedFileItem(bool Version, bool Exif, FileItem Item);
