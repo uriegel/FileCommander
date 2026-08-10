@@ -211,23 +211,40 @@ async function refresh() {
 
 async function setItems(items) {
     tableView.setItems(items)
+    itemsMap = new Map(items.map(item => [item.text, item]))
+    changeDetectionCancellation = true
+    detectChanges()
+}
 
+async function detectChanges() {
+    changeDetectionCancellation = false
+    const response = await fetch("getFileChanges")
 
-    const response = await fetch(`request/refresh/${getPosition()}`)
+    const reader = response.body.getReader()
+    const decoder = new TextDecoder()
+
+    let buffer = ""
+
     while (true) {
-        await delayAsync(200)
-        await refresh()
-        await delayAsync(200)
-        await refresh()
-        await delayAsync(200)
-        await refresh()
+        const { value, done } = await reader.read()
 
+        if (done || changeDetectionCancellation)
+            break;
 
+        buffer += decoder.decode(value, { stream: true })
 
-        break
+        const lines = buffer.split("\n")
+        buffer = lines.pop();
+
+        for (const line of lines) {
+            if (!line)
+                continue;
+
+            const event = JSON.parse(line)
+
+            console.log("Changes", event)
+        }
     }
-    // only when extended items are available
-    // refresh extended util finished   
 }
 
 function delayAsync(ms) {
@@ -236,7 +253,7 @@ function delayAsync(ms) {
     })
 }
 
-
-
+var itemsMap
 var columnCount = 0
 var unrestrictedItems
+var changeDetectionCancellation = false

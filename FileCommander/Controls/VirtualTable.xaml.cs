@@ -14,11 +14,16 @@ using System;
 using System.Collections.Generic;
 using System.Collections.Immutable;
 using System.IO;
+using System.IO.Pipes;
 using System.Linq;
 using System.Reflection;
+using System.Runtime.CompilerServices;
+using System.Text;
 using System.Text.Json;
+using System.Threading.Tasks;
 
 using Windows.Storage;
+using Windows.Storage.Streams;
 
 
 namespace FileCommander.Controls;
@@ -51,7 +56,7 @@ public sealed partial class VirtualTable : UserControl
         await WebView.EnsureCoreWebView2Async();
 
         WebView.CoreWebView2.AddWebResourceRequestedFilter("https:*", CoreWebView2WebResourceContext.All);
-        WebView.CoreWebView2.WebResourceRequested += CoreWebView2_WebResourceRequested; ;
+        WebView.CoreWebView2.WebResourceRequested += CoreWebView2_WebResourceRequested; 
         WebView.Source = new Uri("https://localhost/index.html");
         MainContext.Instance.PropertyChanged += MainContext_PropertyChanged;
     }
@@ -67,6 +72,30 @@ public sealed partial class VirtualTable : UserControl
                 ServeIconFromRes(path[12..], args);
             else if (path.StartsWith("icon"))
                 ServeIcon(path[5..], args);
+            else if (path == "getFileChanges")
+            {
+                var stream = new MemoryStream();
+                args.Response = sender.Environment.CreateWebResourceResponse(
+                        stream.AsRandomAccessStream(),
+                        200,
+                        "OK",
+                        "Content-Type: application/x-ndjson\r\nCache-Control: no-cache");
+
+                var bytes = Encoding.UTF8.GetBytes("{\"status\":\"stream-start\"}\n");
+                stream.Write(bytes);
+                Task.Run(SendChanges).ConfigureAwait(false);
+                async void SendChanges()
+                {
+                    while (true)
+                    {
+                        await Task.Delay(1000).ConfigureAwait(false); 
+
+                        var jsonLine = $"{{\"message\":\"Hello Event\",\"timestamp\":\"{DateTime.UtcNow:o}\"}}";
+                        await stream.WriteAsync(Encoding.UTF8.GetBytes(jsonLine));
+                        await Task.Delay(1000).ConfigureAwait(false);
+                    }
+                }
+            }
             else
             {
                 var names = Assembly.GetExecutingAssembly().GetManifestResourceNames();
@@ -111,7 +140,7 @@ public sealed partial class VirtualTable : UserControl
             {
                 var settings = ApplicationData.Current.LocalSettings.Values;
                 var key = $"{context.Id}-latestPath";
-                var initpath = settings.ContainsKey(key) ? (string)settings[key] : "";
+                var initpath = settings.TryGetValue(key, out var value) ? (string)value : "";
                 var columns = controller.GetColumns();
                 (var items, _, var dirs, var files) = controller.GetItems(initpath, true);
                 context.CurrentFileCount = files;
@@ -124,8 +153,8 @@ public sealed partial class VirtualTable : UserControl
             {
                 var query = MakeQuery(args.Request.Uri);
                 var index = query.TryGetValue("column", out var res) ? res.ParseInt() ?? 0 : 0;
-                var desc = query.TryGetValue("descending", out var descVal) ? descVal == "true" : false;
-                var subcol = query.TryGetValue("subcolumn", out var colVal) ? colVal == "true" : false;
+                var desc = query.TryGetValue("descending", out var descVal) && descVal == "true";
+                var subcol = query.TryGetValue("subcolumn", out var colVal) && colVal == "true";
                 var pos = query.TryGetValue("pos", out var resPos) ? resPos.ParseInt() ?? 0 : 0;
                 (var items, var newPos) = controller.Sort(index, desc, subcol, pos);
                 var itemsResult = items != null ? new ItemsResult(null, items, newPos) : null;
@@ -187,11 +216,11 @@ public sealed partial class VirtualTable : UserControl
                     else
                     {
                         var (controller, cols, newPath, _) = this.controller.CheckPath(pos);
-                        var res = controller.GetItems(newPath, controller != this.controller);
+                        var (items, oldPos, dirCount, fileCount) = controller.GetItems(newPath, controller != this.controller);
                         this.controller = controller;
-                        context.CurrentFileCount = res.fileCount;
-                        context.CurrentDirectoryCount = res.dirCount;
-                        var itemsResult = new ItemsResult(cols, res.Items, res.oldPos);
+                        context.CurrentFileCount = fileCount;
+                        context.CurrentDirectoryCount = dirCount;
+                        var itemsResult = new ItemsResult(cols, items, oldPos);
                         SendResult(args, new ProcessResult(ItemsResult: itemsResult));
                     }
                 }

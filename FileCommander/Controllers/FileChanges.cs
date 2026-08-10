@@ -19,7 +19,8 @@ class FileChanges
         }
         finally
         {
-            locker.Release();
+            locker.Release();   
+
         }
     }
 
