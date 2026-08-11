@@ -218,32 +218,38 @@ async function setItems(items) {
 
 async function detectChanges() {
     changeDetectionCancellation = false
-    const response = await fetch("getFileChanges")
+    while (!changeDetectionCancellation)
+    { 
+        const response = await fetch("request/getFileChanges")
+        const items = await response.json()
+        console.log("Changes", items)
+        if (items.changes == undefined)
+            break
+        await delayAsync(40) 
+    // const reader = response.body.getReader()
+    // const decoder = new TextDecoder()
 
-    const reader = response.body.getReader()
-    const decoder = new TextDecoder()
+    // let buffer = ""
 
-    let buffer = ""
+    // while (true) {
+    //     const { value, done } = await reader.read()
 
-    while (true) {
-        const { value, done } = await reader.read()
+    //     if (done || changeDetectionCancellation)
+    //         break;
 
-        if (done || changeDetectionCancellation)
-            break;
+    //     buffer += decoder.decode(value, { stream: true })
 
-        buffer += decoder.decode(value, { stream: true })
+    //     const lines = buffer.split("\n")
+    //     buffer = lines.pop();
 
-        const lines = buffer.split("\n")
-        buffer = lines.pop();
+    //     for (const line of lines) {
+    //         if (!line)
+    //             continue;
 
-        for (const line of lines) {
-            if (!line)
-                continue;
+    //         const event = JSON.parse(line)
 
-            const event = JSON.parse(line)
-
-            console.log("Changes", event)
-        }
+    //         console.log("Changes", event)
+    //     }
     }
 }
 

@@ -6,6 +6,7 @@ using FileCommander.Data;
 using System;
 using System.IO;
 using System.Linq;
+using System.Threading.Tasks;
 
 namespace FileCommander.Controllers;
 
@@ -71,6 +72,9 @@ class DirectoryController : Controller
         else        
             return false;
     }
+
+    public override async Task<Item[]?> GetItemChangesAsync()
+        => await changes.GetItemsAsync();
 
     public override string OnPosition(int pos) 
         => pos < viewItems.Length ? Context.CurrentPath.AppendPath(viewItems[pos].Name) : Context.CurrentPath;

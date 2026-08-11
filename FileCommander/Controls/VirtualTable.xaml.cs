@@ -72,7 +72,7 @@ public sealed partial class VirtualTable : UserControl
                 ServeIconFromRes(path[12..], args);
             else if (path.StartsWith("icon"))
                 ServeIcon(path[5..], args);
-            else if (path == "getFileChanges")
+            else if (path == "22getFileChanges")
             {
                 var stream = new MemoryStream();
                 args.Response = sender.Environment.CreateWebResourceResponse(
@@ -132,7 +132,7 @@ public sealed partial class VirtualTable : UserControl
         }
     }
 
-    void ServeRequest(string path, CoreWebView2WebResourceRequestedEventArgs args)
+    async void ServeRequest(string path, CoreWebView2WebResourceRequestedEventArgs args)
     {
         switch (path)
         {
@@ -179,6 +179,20 @@ public sealed partial class VirtualTable : UserControl
                 SendResult(args, new ProcessResult(ItemsResult: itemsResult));
                 break;
             }
+            case "getFileChanges":
+            {
+                var deferral = args.GetDeferral();
+                try
+                {
+                    var items = await controller.GetItemChangesAsync();
+                    SendResult(args, new ItemsChanges(items));
+                }
+                finally
+                {
+                    deferral.Complete();
+                }
+                break;
+            }
             case "history":
             {
                 var query = MakeQuery(args.Request.Uri);
@@ -195,17 +209,6 @@ public sealed partial class VirtualTable : UserControl
                 SendResult(args, itemsResult);
                 break;
             }
-            //case "TODO":
-            //    var deferral = args.GetDeferral();
-            //    try
-            //    {
-            //        // args.Response = await ...()
-            //    }
-            //    finally
-            //    {
-            //        deferral.Complete();
-            //    }
-            //    break;
             default:
             {
                 if (path.StartsWith("process"))

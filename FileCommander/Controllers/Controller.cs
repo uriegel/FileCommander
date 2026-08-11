@@ -2,6 +2,7 @@
 using FileCommander.Data;
 
 using System;
+using System.Threading.Tasks;
 
 using Windows.Storage;
 
@@ -35,6 +36,8 @@ abstract class Controller
             Context.AddHistory(path);
         Context.CurrentPath = path;
     }
+
+    public virtual Task<Item[]?> GetItemChangesAsync() => Task.FromResult<Item[]?>(null);
 
     public abstract Column[] GetColumns();
     public abstract (Item[] Items, int oldPos, int dirCount, int fileCount) GetItems(
