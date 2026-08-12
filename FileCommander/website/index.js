@@ -225,31 +225,13 @@ async function detectChanges() {
         console.log("Changes", items)
         if (items.changes == undefined)
             break
+        items.changes.forEach(n => {
+            const item = itemsMap.get(n.text)
+            if (item)
+                item.exifValue = n.exifValue
+        })
+        tableView.refresh()
         await delayAsync(40) 
-    // const reader = response.body.getReader()
-    // const decoder = new TextDecoder()
-
-    // let buffer = ""
-
-    // while (true) {
-    //     const { value, done } = await reader.read()
-
-    //     if (done || changeDetectionCancellation)
-    //         break;
-
-    //     buffer += decoder.decode(value, { stream: true })
-
-    //     const lines = buffer.split("\n")
-    //     buffer = lines.pop();
-
-    //     for (const line of lines) {
-    //         if (!line)
-    //             continue;
-
-    //         const event = JSON.parse(line)
-
-    //         console.log("Changes", event)
-    //     }
     }
 }
 

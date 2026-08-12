@@ -276,6 +276,11 @@ export class VirtualTable extends HTMLElement {
         this.shadow.append(style)
     }
 
+    refresh() {
+        const elements = Array.from(this.tableBody.children)
+        elements.forEach((element, idx) => this.renderRowItem(element, this.items[this.offset + idx]))
+    }
+
     measure() {
         var tr = this.createRowItem()
         this.measureRowItem(tr)

@@ -14,21 +14,19 @@ using System;
 using System.Collections.Generic;
 using System.Collections.Immutable;
 using System.IO;
-using System.IO.Pipes;
 using System.Linq;
 using System.Reflection;
-using System.Runtime.CompilerServices;
 using System.Text;
 using System.Text.Json;
 using System.Threading.Tasks;
 
 using Windows.Storage;
-using Windows.Storage.Streams;
 
 
 namespace FileCommander.Controls;
 
 // TODO exif date and version
+// TODO FileChanges disposable
 // TODO File SystemWatcher with directories
 // TODO Grid Splitter (maybe WinUITools)
 // TODO SetSelections
@@ -72,30 +70,6 @@ public sealed partial class VirtualTable : UserControl
                 ServeIconFromRes(path[12..], args);
             else if (path.StartsWith("icon"))
                 ServeIcon(path[5..], args);
-            else if (path == "22getFileChanges")
-            {
-                var stream = new MemoryStream();
-                args.Response = sender.Environment.CreateWebResourceResponse(
-                        stream.AsRandomAccessStream(),
-                        200,
-                        "OK",
-                        "Content-Type: application/x-ndjson\r\nCache-Control: no-cache");
-
-                var bytes = Encoding.UTF8.GetBytes("{\"status\":\"stream-start\"}\n");
-                stream.Write(bytes);
-                Task.Run(SendChanges).ConfigureAwait(false);
-                async void SendChanges()
-                {
-                    while (true)
-                    {
-                        await Task.Delay(1000).ConfigureAwait(false); 
-
-                        var jsonLine = $"{{\"message\":\"Hello Event\",\"timestamp\":\"{DateTime.UtcNow:o}\"}}";
-                        await stream.WriteAsync(Encoding.UTF8.GetBytes(jsonLine));
-                        await Task.Delay(1000).ConfigureAwait(false);
-                    }
-                }
-            }
             else
             {
                 var names = Assembly.GetExecutingAssembly().GetManifestResourceNames();
