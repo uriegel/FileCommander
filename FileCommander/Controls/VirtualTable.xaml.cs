@@ -16,17 +16,15 @@ using System.Collections.Immutable;
 using System.IO;
 using System.Linq;
 using System.Reflection;
-using System.Text;
 using System.Text.Json;
-using System.Threading.Tasks;
 
 using Windows.Storage;
 
 
 namespace FileCommander.Controls;
 
-// TODO exif date and version
-// TODO FileChanges disposable
+// TODO version
+// TODO Status bar: "Erweiterte Informationen werden ermittelt..."
 // TODO File SystemWatcher with directories
 // TODO Grid Splitter (maybe WinUITools)
 // TODO SetSelections

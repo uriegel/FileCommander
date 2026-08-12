@@ -12,11 +12,6 @@ using System.Threading.Tasks;
 
 namespace FileCommander.Controllers;
 
-// TODO: after getItems call refresh?extended=true
-    // => extended items and finished true/false
-// TODO: When restriction
-
-
 class ExtendedFileInfos : IDisposable
 {
     public ExtendedFileInfos(FileChanges changes, string path, IEnumerable<FileItem> items)

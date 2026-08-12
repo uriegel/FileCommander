@@ -42,6 +42,7 @@ class DirectoryController : Controller
         var fromPath = !controllerChanged && dirInfo.FullName.Length < Context.CurrentPath.Length ? Context.CurrentPath[dirInfo.FullName.Length..].Trim('\\') : null;
         SetNewPath(dirInfo.FullName, fromHistory);
         items = [new ParentItem(), .. dirItems, .. fileItems];
+        changes?.Dispose();
         changes = new();
         extendedFileInfos?.Dispose();
         extendedFileInfos = new(changes, Context.CurrentPath, items.SelectFilterNull(n => n as FileItem));
@@ -133,6 +134,6 @@ class DirectoryController : Controller
     bool sortSubcolumn = false;
 
     ExtendedFileInfos? extendedFileInfos;
-    FileChanges changes = null!;
+    FileChanges? changes;
 }
 
