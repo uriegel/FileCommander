@@ -2,6 +2,7 @@
 using CsTools.Extensions;
 
 using System;
+using System.Diagnostics;
 using System.IO;
 
 namespace FileCommander.Controllers;
@@ -22,6 +23,7 @@ record DirectoryItem(string Name, bool IsHidden, DateTime DateTime) : ItemBase(N
 record FileItem(string Name, bool IsVisible, DateTime DateTime, long Size) : ItemBase(Name, IsVisible)
 {
     public ExifData? ExifData { get; set; }
+    public FileVersionInfo? Version { get; set; }
     public static FileItem Create(FileInfo info) => new(info.Name, info.IsHidden(), info.LastWriteTime, info.Length);
     public override string GetIcon(string path)
         => $"icon/{(Name.EndsWith(".exe", StringComparison.OrdinalIgnoreCase) ? path.AppendPath(Name) : Name.GetFileExtension())}";

@@ -1,4 +1,6 @@
-﻿using CsTools;
+﻿using System.Diagnostics;
+
+using CsTools;
 
 using FileCommander.Controllers;
 
@@ -7,7 +9,8 @@ namespace FileCommander.Data;
 record Item(string Text, string Icon, string[] Values, ExifValue? ExifValue = null, bool Hidden = false)
 {
     public static Item Get(FileItem item, string path)
-        => new(item.Name, item.GetIcon(path), [item.DateTime.ToString("g"), item.Size.FormatSize()], ExifValue.Create(item.ExifData), item.IsHidden);
+        => new(item.Name, item.GetIcon(path), [item.DateTime.ToString("g"), item.Size.FormatSize(), item.Version?.Format() ?? ""], 
+            ExifValue.Create(item.ExifData), item.IsHidden);
 };
 
 record ExifValue(string? Date, double? Latitude, double? Longitude)
@@ -46,5 +49,8 @@ static class ItemExtensions
         }
         return sizeStr;
     }
+
+    public static string Format(this FileVersionInfo version)
+        => $"{version.ProductMajorPart}.{version.ProductMinorPart}.{version.ProductBuildPart}.{version.ProductPrivatePart}";
 }
 

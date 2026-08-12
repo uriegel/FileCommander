@@ -120,8 +120,8 @@ class DirectoryController : Controller
 
                 n switch
                 {
-                    ParentItem p => new Item(p.Name, n.GetIcon(Context.CurrentPath), []),
-                    DirectoryItem d => new Item(d.Name, n.GetIcon(Context.CurrentPath), [d.DateTime.ToString("g")], null, d.IsHidden),
+                    ParentItem p => new Item(p.Name, n.GetIcon(Context.CurrentPath), ["", "", ""]),
+                    DirectoryItem d => new Item(d.Name, n.GetIcon(Context.CurrentPath), [d.DateTime.ToString("g"), "", ""], null, d.IsHidden),
                     FileItem f => Item.Get(f, Context.CurrentPath),
                     _ => throw new Exception("Unknown ItemBase")
                 })];

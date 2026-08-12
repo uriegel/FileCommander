@@ -38,6 +38,15 @@ class ExtendedFileInfos : IDisposable
                         await changes.AddChangedItemAsync(Item.Get(extendedItem.Item, path));
                     }
                 }
+                if (extendedItem.Version)
+                {
+                    var info = FileVersionInfo.GetVersionInfo(path.AppendPath(extendedItem.Item.Name));
+                    if (info != null)
+                    {
+                        extendedItem.Item.Version = info;
+                        await changes.AddChangedItemAsync(Item.Get(extendedItem.Item, path));
+                    }
+                }
             }
         var timeNeeded = stoppwatch.Elapsed;
         Debug.WriteLine($"Get extended needed {timeNeeded.TotalMilliseconds} ms for {extendedItems.Length} items");

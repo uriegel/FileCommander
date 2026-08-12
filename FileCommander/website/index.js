@@ -37,11 +37,11 @@ tableView.addEventListener("render-rowitem", evt => {
     img.src = evt.detail.item.icon
     const sp = tr.querySelector('#text')
     sp.textContent = evt.detail.item.text
-    for (let i = 0; i < columnCount - 1; i++) {
+    for (let i = 0; i < columnCount; i++) {
         const element = tr.querySelector(`#item${i}`)
         if (i == 0 && evt.detail.item?.exifValue?.date) 
             element.textContent = evt.detail.item?.exifValue?.date
-        else
+        else if (evt.detail.item.values.length > i)
             element.textContent = evt.detail.item.values[i]
     }
 })
@@ -227,8 +227,10 @@ async function detectChanges() {
             break
         items.changes.forEach(n => {
             const item = itemsMap.get(n.text)
-            if (item)
+            if (item && n.exifValue)
                 item.exifValue = n.exifValue
+            if (item && n.values.length == 3 && n.values[2].length > 0)
+                item.values = n.values
         })
         tableView.refresh()
         await delayAsync(40) 
