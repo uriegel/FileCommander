@@ -15,6 +15,34 @@ public class FolderContext : INotifyPropertyChanged
 
     public FolderContext(string id) => Id = id;
 
+    public string StatusBarText { get => InfoText ?? SelectedPath; }
+
+    public string SelectedPath
+    {
+        get;
+        set
+        {
+            if (field != value)
+            {
+                field = value;
+                OnChanged(nameof(StatusBarText));
+            }
+        }
+    } = string.Empty;
+
+    public string? InfoText
+    {
+        get;
+        set
+        {
+            if (field != value)
+            {
+                field = value;
+                OnChanged(nameof(StatusBarText));
+            }
+        }
+    }
+
     public string CurrentPath
     {
         get;
@@ -57,32 +85,6 @@ public class FolderContext : INotifyPropertyChanged
         }
     }
 
-    public string SelectedPath
-    {
-        get;
-        set
-        {
-            if (field != value)
-            {
-                field = value;
-                OnChanged(nameof(SelectedPath));
-            }
-        }
-    } = string.Empty;
-
-    //public string Restriction
-    //{
-    //    get;
-    //    set
-    //    {
-    //        if (field != value)
-    //        {
-    //            field = value;
-    //            OnChanged(nameof(Restriction));
-    //        }
-    //    }
-    //} = string.Empty;
-
     //public BackgroundAction BackgroundAction
     //{
     //    get;
@@ -96,20 +98,20 @@ public class FolderContext : INotifyPropertyChanged
     //    }
     //}
 
-    //public ExifData? ExifData
-    //{
-    //    get;
-    //    set
-    //    {
-    //        if (field != value)
-    //        {
-    //            field = value;
-    //            OnChanged(nameof(ExifData));
-    //        }
-    //    }
-    //}
+        //public ExifData? ExifData
+        //{
+        //    get;
+        //    set
+        //    {
+        //        if (field != value)
+        //        {
+        //            field = value;
+        //            OnChanged(nameof(ExifData));
+        //        }
+        //    }
+        //}
 
-    //public bool IsEditing { get; set; }
+        //public bool IsEditing { get; set; }
 
     public void AddHistory(string path)
     {

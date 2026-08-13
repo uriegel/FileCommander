@@ -1,6 +1,7 @@
 ﻿using CsTools;
 using CsTools.Extensions;
 
+using FileCommander.Contexts;
 using FileCommander.Data;
 
 using System;
@@ -14,13 +15,15 @@ namespace FileCommander.Controllers;
 
 class ExtendedFileInfos : IDisposable
 {
-    public ExtendedFileInfos(FileChanges changes, string path, IEnumerable<FileItem> items)
+    public ExtendedFileInfos(FileChanges changes, string path, FolderContext context, IEnumerable<FileItem> items)
     {
         this.changes = changes;
-        task = Task.Run(() => GetAsync(path, items));
+        context.InfoText = "Erweiterte Infos werden ermittelt...";
+        task = Task.Run(() => GetAsync(path, context, items));
+        task.GetAwaiter().OnCompleted(() => context.InfoText = null);
     }
 
-    public async Task GetAsync(string path, IEnumerable<FileItem> items)
+    async Task GetAsync(string path, FolderContext context, IEnumerable<FileItem> items)
     {
         var stoppwatch = Stopwatch.StartNew();
         var extendedItems = GetExtendedFileItems(items);

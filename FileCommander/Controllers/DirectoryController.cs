@@ -45,7 +45,7 @@ class DirectoryController : Controller
         changes?.Dispose();
         changes = new();
         extendedFileInfos?.Dispose();
-        extendedFileInfos = new(changes, Context.CurrentPath, items.SelectFilterNull(n => n as FileItem));
+        extendedFileInfos = new(changes, Context.CurrentPath, Context, items.SelectFilterNull(n => n as FileItem));
         (viewItems, var oldPos) = MapViewItems(fromPath);
         return (MapItems(), oldPos, viewItems.Count(n => n is DirectoryItem), viewItems.Count(n => n is FileItem));  
     }
@@ -74,8 +74,9 @@ class DirectoryController : Controller
             return false;
     }
 
-    public override async Task<Item[]?> GetItemChangesAsync()
-        => await changes.GetItemsAsync();
+    public override Task<Item[]?> GetItemChangesAsync()
+        => changes?.GetItemsAsync() 
+            ?? Task.FromResult<Item[]?>(null);
 
     public override string OnPosition(int pos) 
         => pos < viewItems.Length ? Context.CurrentPath.AppendPath(viewItems[pos].Name) : Context.CurrentPath;

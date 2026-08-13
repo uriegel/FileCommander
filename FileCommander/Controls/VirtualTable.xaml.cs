@@ -23,7 +23,6 @@ using Windows.Storage;
 
 namespace FileCommander.Controls;
 
-// TODO Status bar: "Erweiterte Informationen werden ermittelt..."
 // TODO Version: sort version
 // TODO File SystemWatcher with directories
 // TODO Grid Splitter (maybe WinUITools)
