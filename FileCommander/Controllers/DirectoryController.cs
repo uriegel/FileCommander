@@ -1,4 +1,6 @@
-﻿using CsTools.Extensions;
+﻿using ABI.Microsoft.UI.Text;
+
+using CsTools.Extensions;
 
 using FileCommander.Contexts;
 using FileCommander.Data;
@@ -139,8 +141,13 @@ class DirectoryController : Controller
         try
         {
             Debug.WriteLine($"Datei oder Verzeichnis angelegt: {e.FullPath}");
-            //store.Splice(0, 0, [DirectoryItem.CreateFileItem(new FileInfo(e.FullPath))]);
-            //view.CountsChanged(GetDirectoryCount(), GetFileCount());
+            items = [
+                FileItem.Create(new FileInfo(e.FullPath)), 
+                .. items
+                ];
+            (viewItems, _) = MapViewItems(null);
+            // TODO Adapt fileItemCount
+            // TODO New Selection
         }
         catch { }
     }
@@ -148,9 +155,10 @@ class DirectoryController : Controller
     void WatchDeleted(object _, FileSystemEventArgs e)
     {
         Debug.WriteLine($"Datei oder Verzeichnis gelöscht: {e.FullPath}");
-        //var pos = store.GetItems<DirectoryItem>().TakeWhile(n => n.Name != e.Name).Count();
-        //store.Splice<DirectoryItem>(pos, 1, []);
-        //view.CountsChanged(GetDirectoryCount(), GetFileCount());
+        items = [.. items.Where(n => n.Name != e.Name)];
+        (viewItems, _) = MapViewItems(null);
+        // TODO Adapt fileItemCount
+        // TODO New Selection
     }
 
 
