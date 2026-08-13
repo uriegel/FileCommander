@@ -23,13 +23,15 @@ using Windows.Storage;
 
 namespace FileCommander.Controls;
 
-// TODO File SystemWatcher changed
-// TODO File SystemWatcher deleted
 // TODO File SystemWatcher created
+// TODO File SystemWatcher deleted
+// TODO => create new items and viewItems => event itemsChanged
+
+// TODO File SystemWatcher changed
 // TODO File SystemWatcher rename => delete create
-// TODO File SystemWatcher Directory changed
-// TODO File SystemWatcher Directory deleted
 // TODO File SystemWatcher Directory created
+// TODO File SystemWatcher Directory deleted
+// TODO File SystemWatcher Directory changed
 // TODO File SystemWatcher Directory rename => delete create
 // TODO Grid Splitter (maybe WinUITools)
 // TODO SetSelections
@@ -197,7 +199,11 @@ public sealed partial class VirtualTable : UserControl
                     {
                         var (controller, cols, newPath, _) = this.controller.CheckPath(pos);
                         var (items, oldPos, dirCount, fileCount) = controller.GetItems(newPath, controller != this.controller);
-                        this.controller = controller;
+                        if (this.controller != controller)
+                        {
+                            this.controller.Dispose();
+                            this.controller = controller;
+                        }
                         context.CurrentFileCount = fileCount;
                         context.CurrentDirectoryCount = dirCount;
                         var itemsResult = new ItemsResult(cols, items, oldPos);

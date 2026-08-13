@@ -4,6 +4,7 @@ using FileCommander.Contexts;
 using FileCommander.Data;
 
 using System;
+using System.Diagnostics;
 using System.IO;
 using System.Linq;
 using System.Threading.Tasks;
@@ -15,9 +16,20 @@ class DirectoryController : Controller
     public static DirectoryController Get(Controller? current, FolderContext context)
     => current is DirectoryController dirController
         ? dirController
-        : new DirectoryController(context);
+        : new DirectoryController(context).SideEffect(_ => current?.Dispose());
 
-    public DirectoryController(FolderContext context) : base(context) { }
+    public DirectoryController(FolderContext context) : base(context) 
+    {
+        watcher.Created += WatchCreated;
+        watcher.Deleted += WatchDeleted;
+        //watcher.Changed += WatchChanged;
+        //watcher.Renamed += WatchRenamed;
+        watcher.NotifyFilter = NotifyFilters.CreationTime
+                    | NotifyFilters.DirectoryName
+                    | NotifyFilters.FileName
+                    | NotifyFilters.LastWrite
+                    | NotifyFilters.Size;
+    }
 
     public override Column[] GetColumns()
         => [
@@ -47,6 +59,12 @@ class DirectoryController : Controller
         extendedFileInfos?.Dispose();
         extendedFileInfos = new(changes, Context.CurrentPath, Context, items.SelectFilterNull(n => n as FileItem));
         (viewItems, var oldPos) = MapViewItems(fromPath);
+
+        var enableEvents = watcher.Path == "";
+        watcher.Path = Context.CurrentPath;
+        if (enableEvents)
+            watcher.EnableRaisingEvents = true;
+
         return (MapItems(), oldPos, viewItems.Count(n => n is DirectoryItem), viewItems.Count(n => n is FileItem));  
     }
 
@@ -116,6 +134,26 @@ class DirectoryController : Controller
         return (filtered, oldPos);
     }
 
+    void WatchCreated(object _, FileSystemEventArgs e)
+    {
+        try
+        {
+            Debug.WriteLine($"Datei oder Verzeichnis angelegt: {e.FullPath}");
+            //store.Splice(0, 0, [DirectoryItem.CreateFileItem(new FileInfo(e.FullPath))]);
+            //view.CountsChanged(GetDirectoryCount(), GetFileCount());
+        }
+        catch { }
+    }
+
+    void WatchDeleted(object _, FileSystemEventArgs e)
+    {
+        Debug.WriteLine($"Datei oder Verzeichnis gelöscht: {e.FullPath}");
+        //var pos = store.GetItems<DirectoryItem>().TakeWhile(n => n.Name != e.Name).Count();
+        //store.Splice<DirectoryItem>(pos, 1, []);
+        //view.CountsChanged(GetDirectoryCount(), GetFileCount());
+    }
+
+
     Item[] MapItems()
         => [.. viewItems.Select(n =>
 
@@ -127,14 +165,37 @@ class DirectoryController : Controller
                     _ => throw new Exception("Unknown ItemBase")
                 })];
 
+    readonly FileSystemWatcher watcher = new();
+
     ItemBase[] items = null!;
     ItemBase[] viewItems = null!;
 
     int sortIndex = -1;
     bool sortDescending = false;
     bool sortSubcolumn = false;
-
     ExtendedFileInfos? extendedFileInfos;
     FileChanges? changes;
+
+    #region IDispose
+
+    protected override void Dispose(bool disposing)
+    {
+        if (!disposedValue)
+        {
+            if (disposing)
+            {
+                // Verwalteten Zustand (verwaltete Objekte) bereinigen
+                watcher.Dispose();
+            }
+
+            // Nicht verwaltete Ressourcen (nicht verwaltete Objekte) freigeben und Finalizer überschreiben
+            // Große Felder auf NULL setzen
+            disposedValue = true;
+        }
+    }
+
+    bool disposedValue;
+
+    #endregion
 }
 

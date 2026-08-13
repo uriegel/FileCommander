@@ -1,4 +1,5 @@
 ﻿using CsTools;
+using CsTools.Extensions;
 
 using FileCommander.Contexts;
 using FileCommander.Data;
@@ -6,9 +7,6 @@ using FileCommander.Data;
 using System;
 using System.IO;
 using System.Linq;
-using System.Runtime;
-
-using static System.Net.WebRequestMethods;
 
 namespace FileCommander.Controllers;
 
@@ -21,7 +19,7 @@ class RootController : Controller
     public static RootController Get(Controller? current, FolderContext context)
         => current is RootController rootController
             ? rootController
-            : new RootController(context);
+            : new RootController(context).SideEffect(_ => current?.Dispose());
 
     public RootController(FolderContext context) : base(context) { }
 

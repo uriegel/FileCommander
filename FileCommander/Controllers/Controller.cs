@@ -8,7 +8,7 @@ using Windows.Storage;
 
 namespace FileCommander.Controllers;
 
-abstract class Controller
+abstract class Controller : IDisposable
 {
     public FolderContext Context { get; } = null!;
 
@@ -48,6 +48,41 @@ abstract class Controller
     public virtual (Item[]? Items, int newPos) Sort(int index, bool descending, bool subcolumn, int pos) => (null, 0);
     public abstract (Controller Controller, Column[]? Columns, string Path, string OldPath) CheckPath(int pos);
     public virtual bool Process(int pos) => false;
+
+    #region IDisposable
+
+    public void Dispose()
+    {
+        // Ändere diesen Code nicht. Füge Bereinigungscode in der Methode "Dispose(bool disposing)" ein.
+        Dispose(disposing: true);
+        GC.SuppressFinalize(this);
+    }
+
+    protected virtual void Dispose(bool disposing)
+    {
+        if (!disposedValue)
+        {
+            if (disposing)
+            {
+                // Verwalteten Zustand (verwaltete Objekte) bereinigen
+            }
+
+            // Nicht verwaltete Ressourcen (nicht verwaltete Objekte) freigeben und Finalizer überschreiben
+            // Große Felder auf NULL setzen
+            disposedValue = true;
+        }
+    }
+
+    // Finalizer nur überschreiben, wenn "Dispose(bool disposing)" Code für die Freigabe nicht verwalteter Ressourcen enthält
+    // ~Controller()
+    // {
+    //     // Ändere diesen Code nicht. Füge Bereinigungscode in der Methode "Dispose(bool disposing)" ein.
+    //     Dispose(disposing: false);
+    // }
+        
+    bool disposedValue;
+
+    #endregion
 }
 
 
