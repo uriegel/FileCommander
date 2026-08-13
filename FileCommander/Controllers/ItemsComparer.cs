@@ -2,6 +2,7 @@
 
 using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 
 namespace FileCommander.Controllers;
 
@@ -34,6 +35,7 @@ class ItemsComparer(int sortIndex, bool subColumn, bool descending) : IComparer<
             (0, true) => StringComparer.CurrentCultureIgnoreCase.Compare(x!.Name.GetFileExtension(), y!.Name.GetFileExtension()),
             (1, _) => CompareDate(x!, y!),
             (2, _) => CompareSize(x!, y!),
+            (3, _) => CompareVersion(x!, y!),
             _ => 0
         };
 
@@ -66,4 +68,26 @@ class ItemsComparer(int sortIndex, bool subColumn, bool descending) : IComparer<
 
         return sx.CompareTo(sy);
     }
+
+    static int CompareVersion(ItemBase x, ItemBase y)
+    {
+        var sx = x is FileItem f1 ? f1.Version : null;
+        var sy = y is FileItem f2 ? f2.Version : null;
+        return (sx != null && sy != null)
+            ? CompareVersion(sx, sy)
+            : sx == null && sy == null
+            ? 0
+            : sy == null
+            ? 1
+            : -1;
+    }
+
+    static int CompareVersion(FileVersionInfo x, FileVersionInfo y)
+        => x.FileMajorPart != y.FileMajorPart
+            ? x.FileMajorPart - y.FileMajorPart
+            : x.FileMinorPart != y.FileMinorPart
+            ? x.FileMinorPart - y.FileMinorPart
+            : x.FileBuildPart != y.FileBuildPart
+            ? x.FileBuildPart - y.FileBuildPart
+            : x.FilePrivatePart - y.FilePrivatePart;
 }

@@ -23,8 +23,14 @@ using Windows.Storage;
 
 namespace FileCommander.Controls;
 
-// TODO Version: sort version
-// TODO File SystemWatcher with directories
+// TODO File SystemWatcher changed
+// TODO File SystemWatcher deleted
+// TODO File SystemWatcher created
+// TODO File SystemWatcher rename => delete create
+// TODO File SystemWatcher Directory changed
+// TODO File SystemWatcher Directory deleted
+// TODO File SystemWatcher Directory created
+// TODO File SystemWatcher Directory rename => delete create
 // TODO Grid Splitter (maybe WinUITools)
 // TODO SetSelections
 // TODO Viewers
