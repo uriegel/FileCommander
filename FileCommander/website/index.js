@@ -229,6 +229,7 @@ async function detectChanges() {
         // TODO check
         if (items.changes.complete) {
             tableView.setItems(items.changes.items)
+            tableView.setPosition(items.changes.pos);
             itemsMap = new Map(items.changes.items.map(item => [item.text, item]))
         }
         else {

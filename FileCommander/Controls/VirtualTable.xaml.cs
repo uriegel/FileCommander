@@ -23,8 +23,6 @@ using Windows.Storage;
 
 namespace FileCommander.Controls;
 
-// TODO send selected position
-
 // TODO File SystemWatcher rename => delete create
 // TODO File SystemWatcher changed
 

@@ -12,10 +12,10 @@ class FileChanges : IDisposable
 {
     public void AddChangedItem(Item item)
         => changedItems.Writer.TryWrite(item);
-    public void AddChangedCompleteItem(Item[] items)
+    public void AddChangedCompleteItem(CompleteChange change)
     {
         changedItems.Writer.TryWrite(new("", "", []));
-        Interlocked.Exchange(ref completeItemsChanged, items);
+        Interlocked.Exchange(ref completeItemsChanged, change);
     }
 
     public async Task<FileChangesResult?> GetItemsAsync()
@@ -30,7 +30,7 @@ class FileChanges : IDisposable
         // Show if Full change
         var completeItems = Interlocked.Exchange(ref completeItemsChanged, null);
         if (completeItems != null)
-            return new([.. completeItems], true);
+            return new([.. completeItems.Items], true, completeItems.Pos);
 
         // Nothing was available -> wait for the next item.
         try
@@ -50,7 +50,7 @@ class FileChanges : IDisposable
         SingleReader = true,
         SingleWriter = true
     });
-    Item[]? completeItemsChanged = null;
+    CompleteChange? completeItemsChanged = null;
 
     readonly CancellationTokenSource cancellation = new();
 
@@ -91,4 +91,5 @@ class FileChanges : IDisposable
     #endregion
 }
 
-record FileChangesResult(Item[] Items, bool Complete = false);
+record FileChangesResult(Item[] Items, bool Complete = false, int Pos = 0);
+record CompleteChange(Item[] Items, int Pos);

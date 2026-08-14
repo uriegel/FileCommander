@@ -143,8 +143,11 @@ class DirectoryController : Controller
                 ];
             (viewItems, _) = MapViewItems(null);
             MainWindow.RunOnUI(() => Context.CurrentFileCount = Context.CurrentFileCount + 1);
-            changes?.AddChangedCompleteItem(MapItems());
-            // TODO New Selection
+            var selectedItem = Context.SelectedPath.SubstringAfterLast('\\');
+            var pos = viewItems.TakeWhile(n => n.Name != selectedItem).Count();
+            if (pos == viewItems.Length)
+                pos = 0;
+            changes?.AddChangedCompleteItem(new(MapItems(), pos));
         }
         catch { }
     }
@@ -156,7 +159,11 @@ class DirectoryController : Controller
             items = [.. items.Where(n => n.Name != e.Name)];
             (viewItems, _) = MapViewItems(null);
             MainWindow.RunOnUI(() => Context.CurrentFileCount = Context.CurrentFileCount - 1);
-            changes?.AddChangedCompleteItem(MapItems());
+            var selectedItem = Context.SelectedPath.SubstringAfterLast('\\');
+            var pos = viewItems.TakeWhile(n => n.Name != selectedItem).Count();
+            if (pos == viewItems.Length)
+                pos = 0;
+            changes?.AddChangedCompleteItem(new(MapItems(), pos));
             // TODO New Selection
         }
         catch { }
