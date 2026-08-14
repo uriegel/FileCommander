@@ -37,6 +37,9 @@ namespace FileCommander.Controls;
 // TODO SetSelections
 // TODO Viewers
 // TODO Home folder (later Favorites, Remotes)
+
+// TODO exif dark mode
+// TODO Main WIndow focus -> active folder focus
 public sealed partial class VirtualTable : UserControl
 {
     public event Action<bool>? OnTab;
