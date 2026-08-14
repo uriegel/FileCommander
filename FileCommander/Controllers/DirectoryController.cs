@@ -138,13 +138,13 @@ class DirectoryController : Controller
     {
         try
         {
-            Debug.WriteLine($"Datei oder Verzeichnis angelegt: {e.FullPath}");
             items = [
                 FileItem.Create(new FileInfo(e.FullPath)), 
                 .. items
                 ];
             (viewItems, _) = MapViewItems(null);
             MainWindow.RunOnUI(() => Context.CurrentFileCount = Context.CurrentFileCount + 1);
+            changes?.AddChangedCompleteItem(MapItems());
             // TODO New Selection
         }
         catch { }
@@ -152,17 +152,19 @@ class DirectoryController : Controller
 
     void WatchDeleted(object _, FileSystemEventArgs e)
     {
-        Debug.WriteLine($"Datei oder Verzeichnis gelöscht: {e.FullPath}");
-        items = [.. items.Where(n => n.Name != e.Name)];
-        (viewItems, _) = MapViewItems(null);
-        MainWindow.RunOnUI(() => Context.CurrentFileCount = Context.CurrentFileCount - 1);
-        // TODO New Selection
+        try
+        {
+            items = [.. items.Where(n => n.Name != e.Name)];
+            (viewItems, _) = MapViewItems(null);
+            MainWindow.RunOnUI(() => Context.CurrentFileCount = Context.CurrentFileCount - 1);
+            changes?.AddChangedCompleteItem(MapItems());
+            // TODO New Selection
+        }
+        catch { }
     }
-
 
     Item[] MapItems()
         => [.. viewItems.Select(n =>
-
                 n switch
                 {
                     ParentItem p => new Item(p.Name, n.GetIcon(Context.CurrentPath), ["", "", ""]),

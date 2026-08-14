@@ -23,8 +23,8 @@ using Windows.Storage;
 
 namespace FileCommander.Controls;
 
-// TODO FileChangesWatcher: get small changes, if full changes send fullchange and empty small changes, otherwise send small changes
-// TODO => create new items and viewItems => event itemsChanged
+// TODO Initial sort either via virtual table setup or as default sorting 
+// TODO send selected position
 
 // TODO File SystemWatcher rename => delete create
 // TODO File SystemWatcher changed

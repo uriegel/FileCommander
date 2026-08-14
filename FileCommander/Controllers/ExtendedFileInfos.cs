@@ -38,7 +38,7 @@ class ExtendedFileInfos : IDisposable
                     if (info != null)
                     {
                         extendedItem.Item.ExifData = info;
-                        await changes.AddChangedItemAsync(Item.Get(extendedItem.Item, path));
+                        changes.AddChangedItem(Item.Get(extendedItem.Item, path));
                     }
                 }
                 if (extendedItem.Version)
@@ -47,7 +47,7 @@ class ExtendedFileInfos : IDisposable
                     if (info != null)
                     {
                         extendedItem.Item.Version = info;
-                        await changes.AddChangedItemAsync(Item.Get(extendedItem.Item, path));
+                        changes.AddChangedItem(Item.Get(extendedItem.Item, path));
                     }
                 }
             }

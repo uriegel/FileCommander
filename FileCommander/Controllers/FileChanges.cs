@@ -10,8 +10,13 @@ namespace FileCommander.Controllers;
 
 class FileChanges : IDisposable
 {
-    public async Task AddChangedItemAsync(Item item)
-        => await changedItems.Writer.WriteAsync(item, cancellation.Token);
+    public void AddChangedItem(Item item)
+        => changedItems.Writer.TryWrite(item);
+    public void AddChangedCompleteItem(Item[] items)
+    {
+        changedItems.Writer.TryWrite(new("", "", []));
+        Interlocked.Exchange(ref completeItemsChanged, items);
+    }
 
     public async Task<FileChangesResult?> GetItemsAsync()
     {
@@ -22,8 +27,10 @@ class FileChanges : IDisposable
         while (changedItems.Reader.TryRead(out var item) && now + TimeSpan.FromMilliseconds(10) > DateTime.Now)
             items.Add(item);
 
-
         // Show if Full change
+        var completeItems = Interlocked.Exchange(ref completeItemsChanged, null);
+        if (completeItems != null)
+            return new([.. completeItems], true);
 
         // Nothing was available -> wait for the next item.
         try
@@ -43,7 +50,8 @@ class FileChanges : IDisposable
         SingleReader = true,
         SingleWriter = true
     });
-    
+    Item[]? completeItemsChanged = null;
+
     readonly CancellationTokenSource cancellation = new();
 
     #region IDisposable

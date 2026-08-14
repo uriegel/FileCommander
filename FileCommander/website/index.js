@@ -227,16 +227,20 @@ async function detectChanges() {
             break
 
         // TODO check
-        // items.changes.complete
-
-        items.changes.items.forEach(n => {
-            const item = itemsMap.get(n.text)
-            if (item && n.exifValue)
-                item.exifValue = n.exifValue
-            if (item && n.values.length == 3 && n.values[2].length > 0)
-                item.values = n.values
-        })
-        tableView.refresh()
+        if (items.changes.complete) {
+            tableView.setItems(items.changes.items)
+            itemsMap = new Map(items.changes.items.map(item => [item.text, item]))
+        }
+        else {
+            items.changes.items.forEach(n => {
+                const item = itemsMap.get(n.text)
+                if (item && n.exifValue)
+                    item.exifValue = n.exifValue
+                if (item && n.values.length == 3 && n.values[2].length > 0)
+                    item.values = n.values
+            })
+            tableView.refresh()
+        }
         await delayAsync(40) 
     }
 }
