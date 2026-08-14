@@ -225,7 +225,11 @@ async function detectChanges() {
         console.log("Changes", items)
         if (items.changes == undefined)
             break
-        items.changes.forEach(n => {
+
+        // TODO check
+        // items.changes.complete
+
+        items.changes.items.forEach(n => {
             const item = itemsMap.get(n.text)
             if (item && n.exifValue)
                 item.exifValue = n.exifValue

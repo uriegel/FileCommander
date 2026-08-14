@@ -94,9 +94,9 @@ class DirectoryController : Controller
             return false;
     }
 
-    public override Task<Item[]?> GetItemChangesAsync()
-        => changes?.GetItemsAsync() 
-            ?? Task.FromResult<Item[]?>(null);
+    public override async Task<FileChangesResult?> GetItemChangesAsync() 
+            => await (changes?.GetItemsAsync() 
+                ?? Task.FromResult<FileChangesResult?>(null));
 
     public override string OnPosition(int pos) 
         => pos < viewItems.Length ? Context.CurrentPath.AppendPath(viewItems[pos].Name) : Context.CurrentPath;

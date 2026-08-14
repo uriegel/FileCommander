@@ -23,17 +23,19 @@ using Windows.Storage;
 
 namespace FileCommander.Controls;
 
+// TODO FileChangesWatcher: get small changes, if full changes send fullchange and empty small changes, otherwise send small changes
 // TODO File SystemWatcher created
 // TODO File SystemWatcher deleted
 // TODO => create new items and viewItems => event itemsChanged
 
-// TODO File SystemWatcher changed
 // TODO File SystemWatcher rename => delete create
+// TODO File SystemWatcher changed
 
 // TODO File SystemWatcher Directory created
 // TODO File SystemWatcher Directory deleted
-// TODO File SystemWatcher Directory changed
 // TODO File SystemWatcher Directory rename => delete create
+// TODO File SystemWatcher Directory changed
+
 // TODO Grid Splitter (maybe WinUITools)
 // TODO SetSelections
 // TODO Viewers

@@ -13,7 +13,7 @@ class FileChanges : IDisposable
     public async Task AddChangedItemAsync(Item item)
         => await changedItems.Writer.WriteAsync(item, cancellation.Token);
 
-    public async Task<Item[]?> GetItemsAsync()
+    public async Task<FileChangesResult?> GetItemsAsync()
     {
         var items = new List<Item>();
 
@@ -21,6 +21,9 @@ class FileChanges : IDisposable
         // First, consume everything that is already available.
         while (changedItems.Reader.TryRead(out var item) && now + TimeSpan.FromMilliseconds(10) > DateTime.Now)
             items.Add(item);
+
+
+        // Show if Full change
 
         // Nothing was available -> wait for the next item.
         try
@@ -32,7 +35,7 @@ class FileChanges : IDisposable
         {
             return null;
         }
-        return [.. items];
+        return items.Count > 0 ? new([.. items], false) : null;
     }
 
     readonly Channel<Item> changedItems = Channel.CreateUnbounded<Item>(new UnboundedChannelOptions
@@ -79,3 +82,5 @@ class FileChanges : IDisposable
 
     #endregion
 }
+
+record FileChangesResult(Item[] Items, bool Complete = false);

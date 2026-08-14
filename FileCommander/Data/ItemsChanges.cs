@@ -1,3 +1,5 @@
-﻿namespace FileCommander.Data;
+﻿using FileCommander.Controllers;
 
-record ItemsChanges(Item[]? Changes);
+namespace FileCommander.Data;
+
+record ItemsChanges(FileChangesResult? Changes);
