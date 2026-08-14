@@ -4,7 +4,6 @@ using FileCommander.Contexts;
 using FileCommander.Data;
 
 using System;
-using System.Diagnostics;
 using System.IO;
 using System.Linq;
 using System.Threading.Tasks;
@@ -178,7 +177,7 @@ class DirectoryController : Controller
     ItemBase[] items = null!;
     ItemBase[] viewItems = null!;
 
-    int sortIndex = -1;
+    int sortIndex;
     bool sortDescending = false;
     bool sortSubcolumn = false;
     ExtendedFileInfos? extendedFileInfos;

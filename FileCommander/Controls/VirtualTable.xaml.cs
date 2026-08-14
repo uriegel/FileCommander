@@ -23,7 +23,6 @@ using Windows.Storage;
 
 namespace FileCommander.Controls;
 
-// TODO Initial sort either via virtual table setup or as default sorting 
 // TODO send selected position
 
 // TODO File SystemWatcher rename => delete create
