@@ -24,8 +24,6 @@ using Windows.Storage;
 namespace FileCommander.Controls;
 
 // TODO FileChangesWatcher: get small changes, if full changes send fullchange and empty small changes, otherwise send small changes
-// TODO File SystemWatcher created
-// TODO File SystemWatcher deleted
 // TODO => create new items and viewItems => event itemsChanged
 
 // TODO File SystemWatcher rename => delete create

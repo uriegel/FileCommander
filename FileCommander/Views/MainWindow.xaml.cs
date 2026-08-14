@@ -22,7 +22,8 @@ public sealed partial class MainWindow : Window
     public MainWindow()
     {
         this.InitializeComponent();
-        
+        mainWindow = this;
+
         var settings = ApplicationData.Current.LocalSettings.Values;
         if (settings?.ContainsKey("WindowX") == true)
         {
@@ -72,6 +73,9 @@ public sealed partial class MainWindow : Window
         }
 
     }
+
+    public static void RunOnUI(Action action)
+        => mainWindow.DispatcherQueue.TryEnqueue(() => action());
 
     void AppTitleBar_Loaded(object sender, RoutedEventArgs e)
     {
@@ -208,5 +212,6 @@ public sealed partial class MainWindow : Window
         return Api.MonitorFromRect(ref rect, MonitorDefaultTo.Null) != 0;
     }
 
+    static MainWindow mainWindow = null!;
     FolderView? activeView;
 }

@@ -1,6 +1,4 @@
-﻿using ABI.Microsoft.UI.Text;
-
-using CsTools.Extensions;
+﻿using CsTools.Extensions;
 
 using FileCommander.Contexts;
 using FileCommander.Data;
@@ -146,7 +144,7 @@ class DirectoryController : Controller
                 .. items
                 ];
             (viewItems, _) = MapViewItems(null);
-            // TODO Adapt fileItemCount
+            MainWindow.RunOnUI(() => Context.CurrentFileCount = Context.CurrentFileCount + 1);
             // TODO New Selection
         }
         catch { }
@@ -157,7 +155,7 @@ class DirectoryController : Controller
         Debug.WriteLine($"Datei oder Verzeichnis gelöscht: {e.FullPath}");
         items = [.. items.Where(n => n.Name != e.Name)];
         (viewItems, _) = MapViewItems(null);
-        // TODO Adapt fileItemCount
+        MainWindow.RunOnUI(() => Context.CurrentFileCount = Context.CurrentFileCount - 1);
         // TODO New Selection
     }
 
