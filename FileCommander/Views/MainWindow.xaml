@@ -99,8 +99,12 @@
                                  HorizontalAlignment="Stretch"
                                  GotFocus="LeftView_GotFocus">
                 </controls1:FolderView>
-                <Border Grid.Column="1" Width="5" HorizontalAlignment="Stretch" 
-                          Background="Transparent"/>
+                <controls1:SplitterGrid x:Name="Splitter" Grid.Column="1" Width="5" 
+                                        PointerEntered="Splitter_PointerEntered" PointerExited="Splitter_PointerExited"
+                                        HorizontalAlignment="Stretch" Background="Transparent">
+                    <Border x:Name="SplitterHighlight" Width="2" HorizontalAlignment="Center" 
+                            Background="{ThemeResource AccentFillColorDefaultBrush}" Opacity="0"/>
+                </controls1:SplitterGrid>
                 <controls1:FolderView x:Name="RightView" Id="RightView" Grid.Column="2" 
                                  HorizontalAlignment="Stretch"
                                  GotFocus="RightView_GotFocus">

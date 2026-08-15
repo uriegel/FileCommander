@@ -3,10 +3,12 @@ using ClrWinApi;
 using FileCommander.Contexts;
 using FileCommander.Controls;
 
+using Microsoft.UI.Input;
 using Microsoft.UI.Windowing;
 using Microsoft.UI.Xaml;
 using Microsoft.UI.Xaml.Input;
 using Microsoft.UI.Xaml.Media;
+using Microsoft.UI.Xaml.Media.Animation;
 
 using System;
 using System.Threading.Tasks;
@@ -197,7 +199,7 @@ public sealed partial class MainWindow : Window
 
         settings["WindowMaximized"] =
             presenter.State == OverlappedPresenterState.Maximized;
-    } 
+    }
 
     bool IsWindowVisible()
     {
@@ -211,6 +213,29 @@ public sealed partial class MainWindow : Window
         return Api.MonitorFromRect(ref rect, MonitorDefaultTo.Null) != 0;
     }
 
+    void Splitter_PointerEntered(object sender, PointerRoutedEventArgs e)
+        => SetHighlight(true);
+
+    void Splitter_PointerExited(object sender, PointerRoutedEventArgs e)
+        => SetHighlight(false);
+
+    void SetHighlight(bool visible)
+    {
+        var animation = new DoubleAnimation
+        {
+            To = visible ? 1 : 0,
+            Duration = new Duration(TimeSpan.FromMilliseconds(250))
+        };
+
+        Storyboard.SetTarget(animation, SplitterHighlight);
+        Storyboard.SetTargetProperty(animation, "Opacity");
+
+        var storyboard = new Storyboard();
+        storyboard.Children.Add(animation);
+
+        storyboard.Begin();
+    }
+
     async void Window_Activated(object sender, WindowActivatedEventArgs args)
     {
         if (args.WindowActivationState == WindowActivationState.CodeActivated || args.WindowActivationState == WindowActivationState.PointerActivated)
@@ -221,4 +246,5 @@ public sealed partial class MainWindow : Window
 
     static MainWindow mainWindow = null!;
     FolderView? activeView;
+    InputSystemCursor cursor = InputSystemCursor.Create(InputSystemCursorShape.SizeWestEast);
 }
