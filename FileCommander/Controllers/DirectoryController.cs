@@ -3,6 +3,8 @@
 using FileCommander.Contexts;
 using FileCommander.Data;
 
+using Microsoft.UI.Xaml.Shapes;
+
 using System;
 using System.Diagnostics;
 using System.IO;
@@ -22,7 +24,7 @@ class DirectoryController : Controller
     {
         watcher.Created += WatchCreated;
         watcher.Deleted += WatchDeleted;
-        //watcher.Changed += WatchChanged;
+        watcher.Changed += WatchChanged;
         watcher.Renamed += WatchRenamed;
         watcher.NotifyFilter = NotifyFilters.CreationTime
                     | NotifyFilters.DirectoryName
@@ -140,11 +142,17 @@ class DirectoryController : Controller
         {
             var isFile = File.Exists(e.FullPath);
             items = [
-                isFile ? FileItem.Create(new FileInfo(e.FullPath)) : DirectoryItem.Create(new DirectoryInfo(e.FullPath)), 
+                isFile ? FileItem.Create(new FileInfo(e.FullPath)) : DirectoryItem.Create(new DirectoryInfo(e.FullPath)),
                 .. items
                 ];
             (viewItems, _) = MapViewItems(null);
-            MainWindow.RunOnUI(() => Context.CurrentFileCount = Context.CurrentFileCount + 1);
+            MainWindow.RunOnUI(() =>
+            {
+                if (isFile)
+                    Context.CurrentFileCount = Context.CurrentFileCount + 1;
+                else
+                    Context.CurrentDirectoryCount = Context.CurrentDirectoryCount + 1;
+            });
             var selectedItem = Context.SelectedPath.SubstringAfterLast('\\');
             var pos = viewItems.TakeWhile(n => n.Name != selectedItem).Count();
             if (pos == viewItems.Length)
@@ -161,9 +169,16 @@ class DirectoryController : Controller
     {
         try
         {
+            var isFile = items.FirstOrDefault(n => n.Name == e.Name) is FileItem;
             items = [.. items.Where(n => n.Name != e.Name)];
             (viewItems, _) = MapViewItems(null);
-            MainWindow.RunOnUI(() => Context.CurrentFileCount = Context.CurrentFileCount - 1);
+            MainWindow.RunOnUI(() =>
+            {
+                if (isFile)
+                    Context.CurrentFileCount = Context.CurrentFileCount - 1;
+                else
+                    Context.CurrentDirectoryCount = Context.CurrentDirectoryCount - 1;
+            });
             var selectedItem = Context.SelectedPath.SubstringAfterLast('\\');
             var pos = viewItems.TakeWhile(n => n.Name != selectedItem).Count();
             if (pos == viewItems.Length)
@@ -191,7 +206,6 @@ class DirectoryController : Controller
                 .. items.Where(n => n.Name != e.OldName)
             ];
             (viewItems, _) = MapViewItems(null);
-            MainWindow.RunOnUI(() => Context.CurrentFileCount = Context.CurrentFileCount - 1);
             var selectedItem = Context.SelectedPath.SubstringAfterLast('\\');
             var pos = viewItems.TakeWhile(n => n.Name != selectedItem).Count();
             if (pos == viewItems.Length)
@@ -204,12 +218,30 @@ class DirectoryController : Controller
         }
     }
 
+    void WatchChanged(object _, FileSystemEventArgs e)
+    {
+        var item = items.FirstOrDefault(n => n.Name == e.Name);
+        if (item is DirectoryItem di)
+        {
+            var dirInfo = new DirectoryInfo(e.FullPath);
+            di.DateTime = dirInfo.LastWriteTime;
+            changes?.AddChangedItem(Item.Get(di));
+        }
+        else if (item is FileItem fi)
+        {
+            var fileInfo = new FileInfo(e.FullPath);
+            fi.DateTime = fileInfo.LastWriteTime;
+            fi.Size = fileInfo.Length;
+            changes?.AddChangedItem(Item.Get(fi, Context.CurrentPath));
+        }
+    }
+
     Item[] MapItems()
         => [.. viewItems.Select(n =>
                 n switch
                 {
                     ParentItem p => new Item(p.Name, n.GetIcon(Context.CurrentPath), ["", "", ""]),
-                    DirectoryItem d => new Item(d.Name, n.GetIcon(Context.CurrentPath), [d.DateTime.ToString("g"), "", ""], null, d.IsHidden),
+                    DirectoryItem d => Item.Get(d),
                     FileItem f => Item.Get(f, Context.CurrentPath),
                     _ => throw new Exception("Unknown ItemBase")
                 })];

@@ -11,6 +11,9 @@ record Item(string Text, string Icon, string[] Values, ExifValue? ExifValue = nu
     public static Item Get(FileItem item, string path)
         => new(item.Name, item.GetIcon(path), [item.DateTime.ToString("g"), item.Size.FormatSize(), item.Version?.Format() ?? ""], 
             ExifValue.Create(item.ExifData), item.IsHidden);
+
+    public static Item Get(DirectoryItem item)
+        => new(item.Name, item.GetIcon(""), [item.DateTime.ToString("g"), "", ""], null, item.IsHidden);
 };
 
 record ExifValue(string? Date, double? Latitude, double? Longitude)

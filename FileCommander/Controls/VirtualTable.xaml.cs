@@ -23,18 +23,17 @@ using Windows.Storage;
 
 namespace FileCommander.Controls;
 
-// TODO File SystemWatcher changed
-// TODO File SystemWatcher Directory changed
-
-// TODO File SystemWatcher start exif and version: after create check exifs from all newly create items, until creation time is older than 10s
-
+// TODO Mouse click on Path edit: select all
+// TODO Main WIndow focus -> active folder focus
 // TODO Grid Splitter (maybe WinUITools)
 // TODO SetSelections
 // TODO Viewers
 // TODO Home folder (later Favorites, Remotes)
 
 // TODO exif dark mode
-// TODO Main WIndow focus -> active folder focus
+
+// TODO File SystemWatcher start exif and version: after create check exifs from all newly create items, until creation time is older than 10s
+
 public sealed partial class VirtualTable : UserControl
 {
     public event Action<bool>? OnTab;

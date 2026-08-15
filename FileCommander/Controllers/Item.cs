@@ -15,16 +15,23 @@ record ParentItem() : ItemBase("..", false)
 {
     public override string GetIcon(string path) => "iconFromRes/GoUp";
 }
-record DirectoryItem(string Name, bool IsHidden, DateTime DateTime) : ItemBase(Name, IsHidden)
+record DirectoryItem(string Name, bool IsHidden) : ItemBase(Name, IsHidden)
 {
-    public static DirectoryItem Create(DirectoryInfo info) => new(info.Name, info.IsHidden(), info.LastWriteTime);
+    public DateTime DateTime { get; set; }
+    public static DirectoryItem Create(DirectoryInfo info) => new(info.Name, info.IsHidden()) { DateTime = info.LastWriteTime };
     public override string GetIcon(string path) => "iconFromRes/Folder";
 }
-record FileItem(string Name, bool IsVisible, DateTime DateTime, long Size) : ItemBase(Name, IsVisible)
+record FileItem(string Name, bool IsVisible) : ItemBase(Name, IsVisible)
 {
+    public long Size { get; set; }
+    public DateTime DateTime { get; set; }
     public ExifData? ExifData { get; set; }
     public FileVersionInfo? Version { get; set; }
-    public static FileItem Create(FileInfo info) => new(info.Name, info.IsHidden(), info.LastWriteTime, info.Length);
+    public static FileItem Create(FileInfo info) => new(info.Name, info.IsHidden())
+    { 
+        Size = info.Length,
+        DateTime = info.LastWriteTime
+    };
     public override string GetIcon(string path)
         => $"icon/{(Name.EndsWith(".exe", StringComparison.OrdinalIgnoreCase) ? path.AppendPath(Name) : Name.GetFileExtension())}";
 }
