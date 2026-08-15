@@ -19,6 +19,9 @@ class FileChanges : IDisposable
     public void AddCreateItem(Item item, int position, int selection)
         => changedItems.Writer.TryWrite(new() { Created = new(item, position, selection) });
 
+    public void AddRenameItem(Item item, int oldPosition, int position, int selection)
+        => changedItems.Writer.TryWrite(new() { Renamed = new(item, oldPosition, position, selection) });
+    
     public async Task<Change[]?> GetItemsAsync()
     {
         var items = new List<Change>();

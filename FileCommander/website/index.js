@@ -246,6 +246,14 @@ async function detectChanges() {
                     tableView.setItems([...items.slice(0, n.created.position), n.created.item, ...items.slice(n.created.position)])
                     tableView.setPosition(n.created.selection)
                 }
+            } else if (n.renamed) {
+                if (!unrestrictedItems) {
+                    let items = tableView.getItems()
+                    items = items.filter((_, i) => i != n.renamed.oldPosition)
+                    items = [...items.slice(0, n.renamed.position), n.renamed.item, ...items.slice(n.renamed.position)]
+                    tableView.setItems(items)
+                    tableView.setPosition(n.renamed.selection)
+                }
             }
         })
         await delayAsync(40) 

@@ -3,6 +3,8 @@
 using FileCommander.Contexts;
 using FileCommander.Data;
 
+using Microsoft.UI.Xaml.Controls.Primitives;
+
 using System;
 using System.Diagnostics;
 using System.IO;
@@ -205,7 +207,6 @@ class DirectoryController : Controller
 
     void WatchRenamed(object _, RenamedEventArgs e)
     {
-        Debug.WriteLine($"Renamed: {e.OldName} -> {e.Name}");
         try
         {
             var oldItem = items.FirstOrDefault(n => n.Name == e.OldName);
@@ -214,16 +215,23 @@ class DirectoryController : Controller
                 WatchCreated(this, new FileSystemEventArgs(WatcherChangeTypes.Created, e.FullPath, e.Name));
                 return;
             }
+            var oldPos = Array.IndexOf(viewItems, oldItem);
+            var newItem = oldItem with { Name = e.Name ?? "" };
             items = [
-                oldItem with { Name = e.Name ?? "" },
+                newItem,
                 .. items.Where(n => n.Name != e.OldName)
-            ];
+            ]; var selectedItem = Context.SelectedPath.SubstringAfterLast('\\');
             (viewItems, _) = MapViewItems(null);
-            var selectedItem = Context.SelectedPath.SubstringAfterLast('\\');
-            var pos = viewItems.TakeWhile(n => n.Name != selectedItem).Count();
-            if (pos == viewItems.Length)
-                pos = 0;
-            //changes?.AddChangedCompleteItem(new(MapItems(), pos));
+
+            var selpos = viewItems.TakeWhile(n => n.Name != selectedItem).Count();
+            if (selpos == viewItems.Length)
+                selpos = 0;
+            var newPos = Array.IndexOf(viewItems, newItem);
+            
+            var item = oldItem is FileItem
+                ? Item.Get((newItem as FileItem)!, Context.CurrentPath)
+                : Item.Get((newItem as DirectoryItem)!);
+            changes?.AddRenameItem(item, oldPos, newPos, selpos);
         }
         catch (Exception ex)
         {
