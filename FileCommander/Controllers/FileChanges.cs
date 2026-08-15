@@ -11,26 +11,19 @@ namespace FileCommander.Controllers;
 class FileChanges : IDisposable
 {
     public void AddChangedItem(Item item)
-        => changedItems.Writer.TryWrite(item);
-    public void AddChangedCompleteItem(CompleteChange change)
-    {
-        changedItems.Writer.TryWrite(new("", "", []));
-        Interlocked.Exchange(ref completeItemsChanged, change);
-    }
+        => changedItems.Writer.TryWrite(new(item));
 
-    public async Task<FileChangesResult?> GetItemsAsync()
+    public void AddDeletedItem(int position, int selection)
+        => changedItems.Writer.TryWrite(new() {Deleted = new(position, selection) });
+
+    public async Task<Change[]?> GetItemsAsync()
     {
-        var items = new List<Item>();
+        var items = new List<Change>();
 
         var now = DateTime.Now;        
         // First, consume everything that is already available.
         while (changedItems.Reader.TryRead(out var item) && now + TimeSpan.FromMilliseconds(10) > DateTime.Now)
             items.Add(item);
-
-        // Show if Full change
-        var completeItems = Interlocked.Exchange(ref completeItemsChanged, null);
-        if (completeItems != null)
-            return new([.. completeItems.Items], true, completeItems.Pos);
 
         // Nothing was available -> wait for the next item.
         try
@@ -42,15 +35,14 @@ class FileChanges : IDisposable
         {
             return null;
         }
-        return items.Count > 0 ? new([.. items], false) : null;
+        return items.Count > 0 ? [.. items] : null;
     }
 
-    readonly Channel<Item> changedItems = Channel.CreateUnbounded<Item>(new UnboundedChannelOptions
+    readonly Channel<Change> changedItems = Channel.CreateUnbounded<Change>(new UnboundedChannelOptions
     {
         SingleReader = true,
         SingleWriter = true
     });
-    CompleteChange? completeItemsChanged = null;
 
     readonly CancellationTokenSource cancellation = new();
 
@@ -91,5 +83,7 @@ class FileChanges : IDisposable
     #endregion
 }
 
-record FileChangesResult(Item[] Items, bool Complete = false, int Pos = 0);
-record CompleteChange(Item[] Items, int Pos);
+
+
+
+

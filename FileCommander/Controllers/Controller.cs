@@ -37,7 +37,7 @@ abstract class Controller : IDisposable
         Context.CurrentPath = path;
     }
 
-    public virtual Task<FileChangesResult?> GetItemChangesAsync() => Task.FromResult<FileChangesResult?>(null);
+    public virtual Task<Change[]?> GetItemChangesAsync() => Task.FromResult<Change[]?>(null);
 
     public abstract Column[] GetColumns();
     public abstract (Item[] Items, int oldPos, int dirCount, int fileCount) GetItems(

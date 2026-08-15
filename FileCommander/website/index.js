@@ -221,27 +221,27 @@ async function detectChanges() {
     while (!changeDetectionCancellation)
     { 
         const response = await fetch("request/getFileChanges")
-        const items = await response.json()
-        console.log("Changes", items)
-        if (items.changes == undefined)
+        const res = await response.json()
+        console.log("Changes", res)
+        if (res.changes == undefined)
             break
 
-        // TODO check
-        if (items.changes.complete) {
-            tableView.setItems(items.changes.items)
-            tableView.setPosition(items.changes.pos);
-            itemsMap = new Map(items.changes.items.map(item => [item.text, item]))
-        }
-        else {
-            items.changes.items.forEach(n => {
-                const item = itemsMap.get(n.text)
-                if (item && n.exifValue)
-                    item.exifValue = n.exifValue
-                if (item && n.values.length == 3 && n.values[2].length > 0)
-                    item.values = n.values
-            })
-            tableView.refresh()
-        }
+        res.changes.forEach(n => {
+            if (n.item) {
+                const item = itemsMap.get(n.item.text)
+                if (item && n.item.exifValue)
+                    item.exifValue = n.item.exifValue
+                if (item && n.item.values.length == 3 && n.item.values[2].length > 0)
+                    item.values = n.item.values
+                tableView.refresh()
+            } else if (n.deleted) {
+                if (!unrestrictedItems) {
+                    const items = tableView.getItems()                                        
+                    tableView.setItems(items.filter((_, i) => i != n.deleted.position))
+                    tableView.setPosition(n.deleted.selection)
+                }
+            }
+        })
         await delayAsync(40) 
     }
 }

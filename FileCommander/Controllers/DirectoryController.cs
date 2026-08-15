@@ -92,9 +92,9 @@ class DirectoryController : Controller
             return false;
     }
 
-    public override async Task<FileChangesResult?> GetItemChangesAsync() 
+    public override async Task<Change[]?> GetItemChangesAsync() 
             => await (changes?.GetItemsAsync() 
-                ?? Task.FromResult<FileChangesResult?>(null));
+                ?? Task.FromResult<Change[]?>(null));
 
     public override string OnPosition(int pos) 
         => pos < viewItems.Length ? Context.CurrentPath.AppendPath(viewItems[pos].Name) : Context.CurrentPath;
@@ -156,7 +156,7 @@ class DirectoryController : Controller
             var pos = viewItems.TakeWhile(n => n.Name != selectedItem).Count();
             if (pos == viewItems.Length)
                 pos = 0;
-            changes?.AddChangedCompleteItem(new(MapItems(), pos));
+            //changes?.AddChangedCompleteItem(new(MapItems(), pos));
         }
         catch (Exception ex)
         {
@@ -169,6 +169,11 @@ class DirectoryController : Controller
         Debug.WriteLine($"Deleted: {e.Name}");
         try
         {
+            var selectedItem = Context.SelectedPath.SubstringAfterLast('\\');
+            var pos = viewItems.TakeWhile(n => n.Name != selectedItem).Count();
+            if (pos == viewItems.Length)
+                pos = 0;
+            var delPos = viewItems.TakeWhile(n => n.Name != e.Name).Count();
             var isFile = items.FirstOrDefault(n => n.Name == e.Name) is FileItem;
             items = [.. items.Where(n => n.Name != e.Name)];
             (viewItems, _) = MapViewItems(null);
@@ -179,11 +184,9 @@ class DirectoryController : Controller
                 else
                     Context.CurrentDirectoryCount = Context.CurrentDirectoryCount - 1;
             });
-            var selectedItem = Context.SelectedPath.SubstringAfterLast('\\');
-            var pos = viewItems.TakeWhile(n => n.Name != selectedItem).Count();
-            if (pos == viewItems.Length)
-                pos = 0;
-            changes?.AddChangedCompleteItem(new(MapItems(), pos));
+            if (pos > delPos)
+                pos--;
+            changes?.AddDeletedItem(delPos, pos);
         }
         catch (Exception ex)
         {
@@ -211,7 +214,7 @@ class DirectoryController : Controller
             var pos = viewItems.TakeWhile(n => n.Name != selectedItem).Count();
             if (pos == viewItems.Length)
                 pos = 0;
-            changes?.AddChangedCompleteItem(new(MapItems(), pos));
+            //changes?.AddChangedCompleteItem(new(MapItems(), pos));
         }
         catch (Exception ex)
         {

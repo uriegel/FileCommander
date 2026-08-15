@@ -29,6 +29,8 @@ namespace FileCommander.Controls;
 // TODO Delete: pos (if restriction unrestrictedItems)
 // TODO Rename: items with oldPos newPos (if restriction unrestrictedItems)
 
+// TODO Refresh: position is wrong when item removed
+
 // TODO Mouse click on Path edit: select all
 // TODO Main WIndow focus -> active folder focus
 // TODO Grid Splitter (maybe WinUITools)
@@ -167,7 +169,7 @@ public sealed partial class VirtualTable : UserControl
                 try
                 {
                     var items = await controller.GetItemChangesAsync();
-                    SendResult(args, new ItemsChanges(items));
+                    SendResult(args, new ChangesResult(items));
                 }
                 finally
                 {

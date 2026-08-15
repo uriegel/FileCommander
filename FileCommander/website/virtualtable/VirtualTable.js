@@ -226,7 +226,7 @@ export class VirtualTable extends HTMLElement {
         this.onColumnWidthChange = cb
     }
 
-    setItems(items, pos) {
+    setItems(items) {
         this.currentPosition = 0
         this.offset = 0
         this.items = items
