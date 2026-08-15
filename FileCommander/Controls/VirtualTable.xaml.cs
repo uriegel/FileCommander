@@ -23,8 +23,6 @@ using Windows.Storage;
 
 namespace FileCommander.Controls;
 
-// TODO Main WIndow focus -> active folder focus
-
 // TODO Grid Splitter (maybe WinUITools)
 
 // TODO SetSelections

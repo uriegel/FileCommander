@@ -8,6 +8,7 @@
     xmlns:controls1="using:FileCommander.Controls"
     xmlns:converters="using:FileCommander.ValueConverters"
     mc:Ignorable="d"
+    Activated="Window_Activated"
     Closed="Window_Closed">
 
     <Grid Name="MainGrid">

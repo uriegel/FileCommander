@@ -65,13 +65,12 @@ public sealed partial class MainWindow : Window
         activeView = LeftView;
         MainContext.Instance.ChangeFolderContext(LeftView.Context);
         Focus();
-
         async void Focus()
         {
+            activeView?.Focus(FocusState.Keyboard);
             await Task.Delay(100);
-            activeView.Focus(FocusState.Keyboard);
+            activeView?.Focus(FocusState.Keyboard);
         }
-
     }
 
     public static void RunOnUI(Action action)
@@ -210,6 +209,14 @@ public sealed partial class MainWindow : Window
             Bottom = AppWindow.Position.Y + AppWindow.Size.Height 
         };
         return Api.MonitorFromRect(ref rect, MonitorDefaultTo.Null) != 0;
+    }
+
+    async void Window_Activated(object sender, WindowActivatedEventArgs args)
+    {
+        if (args.WindowActivationState == WindowActivationState.CodeActivated || args.WindowActivationState == WindowActivationState.PointerActivated)
+        {
+            DispatcherQueue.TryEnqueue(Microsoft.UI.Dispatching.DispatcherQueuePriority.Low, () => activeView?.Focus(FocusState.Programmatic));
+        }
     }
 
     static MainWindow mainWindow = null!;
