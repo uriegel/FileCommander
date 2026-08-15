@@ -16,6 +16,9 @@ class FileChanges : IDisposable
     public void AddDeletedItem(int position, int selection)
         => changedItems.Writer.TryWrite(new() {Deleted = new(position, selection) });
 
+    public void AddCreateItem(Item item, int position, int selection)
+        => changedItems.Writer.TryWrite(new() { Created = new(item, position, selection) });
+
     public async Task<Change[]?> GetItemsAsync()
     {
         var items = new List<Change>();

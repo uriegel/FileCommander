@@ -236,9 +236,15 @@ async function detectChanges() {
                 tableView.refresh()
             } else if (n.deleted) {
                 if (!unrestrictedItems) {
-                    const items = tableView.getItems()                                        
+                    const items = tableView.getItems()
                     tableView.setItems(items.filter((_, i) => i != n.deleted.position))
                     tableView.setPosition(n.deleted.selection)
+                }
+            } else if (n.created) {
+                if (!unrestrictedItems) {
+                    const items = tableView.getItems()
+                    tableView.setItems([...items.slice(0, n.created.position), n.created.item, ...items.slice(n.created.position)])
+                    tableView.setPosition(n.created.selection)
                 }
             }
         })

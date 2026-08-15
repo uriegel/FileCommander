@@ -140,8 +140,11 @@ class DirectoryController : Controller
         try
         {
             var isFile = File.Exists(e.FullPath);
+            var newItem = isFile 
+                ? (ItemBase)FileItem.Create(new FileInfo(e.FullPath)) 
+                : DirectoryItem.Create(new DirectoryInfo(e.FullPath));
             items = [
-                isFile ? FileItem.Create(new FileInfo(e.FullPath)) : DirectoryItem.Create(new DirectoryInfo(e.FullPath)),
+                newItem,
                 .. items
                 ];
             (viewItems, _) = MapViewItems(null);
@@ -152,11 +155,17 @@ class DirectoryController : Controller
                 else
                     Context.CurrentDirectoryCount = Context.CurrentDirectoryCount + 1;
             });
+            var pos = viewItems.TakeWhile(n => n.Name != e.Name).Count();
+            
             var selectedItem = Context.SelectedPath.SubstringAfterLast('\\');
-            var pos = viewItems.TakeWhile(n => n.Name != selectedItem).Count();
-            if (pos == viewItems.Length)
-                pos = 0;
-            //changes?.AddChangedCompleteItem(new(MapItems(), pos));
+            var selpos = viewItems.TakeWhile(n => n.Name != selectedItem).Count();
+            if (selpos == viewItems.Length)
+                selpos = 0;
+
+            var item = isFile 
+                ? Item.Get((newItem as FileItem)!, Context.CurrentPath)
+                : Item.Get((newItem as DirectoryItem)!);
+            changes?.AddCreateItem(item, pos, selpos);
         }
         catch (Exception ex)
         {
@@ -221,6 +230,7 @@ class DirectoryController : Controller
             Debug.WriteLine($"Could not rename changed: {ex}");
         }
     }
+
     void WatchChanged(object _, FileSystemEventArgs e)
     {
         Debug.WriteLine($"Changed: {e.Name}");
