@@ -241,6 +241,9 @@ async function detectChanges() {
                     tableView.setItems(items)
                     itemsMap = new Map(items.map(item => [item.text, item]))
                     tableView.setPosition(n.deleted.selection)
+                } else {
+                    unrestrictedItems = unrestrictedItems.filter((_, i) => i != n.deleted.position)
+                    itemsMap = new Map(unrestrictedItems.map(item => [item.text, item]))
                 }
             } else if (n.created) {
                 if (!unrestrictedItems) {
@@ -249,6 +252,9 @@ async function detectChanges() {
                     tableView.setItems(items)
                     itemsMap = new Map(items.map(item => [item.text, item]))
                     tableView.setPosition(n.created.selection)
+                } else {
+                    unrestrictedItems = [...unrestrictedItems.slice(0, n.created.position), n.created.item, ...unrestrictedItems.slice(n.created.position)]
+                    itemsMap = new Map(unrestrictedItems.map(item => [item.text, item]))
                 }
             } else if (n.renamed) {
                 if (!unrestrictedItems) {
@@ -258,6 +264,10 @@ async function detectChanges() {
                     tableView.setItems(items)
                     itemsMap = new Map(items.map(item => [item.text, item]))
                     tableView.setPosition(n.renamed.selection)
+                } else {
+                    unrestrictedItems = unrestrictedItems.filter((_, i) => i != n.renamed.oldPosition)
+                    unrestrictedItems = [...unrestrictedItems.slice(0, n.renamed.position), n.renamed.item, ...unrestrictedItems.slice(n.renamed.position)]
+                    itemsMap = new Map(unrestrictedItems.map(item => [item.text, item]))
                 }
             }
         })

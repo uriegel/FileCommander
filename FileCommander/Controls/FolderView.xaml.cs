@@ -64,4 +64,7 @@ public sealed partial class FolderView : UserControl
             e.Handled = true;
         }
     }
+
+    void PathTextBox_GotFocus(object sender, RoutedEventArgs e)
+        => PathTextBox.SelectAll();
 }

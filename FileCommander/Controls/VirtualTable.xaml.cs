@@ -23,15 +23,10 @@ using Windows.Storage;
 
 namespace FileCommander.Controls;
 
-// TODO Create: item with pos (if restriction unrestrictedItems)
-// TODO Delete: pos (if restriction unrestrictedItems)
-// TODO Rename: items with oldPos newPos (if restriction unrestrictedItems)
-
-// TODO Refresh: position is wrong when item removed
-
-// TODO Mouse click on Path edit: select all
 // TODO Main WIndow focus -> active folder focus
+
 // TODO Grid Splitter (maybe WinUITools)
+
 // TODO SetSelections
 // TODO Viewers
 // TODO Home folder (later Favorites, Remotes)
