@@ -4,6 +4,7 @@ using FileCommander.Contexts;
 using FileCommander.Data;
 
 using System;
+using System.Diagnostics;
 using System.IO;
 using System.Linq;
 using System.Threading.Tasks;
@@ -22,7 +23,7 @@ class DirectoryController : Controller
         watcher.Created += WatchCreated;
         watcher.Deleted += WatchDeleted;
         //watcher.Changed += WatchChanged;
-        //watcher.Renamed += WatchRenamed;
+        watcher.Renamed += WatchRenamed;
         watcher.NotifyFilter = NotifyFilters.CreationTime
                     | NotifyFilters.DirectoryName
                     | NotifyFilters.FileName
@@ -164,9 +165,29 @@ class DirectoryController : Controller
             if (pos == viewItems.Length)
                 pos = 0;
             changes?.AddChangedCompleteItem(new(MapItems(), pos));
-            // TODO New Selection
         }
         catch { }
+    }
+
+    void WatchRenamed(object _, RenamedEventArgs e)
+    {
+        var oldItem = items.FirstOrDefault(n => n.Name == e.OldName);
+        if (oldItem == null)
+        {
+            Debug.WriteLine($"Renamed old item not existing: {e.OldName} {e.Name}");
+            return;
+        }
+        items = [
+            oldItem with { Name = e.Name ?? "" },
+            .. items.Where(n => n.Name != e.OldName)
+        ];
+        (viewItems, _) = MapViewItems(null);
+        MainWindow.RunOnUI(() => Context.CurrentFileCount = Context.CurrentFileCount - 1);
+        var selectedItem = Context.SelectedPath.SubstringAfterLast('\\');
+        var pos = viewItems.TakeWhile(n => n.Name != selectedItem).Count();
+        if (pos == viewItems.Length)
+            pos = 0;
+        changes?.AddChangedCompleteItem(new(MapItems(), pos));
     }
 
     Item[] MapItems()
