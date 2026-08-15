@@ -23,8 +23,6 @@ using Windows.Storage;
 
 namespace FileCommander.Controls;
 
-// TODO Eliminate AddChangedCompleteItem:
-// TODO Test with copy mp4
 // TODO Create: item with pos (if restriction unrestrictedItems)
 // TODO Delete: pos (if restriction unrestrictedItems)
 // TODO Rename: items with oldPos newPos (if restriction unrestrictedItems)

@@ -3,8 +3,6 @@
 using FileCommander.Contexts;
 using FileCommander.Data;
 
-using Microsoft.UI.Xaml.Controls.Primitives;
-
 using System;
 using System.Diagnostics;
 using System.IO;

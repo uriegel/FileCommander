@@ -231,19 +231,23 @@ async function detectChanges() {
                 const item = itemsMap.get(n.item.text)
                 if (item && n.item.exifValue)
                     item.exifValue = n.item.exifValue
-                if (item && n.item.values.length == 3 && n.item.values[2].length > 0)
+                if (item && n.item.values.length == 3)
                     item.values = n.item.values
                 tableView.refresh()
             } else if (n.deleted) {
                 if (!unrestrictedItems) {
-                    const items = tableView.getItems()
-                    tableView.setItems(items.filter((_, i) => i != n.deleted.position))
+                    let items = tableView.getItems()
+                    items = items.filter((_, i) => i != n.deleted.position)
+                    tableView.setItems(items)
+                    itemsMap = new Map(items.map(item => [item.text, item]))
                     tableView.setPosition(n.deleted.selection)
                 }
             } else if (n.created) {
                 if (!unrestrictedItems) {
-                    const items = tableView.getItems()
-                    tableView.setItems([...items.slice(0, n.created.position), n.created.item, ...items.slice(n.created.position)])
+                    let items = tableView.getItems()
+                    items = [...items.slice(0, n.created.position), n.created.item, ...items.slice(n.created.position)]
+                    tableView.setItems(items)
+                    itemsMap = new Map(items.map(item => [item.text, item]))
                     tableView.setPosition(n.created.selection)
                 }
             } else if (n.renamed) {
@@ -252,6 +256,7 @@ async function detectChanges() {
                     items = items.filter((_, i) => i != n.renamed.oldPosition)
                     items = [...items.slice(0, n.renamed.position), n.renamed.item, ...items.slice(n.renamed.position)]
                     tableView.setItems(items)
+                    itemsMap = new Map(items.map(item => [item.text, item]))
                     tableView.setPosition(n.renamed.selection)
                 }
             }
