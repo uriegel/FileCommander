@@ -32,6 +32,7 @@ class ExtendedFileInfos : IDisposable
             {
                 if (cancellation.IsCancellationRequested)
                     return;
+
                 if (extendedItem.Exif)
                 {
                     var info = ExifReader.GetExifData(path.AppendPath(extendedItem.Item.Name));

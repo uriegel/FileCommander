@@ -3,8 +3,6 @@
 using FileCommander.Contexts;
 using FileCommander.Data;
 
-using Microsoft.UI.Xaml.Shapes;
-
 using System;
 using System.Diagnostics;
 using System.IO;
@@ -138,6 +136,7 @@ class DirectoryController : Controller
 
     void WatchCreated(object _, FileSystemEventArgs e)
     {
+        Debug.WriteLine($"Created: {e.Name}");
         try
         {
             var isFile = File.Exists(e.FullPath);
@@ -167,6 +166,7 @@ class DirectoryController : Controller
 
     void WatchDeleted(object _, FileSystemEventArgs e)
     {
+        Debug.WriteLine($"Deleted: {e.Name}");
         try
         {
             var isFile = items.FirstOrDefault(n => n.Name == e.Name) is FileItem;
@@ -193,6 +193,7 @@ class DirectoryController : Controller
 
     void WatchRenamed(object _, RenamedEventArgs e)
     {
+        Debug.WriteLine($"Renamed: {e.OldName} -> {e.Name}");
         try
         {
             var oldItem = items.FirstOrDefault(n => n.Name == e.OldName);
@@ -217,9 +218,9 @@ class DirectoryController : Controller
             Debug.WriteLine($"Could not rename changed: {ex}");
         }
     }
-
     void WatchChanged(object _, FileSystemEventArgs e)
     {
+        Debug.WriteLine($"Changed: {e.Name}");
         var item = items.FirstOrDefault(n => n.Name == e.Name);
         if (item is DirectoryItem di)
         {
@@ -232,6 +233,7 @@ class DirectoryController : Controller
             var fileInfo = new FileInfo(e.FullPath);
             fi.DateTime = fileInfo.LastWriteTime;
             fi.Size = fileInfo.Length;
+            Debug.WriteLine($"Changed: {fileInfo.LastWriteTime} {fileInfo.Length}");
             changes?.AddChangedItem(Item.Get(fi, Context.CurrentPath));
         }
     }
