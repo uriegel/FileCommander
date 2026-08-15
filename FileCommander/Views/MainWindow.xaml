@@ -91,9 +91,9 @@
             </Border>
             <Grid KeyDown="Grid_KeyDown">
                 <Grid.ColumnDefinitions>
-                    <ColumnDefinition Width="*" MinWidth="15" />
+                    <ColumnDefinition Width="*" x:Name="LeftColumn" MinWidth="15" />
                     <ColumnDefinition Width="5" />
-                    <ColumnDefinition Width="*" MinWidth="15" />
+                    <ColumnDefinition Width="*" x:Name="RightColumn" MinWidth="15" />
                 </Grid.ColumnDefinitions>
                 <controls1:FolderView x:Name="LeftView" Id="LeftView" Grid.Column="0" 
                                  HorizontalAlignment="Stretch"
@@ -101,6 +101,8 @@
                 </controls1:FolderView>
                 <controls1:SplitterGrid x:Name="Splitter" Grid.Column="1" Width="5" 
                                         PointerEntered="Splitter_PointerEntered" PointerExited="Splitter_PointerExited"
+                                        PointerPressed="Splitter_PointerPressed" PointerMoved="Splitter_PointerMoved"
+                                        PointerReleased="Splitter_PointerReleased"
                                         HorizontalAlignment="Stretch" Background="Transparent">
                     <Border x:Name="SplitterHighlight" Width="2" HorizontalAlignment="Center" 
                             Background="{ThemeResource AccentFillColorDefaultBrush}" Opacity="0"/>

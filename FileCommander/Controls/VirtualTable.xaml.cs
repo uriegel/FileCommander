@@ -23,8 +23,6 @@ using Windows.Storage;
 
 namespace FileCommander.Controls;
 
-// TODO Grid Splitter (maybe WinUITools)
-
 // TODO SetSelections
 // TODO Viewers
 // TODO Home folder (later Favorites, Remotes)

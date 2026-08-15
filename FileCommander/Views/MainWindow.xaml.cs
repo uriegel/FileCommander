@@ -219,6 +219,67 @@ public sealed partial class MainWindow : Window
     void Splitter_PointerExited(object sender, PointerRoutedEventArgs e)
         => SetHighlight(false);
 
+    void Splitter_PointerPressed(object sender, PointerRoutedEventArgs e)
+    {
+        var point = e.GetCurrentPoint(MainGrid);
+
+        if (point.Properties.IsLeftButtonPressed)
+        {
+            dragStartX = point.Position.X;
+
+            leftStartWidth = LeftColumn.ActualWidth;
+            rightStartWidth = RightColumn.ActualWidth;
+
+            Splitter.CapturePointer(e.Pointer);
+            IsPointerCaptured = true;
+
+            e.Handled = true;
+        }
+    }
+
+    void Splitter_PointerMoved(object sender, PointerRoutedEventArgs e)
+    {
+        if (!IsPointerCaptured)
+            return;
+
+        var point = e.GetCurrentPoint(MainGrid);
+
+        var delta = point.Position.X - dragStartX;
+
+        var newLeftWidth = leftStartWidth + delta;
+        var newRightWidth = rightStartWidth - delta;
+
+        const double minWidth = 150;
+
+        if (newLeftWidth < minWidth)
+        {
+            newLeftWidth = minWidth;
+            newRightWidth = leftStartWidth + rightStartWidth - minWidth;
+        }
+
+        if (newRightWidth < minWidth)
+        {
+            newRightWidth = minWidth;
+            newLeftWidth = leftStartWidth + rightStartWidth - minWidth;
+        }
+
+        LeftColumn.Width = new GridLength(newLeftWidth, GridUnitType.Pixel);
+        RightColumn.Width = new GridLength(newRightWidth, GridUnitType.Pixel);
+
+        e.Handled = true;
+    }
+
+    void Splitter_PointerReleased(object sender, PointerRoutedEventArgs e)
+    {
+        if (IsPointerCaptured)
+        {
+            Splitter.ReleasePointerCapture(e.Pointer);
+            IsPointerCaptured = false;
+        }
+
+        e.Handled = true;
+    }
+
     void SetHighlight(bool visible)
     {
         var animation = new DoubleAnimation
@@ -247,4 +308,8 @@ public sealed partial class MainWindow : Window
     static MainWindow mainWindow = null!;
     FolderView? activeView;
     InputSystemCursor cursor = InputSystemCursor.Create(InputSystemCursorShape.SizeWestEast);
+    double dragStartX;
+    double leftStartWidth;
+    double rightStartWidth;
+    bool IsPointerCaptured;
 }
