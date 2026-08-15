@@ -24,13 +24,9 @@ using Windows.Storage;
 namespace FileCommander.Controls;
 
 // TODO File SystemWatcher changed
+// TODO File SystemWatcher Directory changed
 
 // TODO File SystemWatcher start exif and version: after create check exifs from all newly create items, until creation time is older than 10s
-
-// TODO File SystemWatcher Directory created
-// TODO File SystemWatcher Directory deleted
-// TODO File SystemWatcher Directory rename => delete create
-// TODO File SystemWatcher Directory changed
 
 // TODO Grid Splitter (maybe WinUITools)
 // TODO SetSelections

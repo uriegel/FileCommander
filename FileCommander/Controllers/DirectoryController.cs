@@ -138,8 +138,9 @@ class DirectoryController : Controller
     {
         try
         {
+            var isFile = File.Exists(e.FullPath);
             items = [
-                FileItem.Create(new FileInfo(e.FullPath)), 
+                isFile ? FileItem.Create(new FileInfo(e.FullPath)) : DirectoryItem.Create(new DirectoryInfo(e.FullPath)), 
                 .. items
                 ];
             (viewItems, _) = MapViewItems(null);
@@ -150,7 +151,10 @@ class DirectoryController : Controller
                 pos = 0;
             changes?.AddChangedCompleteItem(new(MapItems(), pos));
         }
-        catch { }
+        catch (Exception ex)
+        {
+            Debug.WriteLine($"Could not create changed: {ex}");
+        }
     }
 
     void WatchDeleted(object _, FileSystemEventArgs e)
@@ -166,28 +170,38 @@ class DirectoryController : Controller
                 pos = 0;
             changes?.AddChangedCompleteItem(new(MapItems(), pos));
         }
-        catch { }
+        catch (Exception ex)
+        {
+            Debug.WriteLine($"Could not delete changed: {ex}");
+        }
     }
 
     void WatchRenamed(object _, RenamedEventArgs e)
     {
-        var oldItem = items.FirstOrDefault(n => n.Name == e.OldName);
-        if (oldItem == null)
+        try
         {
-            Debug.WriteLine($"Renamed old item not existing: {e.OldName} {e.Name}");
-            return;
+            var oldItem = items.FirstOrDefault(n => n.Name == e.OldName);
+            if (oldItem == null)
+            {
+                WatchCreated(this, new FileSystemEventArgs(WatcherChangeTypes.Created, e.FullPath, e.Name));
+                return;
+            }
+            items = [
+                oldItem with { Name = e.Name ?? "" },
+                .. items.Where(n => n.Name != e.OldName)
+            ];
+            (viewItems, _) = MapViewItems(null);
+            MainWindow.RunOnUI(() => Context.CurrentFileCount = Context.CurrentFileCount - 1);
+            var selectedItem = Context.SelectedPath.SubstringAfterLast('\\');
+            var pos = viewItems.TakeWhile(n => n.Name != selectedItem).Count();
+            if (pos == viewItems.Length)
+                pos = 0;
+            changes?.AddChangedCompleteItem(new(MapItems(), pos));
         }
-        items = [
-            oldItem with { Name = e.Name ?? "" },
-            .. items.Where(n => n.Name != e.OldName)
-        ];
-        (viewItems, _) = MapViewItems(null);
-        MainWindow.RunOnUI(() => Context.CurrentFileCount = Context.CurrentFileCount - 1);
-        var selectedItem = Context.SelectedPath.SubstringAfterLast('\\');
-        var pos = viewItems.TakeWhile(n => n.Name != selectedItem).Count();
-        if (pos == viewItems.Length)
-            pos = 0;
-        changes?.AddChangedCompleteItem(new(MapItems(), pos));
+        catch (Exception ex)
+        {
+            Debug.WriteLine($"Could not rename changed: {ex}");
+        }
     }
 
     Item[] MapItems()
