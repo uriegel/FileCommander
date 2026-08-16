@@ -23,7 +23,12 @@ using Windows.Storage;
 
 namespace FileCommander.Controls;
 
-// TODO File Commands
+// TODO CreateDirectory
+// TODO DeleteItems (if not to trash show dialog)
+// TODO Copy: check conflicts
+// TODO Copy: 
+// TODO Copy: conflicts: show Conflict Dialog
+// TODO Move
 
 // TODO Viewers
 // TODO Home folder (later Favorites, Remotes)
