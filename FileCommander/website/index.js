@@ -65,6 +65,17 @@ tableView.addEventListener("process-selected", async evt => {
     }
 })
 
+tableView.addEventListener("mousedown", evt => {
+    if (evt.ctrlKey) {
+        const items = tableView.getItems()
+        const pos = tableView.getPosition()
+        const selItem = items[pos]
+        if (selItem.isSelectable)
+            selItem.selected = !selItem.selected
+        tableView.refresh()
+    }
+})
+
 /**
  * 
  * @param {KeyboardEvent} evt

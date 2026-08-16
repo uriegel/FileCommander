@@ -23,8 +23,6 @@ using Windows.Storage;
 
 namespace FileCommander.Controls;
 
-// TODO Select with click + ctrl
-
 // TODO File Commands
 
 // TODO Viewers
