@@ -109,6 +109,26 @@ async function onKeyDown(evt) {
         evt.stopPropagation()
         await fetch("request/command/toggleSelection")
     }
+    else if (evt.key == "Home" && evt.shiftKey) {
+        evt.preventDefault();
+        evt.stopPropagation()
+        await fetch("request/command/selectAllAbove")
+    }
+    else if (evt.key == "End" && evt.shiftKey) {
+        evt.preventDefault();
+        evt.stopPropagation()
+        await fetch("request/command/selectAllBeneath")
+    }
+    else if (evt.code == "NumpadAdd") {
+        evt.preventDefault();
+        evt.stopPropagation()
+        await fetch("request/command/selectAll")
+    }
+    else if (evt.code == "NumpadSubtract") {
+        evt.preventDefault();
+        evt.stopPropagation()
+        await fetch("request/command/selectNone")
+    }
     else if (evt.key.length == 1) {
         if (!unrestrictedItems) {
             const items = tableView.getItems()
@@ -163,6 +183,40 @@ async function onEvent(evt) {
             selItem.selected = !selItem.selected
         tableView.refresh()
         tableView.setPosition(pos + 1)
+    }
+    if (evt.selectAllAbove) {
+        const items = tableView.getItems()
+        const pos = tableView.getPosition()
+        items.forEach((n, i) => {
+            if (n.isSelectable)
+                n.selected = i <= pos
+        })
+        tableView.refresh()
+    }
+    if (evt.selectAllBeneath) {
+        const items = tableView.getItems()
+        const pos = tableView.getPosition()
+        items.forEach((n, i) => {
+            if (n.isSelectable)
+                n.selected = i >= pos
+        })
+        tableView.refresh()
+    }
+    if (evt.selectAll) {
+        const items = tableView.getItems()
+        items.forEach(n => {
+            if (n.isSelectable)
+                n.selected = true
+        })
+        tableView.refresh()
+    }
+    if (evt.selectNone) {
+        const items = tableView.getItems()
+        items.forEach(n => {
+            if (n.isSelectable)
+                n.selected = false
+        })
+        tableView.refresh()
     }
 }
 

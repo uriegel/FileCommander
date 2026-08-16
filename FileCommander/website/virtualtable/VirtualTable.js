@@ -409,14 +409,14 @@ export class VirtualTable extends HTMLElement {
             evt.stopPropagation()
             this.setPosition(this.currentPosition - this.visualItemsCount + 1)
         }
-        else if (evt.key == "End") {
+        else if (evt.key == "End" && !evt.shiftKey && !evt.ctrlKey) {
             evt.preventDefault()
             evt.stopPropagation()
             this.offset = Math.max(this.items.length - this.visualItemsCount, 0)
             this.currentPosition = this.items.length - 1
             this.scrollToOffset()
         }
-        else if (evt.key == "Home") {
+        else if (evt.key == "Home" && !evt.shiftKey && !evt.ctrlKey) {
             evt.preventDefault()
             evt.stopPropagation()
             this.offset = 0

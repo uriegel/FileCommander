@@ -23,10 +23,6 @@ using Windows.Storage;
 
 namespace FileCommander.Controls;
 
-// TODO SelectAllAbove
-// TODO SelectAllBeneath
-// TODO SelectAll
-// TODO SelectNone
 // TODO Select with click + ctrl
 
 // TODO File Commands
@@ -259,6 +255,22 @@ public sealed partial class VirtualTable : UserControl
                             break;
                         case "toggleSelection":
                             MainContext.Instance.ToggleSelectionCommand.Execute(null);
+                            SendResult(args, new ProcessResult());
+                            break;
+                        case "selectAllAbove":
+                            MainContext.Instance.SelectAllAboveCommand.Execute(null);
+                            SendResult(args, new ProcessResult());
+                            break;
+                        case "selectAllBeneath":
+                            MainContext.Instance.SelectAllBeneathCommand.Execute(null);
+                            SendResult(args, new ProcessResult());
+                            break;
+                        case "selectAll":
+                            MainContext.Instance.SelectAllCommand.Execute(null);
+                            SendResult(args, new ProcessResult());
+                            break;
+                        case "selectNone":
+                            MainContext.Instance.SelectNoneCommand.Execute(null);
                             SendResult(args, new ProcessResult());
                             break;
                     }

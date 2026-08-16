@@ -95,7 +95,6 @@
                             <MenuFlyoutItem Command="{StaticResource SelectAllCommand}" />
                             <MenuFlyoutItem Command="{StaticResource SelectNoneCommand}" />
                         </MenuFlyoutSubItem>
-                        <MenuFlyoutItem Text="Settings" />
                     </MenuFlyout>
                 </AppBarButton.Flyout>
             </AppBarButton>
