@@ -6,14 +6,14 @@ using FileCommander.Controllers;
 
 namespace FileCommander.Data;
 
-record Item(string Text, string Icon, string[] Values, ExifValue? ExifValue = null, bool Hidden = false)
+record Item(string Text, string Icon, string[] Values, ExifValue? ExifValue = null, bool Hidden = false, bool IsSelectable = false)
 {
     public static Item Get(FileItem item, string path)
         => new(item.Name, item.GetIcon(path), [item.DateTime.ToString("g"), item.Size.FormatSize(), item.Version?.Format() ?? ""], 
-            ExifValue.Create(item.ExifData), item.IsHidden);
+            ExifValue.Create(item.ExifData), item.IsHidden, true);
 
     public static Item Get(DirectoryItem item)
-        => new(item.Name, item.GetIcon(""), [item.DateTime.ToString("g"), "", ""], null, item.IsHidden);
+        => new(item.Name, item.GetIcon(""), [item.DateTime.ToString("g"), "", ""], null, item.IsHidden, true);
 };
 
 record ExifValue(string? Date, double? Latitude, double? Longitude)

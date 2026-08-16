@@ -40,8 +40,8 @@ public sealed partial class FolderView : UserControl
         };
     }
 
-    public void Refresh()
-        => VirtualTable.Refresh();
+    public void Refresh() => VirtualTable.Refresh();
+    public void ToggleSelection() => VirtualTable.ToggleSelection();
 
     void UserControl_Loaded(object _, RoutedEventArgs e)
     {

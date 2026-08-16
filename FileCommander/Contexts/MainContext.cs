@@ -11,6 +11,7 @@ class MainContext : INotifyPropertyChanged
 
     public ICommand ShowHiddenCommand { get; set; } = null!;
     public ICommand RefreshCommand { get; set; } = null!;
+    public ICommand ToggleSelectionCommand { get; set; } = null!;
 
     public bool ShowHidden
     {

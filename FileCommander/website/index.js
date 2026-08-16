@@ -33,6 +33,10 @@ tableView.addEventListener("render-rowitem", evt => {
         tr.classList.add("exif")
     else
         tr.classList.remove("exif")
+    if (evt.detail.item.selected)
+        tr.classList.add("selected")
+    else
+        tr.classList.remove("selected")
     const img = tr.querySelector('#img')
     img.src = evt.detail.item.icon
     const sp = tr.querySelector('#text')
@@ -100,6 +104,11 @@ async function onKeyDown(evt) {
             }
         }
     }
+    else if (evt.key == "Insert") {
+        evt.preventDefault();
+        evt.stopPropagation()
+        await fetch("request/command/toggleSelection")
+    }
     else if (evt.key.length == 1) {
         if (!unrestrictedItems) {
             const items = tableView.getItems()
@@ -145,6 +154,15 @@ async function onEvent(evt) {
         const res = await response.json()
         if (res.itemsResult) 
             setItems(res.itemsResult.items)
+    }
+    if (evt.toggleSelection) {
+        const items = tableView.getItems()
+        const pos = tableView.getPosition()
+        const selItem = items[pos]
+        if (selItem.isSelectable)
+            selItem.selected = !selItem.selected
+        tableView.refresh()
+        tableView.setPosition(pos + 1)
     }
 }
 

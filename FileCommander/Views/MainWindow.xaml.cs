@@ -43,11 +43,11 @@ public sealed partial class MainWindow : Window
         MainGrid.DataContext = MainContext.Instance;
         MainContext.Instance.ShowHiddenCommand = ShowHiddenCommand;
         MainContext.Instance.RefreshCommand = RefreshCommand;
+        MainContext.Instance.ToggleSelectionCommand = ToggleSelectionCommand;
 
         // Assumes "this" is a XAML Window. In projects that don't use 
         // WinUI 1.3 or later, use interop APIs to get the AppWindow.
         AppWindow.Changed += AppWindow_Changed;
-        Activated += MainWindow_Activated;
         AppTitleBar.SizeChanged += AppTitleBar_SizeChanged;
         AppTitleBar.Loaded += AppTitleBar_Loaded;
 
@@ -104,21 +104,6 @@ public sealed partial class MainWindow : Window
 
         RightPaddingColumn.Width = new GridLength(AppWindow.TitleBar.RightInset / scaleAdjustment);
         LeftPaddingColumn.Width = new GridLength(AppWindow.TitleBar.LeftInset / scaleAdjustment);
-    }
-
-
-    void MainWindow_Activated(object sender, WindowActivatedEventArgs args)
-    {
-        if (args.WindowActivationState == WindowActivationState.Deactivated)
-        {
-            TitleBarTextBlock.Foreground =
-                (SolidColorBrush)App.Current.Resources["WindowCaptionForegroundDisabled"];
-        }
-        else
-        {
-            TitleBarTextBlock.Foreground =
-                (SolidColorBrush)App.Current.Resources["WindowCaptionForeground"];
-        }
     }
 
     void AppWindow_Changed(AppWindow sender, AppWindowChangedEventArgs args)
@@ -179,6 +164,9 @@ public sealed partial class MainWindow : Window
 
     void RefreshCommand_ExecuteRequested(XamlUICommand sender, ExecuteRequestedEventArgs args)
         => activeView?.Refresh();
+
+    void ToggleSelectionCommand_ExecuteRequested(XamlUICommand sender, ExecuteRequestedEventArgs args)
+        => activeView?.ToggleSelection();
 
     FolderView GetOtherView() => activeView == LeftView ? RightView : LeftView;
 
@@ -300,9 +288,11 @@ public sealed partial class MainWindow : Window
     async void Window_Activated(object sender, WindowActivatedEventArgs args)
     {
         if (args.WindowActivationState == WindowActivationState.CodeActivated || args.WindowActivationState == WindowActivationState.PointerActivated)
-        {
             DispatcherQueue.TryEnqueue(Microsoft.UI.Dispatching.DispatcherQueuePriority.Low, () => activeView?.Focus(FocusState.Programmatic));
-        }
+        if (args.WindowActivationState == WindowActivationState.Deactivated)
+            TitleBarTextBlock.Foreground = (SolidColorBrush)App.Current.Resources["WindowCaptionForegroundDisabled"];
+        else
+            TitleBarTextBlock.Foreground = (SolidColorBrush)App.Current.Resources["WindowCaptionForeground"];
     }
 
     static MainWindow mainWindow = null!;

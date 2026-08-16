@@ -23,7 +23,14 @@ using Windows.Storage;
 
 namespace FileCommander.Controls;
 
-// TODO SetSelections
+// TODO SelectAllAbove
+// TODO SelectAllBeneath
+// TODO SelectAll
+// TODO SelectNone
+// TODO Select with click + ctrl
+
+// TODO File Commands
+
 // TODO Viewers
 // TODO Home folder (later Favorites, Remotes)
 
@@ -38,6 +45,7 @@ public sealed partial class VirtualTable : UserControl
     public VirtualTable() => InitializeComponent();
 
     public void Refresh() => SendEvent(new(Reload: new()));
+    public void ToggleSelection() => SendEvent(new(ToggleSelection: new()));
 
     public void SetContext(FolderContext context)
     {
@@ -243,6 +251,10 @@ public sealed partial class VirtualTable : UserControl
                             break;
                         case "refresh":
                             MainContext.Instance.RefreshCommand.Execute(null);
+                            SendResult(args, new ProcessResult());
+                            break;
+                        case "toggleSelection":
+                            MainContext.Instance.ToggleSelectionCommand.Execute(null);
                             SendResult(args, new ProcessResult());
                             break;
                     }

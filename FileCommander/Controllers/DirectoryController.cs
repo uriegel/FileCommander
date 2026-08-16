@@ -259,13 +259,13 @@ class DirectoryController : Controller
 
     Item[] MapItems()
         => [.. viewItems.Select(n =>
-                n switch
-                {
-                    ParentItem p => new Item(p.Name, n.GetIcon(Context.CurrentPath), ["", "", ""]),
-                    DirectoryItem d => Item.Get(d),
-                    FileItem f => Item.Get(f, Context.CurrentPath),
-                    _ => throw new Exception("Unknown ItemBase")
-                })];
+            n switch
+            {
+                ParentItem p => new Item(p.Name, n.GetIcon(Context.CurrentPath), ["", "", ""]),
+                DirectoryItem d => Item.Get(d),
+                FileItem f => Item.Get(f, Context.CurrentPath),
+                _ => throw new Exception("Unknown ItemBase")
+            })];
 
     readonly FileSystemWatcher watcher = new();
 

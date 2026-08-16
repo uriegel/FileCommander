@@ -27,6 +27,12 @@
                         <KeyboardAccelerator Key="R" Modifiers="Control"/>
                     </XamlUICommand.KeyboardAccelerators>
                 </XamlUICommand>
+                <XamlUICommand x:Name="ToggleSelectionCommand" Label="Selektion wechseln" Description="Die Selektion wechseln und zum nächsten Eintrag gehen" 
+                               ExecuteRequested="ToggleSelectionCommand_ExecuteRequested">
+                    <XamlUICommand.KeyboardAccelerators>
+                        <KeyboardAccelerator Key="Insert" />
+                    </XamlUICommand.KeyboardAccelerators>
+                </XamlUICommand>
                 <converters:InfoValueConverter x:Key="InfoValueConverter" />
             </ResourceDictionary>
         </Grid.Resources>
@@ -56,6 +62,9 @@
                         <ToggleMenuFlyoutItem Command="{StaticResource ShowHiddenCommand}" IsChecked="{Binding ShowHidden, Mode=TwoWay}" />
                         <MenuFlyoutItem Command="{StaticResource RefreshCommand}" />
                         <MenuFlyoutSeparator/>
+                        <MenuFlyoutSubItem Text="Selection">
+                            <MenuFlyoutItem Command="{StaticResource ToggleSelectionCommand}" />
+                        </MenuFlyoutSubItem>
                         <MenuFlyoutItem Text="Settings" />
                     </MenuFlyout>
                 </AppBarButton.Flyout>
