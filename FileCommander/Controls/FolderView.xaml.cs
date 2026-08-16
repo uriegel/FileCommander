@@ -42,6 +42,10 @@ public sealed partial class FolderView : UserControl
 
     public void Refresh() => VirtualTable.Refresh();
     public void ToggleSelection() => VirtualTable.ToggleSelection();
+    public void SelectAllAbove() => VirtualTable.SelectAllAbove();
+    public void SelectAllBeneath() => VirtualTable.SelectAllBeneath();
+    public void SelectAll() => VirtualTable.SelectAll();
+    public void SelectNone() => VirtualTable.SelectNone();
 
     void UserControl_Loaded(object _, RoutedEventArgs e)
     {

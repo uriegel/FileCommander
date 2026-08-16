@@ -4,6 +4,10 @@ record Event(
     Refresh? Refresh = null,
     Reload? Reload = null,
     ToggleSelection? ToggleSelection = null,
+    SelectAllAbove? SelectAllAbove = null,
+    SelectAllBeneath? SelectAllBeneath = null,
+    SelectAll? SelectAll = null,
+    SelectNone? SelectNone = null,
     ChangePath? ChangePath = null,
     ChangedItems? ChangedItems = null
 );
@@ -11,6 +15,10 @@ record Event(
 record Refresh();
 record Reload();
 record ToggleSelection();
+record SelectAllAbove();
+record SelectAllBeneath();
+record SelectAll();
+record SelectNone();
 record ChangePath(string Path);
 record ChangedItems(Item[] Items);
 

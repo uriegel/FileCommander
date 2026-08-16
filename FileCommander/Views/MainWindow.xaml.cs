@@ -44,6 +44,10 @@ public sealed partial class MainWindow : Window
         MainContext.Instance.ShowHiddenCommand = ShowHiddenCommand;
         MainContext.Instance.RefreshCommand = RefreshCommand;
         MainContext.Instance.ToggleSelectionCommand = ToggleSelectionCommand;
+        MainContext.Instance.SelectAllAboveCommand = SelectAllAboveCommand;
+        MainContext.Instance.SelectAllBeneathCommand = SelectAllBeneathCommand;
+        MainContext.Instance.SelectAllCommand = SelectAllCommand;
+        MainContext.Instance.SelectNoneCommand = SelectNoneCommand;
 
         // Assumes "this" is a XAML Window. In projects that don't use 
         // WinUI 1.3 or later, use interop APIs to get the AppWindow.
@@ -167,6 +171,14 @@ public sealed partial class MainWindow : Window
 
     void ToggleSelectionCommand_ExecuteRequested(XamlUICommand sender, ExecuteRequestedEventArgs args)
         => activeView?.ToggleSelection();
+    void SelectAllAboveCommand_ExecuteRequested(XamlUICommand sender, ExecuteRequestedEventArgs args)
+        => activeView?.SelectAllAbove();
+    void SelectAllBeneathCommand_ExecuteRequested(XamlUICommand sender, ExecuteRequestedEventArgs args)
+        => activeView?.SelectAllBeneath();
+    void SelectAllCommand_ExecuteRequested(XamlUICommand sender, ExecuteRequestedEventArgs args)
+        => activeView?.SelectAll();
+    void SelectNoneCommand_ExecuteRequested(XamlUICommand sender, ExecuteRequestedEventArgs args)
+        => activeView?.SelectNone();
 
     FolderView GetOtherView() => activeView == LeftView ? RightView : LeftView;
 

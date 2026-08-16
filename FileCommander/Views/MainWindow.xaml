@@ -33,6 +33,30 @@
                         <KeyboardAccelerator Key="Insert" />
                     </XamlUICommand.KeyboardAccelerators>
                 </XamlUICommand>
+                <XamlUICommand x:Name="SelectAllAboveCommand" Label="Oberhalb" Description="Alle Einträge oberhalb der Selektion selektieren" 
+                               ExecuteRequested="SelectAllAboveCommand_ExecuteRequested">
+                    <XamlUICommand.KeyboardAccelerators>
+                        <KeyboardAccelerator Key="Home" Modifiers="Shift" />
+                    </XamlUICommand.KeyboardAccelerators>
+                </XamlUICommand>
+                <XamlUICommand x:Name="SelectAllBeneathCommand" Label="Unterhalb" Description="Alle Einträge unterhalb der Selektion selektieren" 
+                               ExecuteRequested="SelectAllBeneathCommand_ExecuteRequested">
+                    <XamlUICommand.KeyboardAccelerators>
+                        <KeyboardAccelerator Key="End" Modifiers="Shift" />
+                    </XamlUICommand.KeyboardAccelerators>
+                </XamlUICommand>
+                <XamlUICommand x:Name="SelectAllCommand" Label="Alles" Description="Alle Einträge selektieren" 
+                               ExecuteRequested="SelectAllCommand_ExecuteRequested">
+                    <XamlUICommand.KeyboardAccelerators>
+                        <KeyboardAccelerator Key="Add"/>
+                    </XamlUICommand.KeyboardAccelerators>
+                </XamlUICommand>
+                <XamlUICommand x:Name="SelectNoneCommand" Label="Nichts" Description="Keinen Eintrag selektieren" 
+                               ExecuteRequested="SelectNoneCommand_ExecuteRequested">
+                    <XamlUICommand.KeyboardAccelerators>
+                        <KeyboardAccelerator Key="Subtract" />
+                    </XamlUICommand.KeyboardAccelerators>
+                </XamlUICommand>
                 <converters:InfoValueConverter x:Key="InfoValueConverter" />
             </ResourceDictionary>
         </Grid.Resources>
@@ -64,6 +88,12 @@
                         <MenuFlyoutSeparator/>
                         <MenuFlyoutSubItem Text="Selection">
                             <MenuFlyoutItem Command="{StaticResource ToggleSelectionCommand}" />
+                            <MenuFlyoutSeparator/>
+                            <MenuFlyoutItem Command="{StaticResource SelectAllAboveCommand}" />
+                            <MenuFlyoutItem Command="{StaticResource SelectAllBeneathCommand}" />
+                            <MenuFlyoutSeparator/>
+                            <MenuFlyoutItem Command="{StaticResource SelectAllCommand}" />
+                            <MenuFlyoutItem Command="{StaticResource SelectNoneCommand}" />
                         </MenuFlyoutSubItem>
                         <MenuFlyoutItem Text="Settings" />
                     </MenuFlyout>

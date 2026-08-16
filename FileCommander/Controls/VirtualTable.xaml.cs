@@ -46,6 +46,10 @@ public sealed partial class VirtualTable : UserControl
 
     public void Refresh() => SendEvent(new(Reload: new()));
     public void ToggleSelection() => SendEvent(new(ToggleSelection: new()));
+    public void SelectAllAbove() => SendEvent(new(SelectAllAbove: new()));
+    public void SelectAllBeneath() => SendEvent(new(SelectAllBeneath: new()));
+    public void SelectAll() => SendEvent(new(SelectAll: new()));
+    public void SelectNone() => SendEvent(new(SelectNone: new()));
 
     public void SetContext(FolderContext context)
     {
