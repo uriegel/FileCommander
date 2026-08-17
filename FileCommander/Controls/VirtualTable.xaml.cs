@@ -23,7 +23,7 @@ using Windows.Storage;
 
 namespace FileCommander.Controls;
 
-// TODO CreateDirectory
+// TODO Rename
 // TODO DeleteItems (if not to trash show dialog)
 // TODO Exception handling => banner
 // TODO Exception handling CreateDirectory
