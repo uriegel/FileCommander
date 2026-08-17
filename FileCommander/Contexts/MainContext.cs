@@ -16,6 +16,7 @@ class MainContext : INotifyPropertyChanged
     public ICommand SelectAllBeneathCommand { get; set; } = null!;
     public ICommand SelectAllCommand { get; set; } = null!;
     public ICommand SelectNoneCommand { get; set; } = null!;
+    public ICommand CreateFolderCommand { get; set; } = null!;
 
     public bool ShowHidden
     {

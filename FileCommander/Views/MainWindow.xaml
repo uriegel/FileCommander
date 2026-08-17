@@ -60,7 +60,7 @@
                 <XamlUICommand x:Name="CreateFolderCommand" Label="Ordner anlegen" Description="Ordner anlegen" 
                                ExecuteRequested="CreateFolderCommand_ExecuteRequested">
                     <XamlUICommand.KeyboardAccelerators>
-                        <KeyboardAccelerator Key="Delete" />
+                        <KeyboardAccelerator Key="F7" />
                     </XamlUICommand.KeyboardAccelerators>
                 </XamlUICommand>
                 <converters:InfoValueConverter x:Key="InfoValueConverter" />

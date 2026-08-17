@@ -48,7 +48,7 @@ public sealed partial class MainWindow : Window
         MainContext.Instance.SelectAllAboveCommand = SelectAllAboveCommand;
         MainContext.Instance.SelectAllBeneathCommand = SelectAllBeneathCommand;
         MainContext.Instance.SelectAllCommand = SelectAllCommand;
-        MainContext.Instance.SelectNoneCommand = SelectNoneCommand;
+        MainContext.Instance.CreateFolderCommand = CreateFolderCommand;
 
         // Assumes "this" is a XAML Window. In projects that don't use 
         // WinUI 1.3 or later, use interop APIs to get the AppWindow.
@@ -180,6 +180,8 @@ public sealed partial class MainWindow : Window
         => activeView?.SelectAll();
     void SelectNoneCommand_ExecuteRequested(XamlUICommand sender, ExecuteRequestedEventArgs args)
         => activeView?.SelectNone();
+    void CreateFolderCommand_ExecuteRequested(XamlUICommand sender, ExecuteRequestedEventArgs args)
+        => activeView.CreateFolder();
 
     FolderView GetOtherView() => activeView == LeftView ? RightView : LeftView;
 
@@ -315,24 +317,4 @@ public sealed partial class MainWindow : Window
     double leftStartWidth;
     double rightStartWidth;
     bool IsPointerCaptured;
-
-    async void CreateFolderCommand_ExecuteRequested(XamlUICommand sender, ExecuteRequestedEventArgs args)
-    {
-        var dialog = new ContentDialog
-        {
-            Title = "Delete file",
-            Content = new Dialog(),
-            PrimaryButtonText = "Delete",
-            CloseButtonText = "Cancel",
-            DefaultButton = ContentDialogButton.Close,
-            XamlRoot = Content.XamlRoot
-        };
-        var result = await dialog.ShowAsync();
-
-
-        //if (result == ContentDialogResult.Primary)
-        //{
-        //    // Delete the file
-        //}
-    }
 }

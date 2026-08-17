@@ -96,6 +96,11 @@ async function onKeyDown(evt) {
         evt.stopPropagation()
         await fetch("request/command/refresh")
     }
+    else if (evt.key == "F7") {
+        evt.preventDefault();
+        evt.stopPropagation()
+        await fetch("request/command/createFolder")
+    }
     else if (evt.key == "Escape") 
         stopRestriction()
     else if (evt.key == "Backspace") {
