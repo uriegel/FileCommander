@@ -181,7 +181,9 @@ public sealed partial class MainWindow : Window
     void SelectNoneCommand_ExecuteRequested(XamlUICommand sender, ExecuteRequestedEventArgs args)
         => activeView?.SelectNone();
     void CreateFolderCommand_ExecuteRequested(XamlUICommand sender, ExecuteRequestedEventArgs args)
-        => activeView.CreateFolder();
+        => activeView?.CreateFolder();
+    void DeleteCommand_ExecuteRequested(XamlUICommand sender, ExecuteRequestedEventArgs args)
+        => activeView?.DeleteItems();
 
     FolderView GetOtherView() => activeView == LeftView ? RightView : LeftView;
 

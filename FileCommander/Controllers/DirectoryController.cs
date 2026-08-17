@@ -1,4 +1,6 @@
-﻿using CsTools.Extensions;
+﻿using ClrWinApi;
+
+using CsTools.Extensions;
 
 using FileCommander.Contexts;
 using FileCommander.Controls;
@@ -6,12 +8,15 @@ using FileCommander.Data;
 
 using Microsoft.UI.Xaml;
 using Microsoft.UI.Xaml.Controls;
+using Microsoft.UI.Xaml.Shapes;
 
 using System;
 using System.Diagnostics;
 using System.IO;
 using System.Linq;
+using System.Runtime.InteropServices;
 using System.Threading.Tasks;
+using System.Xml.Linq;
 
 namespace FileCommander.Controllers;
 
@@ -143,12 +148,40 @@ class DirectoryController : Controller
             XamlRoot = content.XamlRoot
         };
         var result = await dialog.ShowAsync();
-
-
-        //if (result == ContentDialogResult.Primary)
-        //{
-        //    // Delete the file
-        //}
+        if (result == ContentDialogResult.Primary)
+        {
+            var newName = (dialog.Content as CreateFolderDialog)?.FolderName;
+            try
+            {
+                System.IO.Directory.CreateDirectory(Context.CurrentPath.AppendPath(newName));
+            }
+            catch (UnauthorizedAccessException)
+            {
+                var temp = System.IO.Path.GetTempFileName();
+                File.Delete(temp);
+                System.IO.Directory.CreateDirectory(temp);
+                var sourcePath = temp.AppendPath(newName);
+                System.IO.Directory.CreateDirectory(sourcePath);
+                var res = Api.SHFileOperation(new ShFileOPStruct
+                {
+                    Func = FileFuncFlags.MOVE,
+                    From = $"{sourcePath}\U00000000\U00000000",
+                    To = $"{Context.CurrentPath}\U00000000\U00000000",
+                });
+                System.IO.Directory.Delete(temp, true);
+                switch (res)
+                {
+                    case 0:
+                        return;
+                    case 2:
+                        throw new FileNotFoundException();
+                    case 0x78:
+                        throw new UnauthorizedAccessException();
+                    default:
+                        throw new Exception($"Unknown error code: {Marshal.GetLastWin32Error()}");
+                }
+            }
+        }
     }
 
     (ItemBase[], int) MapViewItems(string? fromPath)

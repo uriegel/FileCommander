@@ -9,7 +9,8 @@ record Event(
     SelectAll? SelectAll = null,
     SelectNone? SelectNone = null,
     ChangePath? ChangePath = null,
-    ChangedItems? ChangedItems = null
+    ChangedItems? ChangedItems = null,
+    DeleteItems? DeleteItems = null
 );
 
 record Refresh();
@@ -21,5 +22,6 @@ record SelectAll();
 record SelectNone();
 record ChangePath(string Path);
 record ChangedItems(Item[] Items);
+record DeleteItems();
 
 

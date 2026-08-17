@@ -63,6 +63,12 @@
                         <KeyboardAccelerator Key="F7" />
                     </XamlUICommand.KeyboardAccelerators>
                 </XamlUICommand>
+                <XamlUICommand x:Name="DeleteCommand" Label="Einträge löschen" Description="Ausgewählte Einträge löschen" 
+                               ExecuteRequested="DeleteCommand_ExecuteRequested">
+                    <XamlUICommand.KeyboardAccelerators>
+                        <KeyboardAccelerator Key="Delete" />
+                    </XamlUICommand.KeyboardAccelerators>
+                </XamlUICommand>
                 <converters:InfoValueConverter x:Key="InfoValueConverter" />
             </ResourceDictionary>
         </Grid.Resources>
@@ -94,6 +100,7 @@
                         <MenuFlyoutSeparator/>
                         <MenuFlyoutSubItem Text="Datei">
                             <MenuFlyoutItem Command="{StaticResource CreateFolderCommand}" />
+                            <MenuFlyoutItem Command="{StaticResource DeleteCommand}" />
                         </MenuFlyoutSubItem>
                         <MenuFlyoutSubItem Text="Selection">
                             <MenuFlyoutItem Command="{StaticResource ToggleSelectionCommand}" />

@@ -145,6 +145,8 @@ async function onKeyDown(evt) {
         evt.stopPropagation()
         await fetch("request/command/selectNone")
     }
+    else if (evt.code == "Delete")
+        deleteItems()
     else if (evt.key.length == 1) {
         if (!unrestrictedItems) {
             const items = tableView.getItems()
@@ -234,6 +236,8 @@ async function onEvent(evt) {
         })
         tableView.refresh()
     }
+    if (evt.deleteItems) 
+        deleteItems()
 }
 
 async function init() {
@@ -364,9 +368,11 @@ async function detectChanges() {
 }
 
 function delayAsync(ms) {
-    return new Promise(res => {
-        setTimeout(res, ms)
-    })
+    return new Promise(res => setTimeout(res, ms))
+}
+
+function deleteItems() {
+    
 }
 
 var itemsMap

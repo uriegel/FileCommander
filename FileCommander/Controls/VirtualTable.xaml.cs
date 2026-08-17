@@ -25,6 +25,10 @@ namespace FileCommander.Controls;
 
 // TODO CreateDirectory
 // TODO DeleteItems (if not to trash show dialog)
+// TODO Exception handling => banner
+// TODO Exception handling CreateDirectory
+// TODO Exception handling Delete
+// TODO Exception handling GetItems
 // TODO Copy: check conflicts
 // TODO Copy: 
 // TODO Copy: conflicts: show Conflict Dialog
@@ -50,6 +54,7 @@ public sealed partial class VirtualTable : UserControl
     public void SelectAll() => SendEvent(new(SelectAll: new()));
     public void SelectNone() => SendEvent(new(SelectNone: new()));
     public async void CreateFolder() => controller.CreateFolder(Content);
+    public async void DeleteItems() => SendEvent(new(DeleteItems: new()));
 
     public void SetContext(FolderContext context)
     {
