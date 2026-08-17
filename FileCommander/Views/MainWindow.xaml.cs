@@ -6,6 +6,7 @@ using FileCommander.Controls;
 using Microsoft.UI.Input;
 using Microsoft.UI.Windowing;
 using Microsoft.UI.Xaml;
+using Microsoft.UI.Xaml.Controls;
 using Microsoft.UI.Xaml.Input;
 using Microsoft.UI.Xaml.Media;
 using Microsoft.UI.Xaml.Media.Animation;
@@ -314,4 +315,24 @@ public sealed partial class MainWindow : Window
     double leftStartWidth;
     double rightStartWidth;
     bool IsPointerCaptured;
+
+    async void CreateFolderCommand_ExecuteRequested(XamlUICommand sender, ExecuteRequestedEventArgs args)
+    {
+        var dialog = new ContentDialog
+        {
+            Title = "Delete file",
+            Content = new Dialog(),
+            PrimaryButtonText = "Delete",
+            CloseButtonText = "Cancel",
+            DefaultButton = ContentDialogButton.Close,
+            XamlRoot = Content.XamlRoot
+        };
+        var result = await dialog.ShowAsync();
+
+
+        //if (result == ContentDialogResult.Primary)
+        //{
+        //    // Delete the file
+        //}
+    }
 }

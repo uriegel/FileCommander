@@ -20,6 +20,7 @@
   </ItemGroup>
   <ItemGroup>
     <None Remove="Assets\FolderView.xaml" />
+    <None Remove="Controls\Dialog.xaml" />
     <None Remove="Controls\VirtualTable.xaml" />
   </ItemGroup>
 	<ItemGroup>
@@ -140,5 +141,11 @@
 		<EmbeddedResource Include="website/virtualtable/*.js">
 			<LogicalName>$([System.String]::new('%(RelativeDir)').SubString(8).Replace('\','/'))%(FileName)%(Extension)</LogicalName>
 		</EmbeddedResource>
+	</ItemGroup>
+
+	<ItemGroup>
+	  <Page Update="Controls\Dialog.xaml">
+	    <Generator>MSBuild:Compile</Generator>
+	  </Page>
 	</ItemGroup>
 </Project>

@@ -57,6 +57,12 @@
                         <KeyboardAccelerator Key="Subtract" />
                     </XamlUICommand.KeyboardAccelerators>
                 </XamlUICommand>
+                <XamlUICommand x:Name="CreateFolderCommand" Label="Ordner anlegen" Description="Ordner anlegen" 
+                               ExecuteRequested="CreateFolderCommand_ExecuteRequested">
+                    <XamlUICommand.KeyboardAccelerators>
+                        <KeyboardAccelerator Key="Delete" />
+                    </XamlUICommand.KeyboardAccelerators>
+                </XamlUICommand>
                 <converters:InfoValueConverter x:Key="InfoValueConverter" />
             </ResourceDictionary>
         </Grid.Resources>
@@ -86,6 +92,9 @@
                         <ToggleMenuFlyoutItem Command="{StaticResource ShowHiddenCommand}" IsChecked="{Binding ShowHidden, Mode=TwoWay}" />
                         <MenuFlyoutItem Command="{StaticResource RefreshCommand}" />
                         <MenuFlyoutSeparator/>
+                        <MenuFlyoutSubItem Text="Datei">
+                            <MenuFlyoutItem Command="{StaticResource CreateFolderCommand}" />
+                        </MenuFlyoutSubItem>
                         <MenuFlyoutSubItem Text="Selection">
                             <MenuFlyoutItem Command="{StaticResource ToggleSelectionCommand}" />
                             <MenuFlyoutSeparator/>
