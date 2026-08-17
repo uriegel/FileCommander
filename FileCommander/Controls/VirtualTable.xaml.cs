@@ -49,29 +49,7 @@ public sealed partial class VirtualTable : UserControl
     public void SelectAllBeneath() => SendEvent(new(SelectAllBeneath: new()));
     public void SelectAll() => SendEvent(new(SelectAll: new()));
     public void SelectNone() => SendEvent(new(SelectNone: new()));
-    public async void CreateFolder()
-    {
-        // TODO  => Controller
-        var dialog = new ContentDialog
-        {
-            Title = "Ordner anlegen",
-            Content = new TextBlock()
-            {
-                Text = "Möchtest Du einen neuen Ordner anlegen?"
-            },
-            PrimaryButtonText = "Ok",
-            CloseButtonText = "Abbrechen",
-            DefaultButton = ContentDialogButton.Primary,
-            XamlRoot = Content.XamlRoot
-        };
-        var result = await dialog.ShowAsync();
-
-
-        //if (result == ContentDialogResult.Primary)
-        //{
-        //    // Delete the file
-        //}
-    }
+    public async void CreateFolder() => controller.CreateFolder(Content);
 
     public void SetContext(FolderContext context)
     {

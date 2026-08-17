@@ -1,6 +1,8 @@
 ﻿using FileCommander.Contexts;
 using FileCommander.Data;
 
+using Microsoft.UI.Xaml;
+
 using System;
 using System.Threading.Tasks;
 
@@ -48,6 +50,7 @@ abstract class Controller : IDisposable
     public virtual (Item[]? Items, int newPos) Sort(int index, bool descending, bool subcolumn, int pos) => (null, 0);
     public abstract (Controller Controller, Column[]? Columns, string Path, string OldPath) CheckPath(int pos);
     public virtual bool Process(int pos) => false;
+    public virtual void CreateFolder(UIElement content) { }
 
     #region IDisposable
 

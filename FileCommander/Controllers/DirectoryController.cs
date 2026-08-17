@@ -1,7 +1,11 @@
 ﻿using CsTools.Extensions;
 
 using FileCommander.Contexts;
+using FileCommander.Controls;
 using FileCommander.Data;
+
+using Microsoft.UI.Xaml;
+using Microsoft.UI.Xaml.Controls;
 
 using System;
 using System.Diagnostics;
@@ -122,6 +126,29 @@ class DirectoryController : Controller
         sortSubcolumn = subcolumn;
         var (items, newPos, _, _) = Refresh(pos);
         return (items, newPos);
+    }
+
+    public override async void CreateFolder(UIElement content) 
+    {
+        var dialog = new ContentDialog
+        {
+            Title = "Ordner anlegen",
+            Content = new CreateFolderDialog()
+            {
+                FolderName = Context.SelectedPath.EndsWith("..") == false ? Context.SelectedPath.SubstringAfterLast('\\') : ""
+            },
+            PrimaryButtonText = "Ok",
+            CloseButtonText = "Abbrechen",
+            DefaultButton = ContentDialogButton.Primary,
+            XamlRoot = content.XamlRoot
+        };
+        var result = await dialog.ShowAsync();
+
+
+        //if (result == ContentDialogResult.Primary)
+        //{
+        //    // Delete the file
+        //}
     }
 
     (ItemBase[], int) MapViewItems(string? fromPath)
