@@ -210,7 +210,7 @@ class DirectoryController : Controller
             var res = Api.SHFileOperation(new ShFileOPStruct
             {
                 Func = FileFuncFlags.DELETE,
-                From = string.Join("\U00000000", itemsToDelete) + "\U00000000\U00000000",
+                From = string.Join("\U00000000", pathsToDelete) + "\U00000000\U00000000",
                 Flags = FileOpFlags.ALLOWUNDO
             }) switch
             {

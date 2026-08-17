@@ -48,6 +48,7 @@ public sealed partial class MainWindow : Window
         MainContext.Instance.SelectAllAboveCommand = SelectAllAboveCommand;
         MainContext.Instance.SelectAllBeneathCommand = SelectAllBeneathCommand;
         MainContext.Instance.SelectAllCommand = SelectAllCommand;
+        MainContext.Instance.SelectNoneCommand = SelectNoneCommand;
         MainContext.Instance.CreateFolderCommand = CreateFolderCommand;
 
         // Assumes "this" is a XAML Window. In projects that don't use 
@@ -169,7 +170,6 @@ public sealed partial class MainWindow : Window
 
     void RefreshCommand_ExecuteRequested(XamlUICommand sender, ExecuteRequestedEventArgs args)
         => activeView?.Refresh();
-
     void ToggleSelectionCommand_ExecuteRequested(XamlUICommand sender, ExecuteRequestedEventArgs args)
         => activeView?.ToggleSelection();
     void SelectAllAboveCommand_ExecuteRequested(XamlUICommand sender, ExecuteRequestedEventArgs args)
