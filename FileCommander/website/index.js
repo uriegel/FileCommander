@@ -372,13 +372,29 @@ function delayAsync(ms) {
 }
 
 async function deleteItems() {
+    const items = getSelectedItems()
+    if (items.length == 0)
+        return
     const response = await fetch("request/deleteItems", {
         method: "POST",
         headers: {
-            "Content-Type": "text/plain"
+            "Content-Type": "application/json"
         },
-        body: "Hallo Welt"
+        body: JSON.stringify(items)
     })
+}
+
+function getSelectedItems() {
+    const items = tableView.getItems()
+    const pos = tableView.getPosition()
+    let selectedItems = items
+        .map((n, i) => n.selected ? i : -1)
+        .filter(n => n != -1)
+    return selectedItems = selectedItems.length > 0
+        ? selectedItems
+        : pos > 0
+        ? [pos]
+        : []
 }
 
 var itemsMap

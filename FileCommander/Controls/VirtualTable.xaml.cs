@@ -200,13 +200,14 @@ public sealed partial class VirtualTable : UserControl
                 break;
             }
             case "deleteItems":
-                {
-                    var stream = args.Request.Content.AsStreamForRead();
-                    var reader = new StreamReader(stream);
-                    var text = reader.ReadToEnd();
-                    
-                    break;
-                }
+            {
+                var stream = args.Request.Content.AsStreamForRead();
+                var items = JsonSerializer.Deserialize<int[]>(stream);
+                if (items != null)
+                    controller.DeleteItems(Content, items);
+                SendResult(args, new ProcessResult());
+                break;
+            }
             default:
             {
                 if (path.StartsWith("process"))

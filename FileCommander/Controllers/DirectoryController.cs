@@ -8,13 +8,13 @@ using FileCommander.Data;
 
 using Microsoft.UI.Xaml;
 using Microsoft.UI.Xaml.Controls;
-using Microsoft.UI.Xaml.Shapes;
 
 using System;
 using System.Diagnostics;
 using System.IO;
 using System.Linq;
 using System.Runtime.InteropServices;
+using System.Security.AccessControl;
 using System.Threading.Tasks;
 using System.Xml.Linq;
 
@@ -184,6 +184,57 @@ class DirectoryController : Controller
         }
     }
 
+    public async override void DeleteItems(UIElement content, int[] items) 
+    {
+        var itemsToDelete = items
+            .Select(n => (viewItems[n] as ItemBase))
+            .ToArray();
+        var (dirs, files) = GetDirAndFileCount(itemsToDelete);
+        var pathsToDelete = itemsToDelete.Select(n => Context.CurrentPath.AppendPath(n.Name)).ToArray();
+        var dirAndFileText = GetDirAndFileText(dirs, files);
+        var dialog = new ContentDialog
+        {
+            Title = "Dateien Löschen",
+            Content = new TextBlock()
+            {
+                Text= $"Möchtest du {dirAndFileText} löschen?"
+            },
+            PrimaryButtonText = "Ok",
+            CloseButtonText = "Abbrechen",
+            DefaultButton = ContentDialogButton.Primary,
+            XamlRoot = content.XamlRoot
+        };
+        var result = await dialog.ShowAsync();
+        if (result == ContentDialogResult.Primary)
+        {
+            var res = Api.SHFileOperation(new ShFileOPStruct
+            {
+                Func = FileFuncFlags.DELETE,
+                From = string.Join("\U00000000", itemsToDelete) + "\U00000000\U00000000",
+                Flags = FileOpFlags.ALLOWUNDO
+            }) switch
+            {
+                0 => 1,
+                2 => throw new FileNotFoundException(),
+                0x78 => throw new UnauthorizedAccessException(),
+                _ => throw new Exception($"Unknown error code: {Marshal.GetLastWin32Error()}")
+            };
+        }
+    }
+
+    (int Dirs, int Files) GetDirAndFileCount(ItemBase[] items)
+        => (items.Count(n => n is DirectoryItem), items.Count(n => n is FileItem));
+
+    string GetDirAndFileText(int dirs, int files)
+        => dirs == 1 && files == 0
+            ? "das Verzeichnis"
+            : dirs == 0 && files == 1
+            ? "die Datei"
+            : dirs > 0 && files == 0
+            ? "die Verzeichnisse"
+            : dirs == 0 && files > 0
+            ? "die Dateien"
+            : "die Dateien und Verzeichnisse";
     (ItemBase[], int) MapViewItems(string? fromPath)
     {
         var filtered = items
