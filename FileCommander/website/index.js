@@ -371,8 +371,14 @@ function delayAsync(ms) {
     return new Promise(res => setTimeout(res, ms))
 }
 
-function deleteItems() {
-    
+async function deleteItems() {
+    const response = await fetch("request/deleteItems", {
+        method: "POST",
+        headers: {
+            "Content-Type": "text/plain"
+        },
+        body: "Hallo Welt"
+    })
 }
 
 var itemsMap

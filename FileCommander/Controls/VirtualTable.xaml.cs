@@ -199,6 +199,14 @@ public sealed partial class VirtualTable : UserControl
                 SendResult(args, itemsResult);
                 break;
             }
+            case "deleteItems":
+                {
+                    var stream = args.Request.Content.AsStreamForRead();
+                    var reader = new StreamReader(stream);
+                    var text = reader.ReadToEnd();
+                    
+                    break;
+                }
             default:
             {
                 if (path.StartsWith("process"))
