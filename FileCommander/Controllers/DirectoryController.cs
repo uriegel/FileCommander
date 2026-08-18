@@ -18,6 +18,8 @@ using System.Security.AccessControl;
 using System.Threading.Tasks;
 using System.Xml.Linq;
 
+using Windows.Foundation;
+
 namespace FileCommander.Controllers;
 
 class DirectoryController : Controller
@@ -184,7 +186,7 @@ class DirectoryController : Controller
         }
     }
 
-    public async override void DeleteItems(UIElement content, int[] items) 
+    public override async Task<bool> DeleteItems(UIElement content, int[] items) 
     {
         var itemsToDelete = items
             .Select(n => (viewItems[n] as ItemBase))
@@ -219,12 +221,14 @@ class DirectoryController : Controller
                 0x78 => throw new UnauthorizedAccessException(),
                 _ => throw new Exception($"Unknown error code: {Marshal.GetLastWin32Error()}")
             };
+            return true;
         }
+        else
+            return false;
     }
 
-    public async override void Rename(UIElement content, int pos)
+    public override async Task<bool> Rename(UIElement content, int pos)
     {
-        //var pos = MapViewItems().
         var dialog = new ContentDialog
         {
             Title = "Ordner anlegen",
@@ -240,7 +244,10 @@ class DirectoryController : Controller
         var result = await dialog.ShowAsync();
         if (result == ContentDialogResult.Primary)
         {
+            return true;
         }
+        else
+            return false;
     }
 
     (int Dirs, int Files) GetDirAndFileCount(ItemBase[] items)
@@ -267,7 +274,6 @@ class DirectoryController : Controller
         return (filtered, oldPos);
     }
     
-
     void WatchCreated(object _, FileSystemEventArgs e)
     {
         Debug.WriteLine($"Created: {e.Name}");

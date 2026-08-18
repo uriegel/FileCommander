@@ -206,7 +206,7 @@ public sealed partial class VirtualTable : UserControl
                 var stream = args.Request.Content.AsStreamForRead();
                 var items = JsonSerializer.Deserialize<int[]>(stream);
                 if (items != null)
-                    controller.DeleteItems(Content, items);
+                    await controller.DeleteItems(Content, items);
                 SendResult(args, new ProcessResult());
                 break;
             }
@@ -262,7 +262,7 @@ public sealed partial class VirtualTable : UserControl
                 else if (path.StartsWith("rename"))
                 {
                     var pos = int.Parse(path[7..]);
-                    controller.Rename(Content, pos);
+                    var res = await controller.Rename(Content, pos);
                     SendResult(args, new ProcessResult());
                 }
                 else if (path.StartsWith("command"))

@@ -395,19 +395,22 @@ async function deleteItems() {
         },
         body: JSON.stringify(items)
     })
+    stopRestriction()
 }
 
 async function rename() {
+    const items = getSelectedItems()
+    if (items.length != 1)
+        return
+    await fetch(`request/rename/${items[0]}`)
     stopRestriction()
-    const pos = tableView.getPosition()
-    if (pos > 0) {
-        await fetch(`request/rename/${pos}`)
-    }
 }
 
 function getSelectedItems() {
     const tableViewItems = tableView.getItems()
-    const pos = tableView.getPosition()
+    const pos = unrestrictedItems
+        ? itemsMap.get(tableViewItems[tableView.getPosition()].text).idx
+        : tableView.getPosition()
     let selectedItems = unrestrictedItems ?
         tableViewItems
             .map(n => itemsMap.get(n.text)) 

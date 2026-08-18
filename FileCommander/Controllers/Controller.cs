@@ -51,8 +51,8 @@ abstract class Controller : IDisposable
     public abstract (Controller Controller, Column[]? Columns, string Path, string OldPath) CheckPath(int pos);
     public virtual bool Process(int pos) => false;
     public virtual void CreateFolder(UIElement content) { }
-    public virtual void DeleteItems(UIElement content, int[] items) { }
-    public virtual void Rename(UIElement content, int pos) { }
+    public virtual Task<bool> DeleteItems(UIElement content, int[] items) => Task.FromResult(false);
+    public virtual Task<bool> Rename(UIElement content, int pos) => Task.FromResult(false);
     
     #region IDisposable
 
