@@ -338,7 +338,6 @@ async function detectChanges() {
                     item.exifValue = n.item.exifValue
                 if (item && n.item.values.length == 3)
                     item.values = n.item.values
-                tableView.refresh()
             } else if (n.deleted) {
                 if (!unrestrictedItems) {
                     let items = tableView.getItems()
@@ -376,6 +375,7 @@ async function detectChanges() {
                 }
             }
         })
+        tableView.refresh()
         await delayAsync(40) 
     }
 }

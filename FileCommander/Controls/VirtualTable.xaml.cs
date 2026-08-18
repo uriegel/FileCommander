@@ -21,10 +21,8 @@ using System.Threading.Tasks;
 
 using Windows.Storage;
 
-
 namespace FileCommander.Controls;
-
-// TODO get selitems and pos when restricted:
+ 
 // TODO Rename
 // TODO DeleteItems (if not to trash show dialog)
 // TODO Exception handling => banner
