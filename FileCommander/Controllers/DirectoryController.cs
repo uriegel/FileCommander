@@ -244,6 +244,19 @@ class DirectoryController : Controller
         var result = await dialog.ShowAsync();
         if (result == ContentDialogResult.Primary)
         {
+            //var res = Api.SHFileOperation(new ShFileOPStruct
+            //{
+            //    Func = input.AsCopy == true ? FileFuncFlags.COPY : FileFuncFlags.RENAME,
+            //    From = input.Path.AppendPath(input.Item) + "\U00000000\U00000000",
+            //    To = input.Path.AppendPath(input.NewName) + "\U00000000\U00000000",
+            //    Flags = FileOpFlags.NOCONFIRMATION | FileOpFlags.ALLOWUNDO
+            //}) switch
+            //{
+            //    0 => 1,
+            //    2 => throw new FileNotFoundException(),
+            //    0x78 => throw new UnauthorizedAccessException(),
+            //    _ => throw new Exception($"Unknown error code: {Marshal.GetLastWin32Error()}")
+            //};
             return true;
         }
         else
