@@ -4,14 +4,20 @@ using System;
 using System.Drawing.Imaging;
 using System.IO;
 using System.Runtime.InteropServices;
+using System.Threading.Tasks;
 
 namespace FileCommander.Icon;
 
 static class Icons
 {
-    public static Stream Get(string path)
+    public static async Task<Stream> GetAsync(string path)
     {
         var hIcon = GetIconHandle(path, 16);
+        if (hIcon == 0)
+        {
+            await Task.Delay(20);
+            hIcon = GetIconHandle(path, 16);
+        }
         using var icon = System.Drawing.Icon.FromHandle(hIcon);
         using var bitmap = icon.ToBitmap();
         var stream = new MemoryStream();

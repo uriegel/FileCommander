@@ -17,13 +17,14 @@ using System.IO;
 using System.Linq;
 using System.Reflection;
 using System.Text.Json;
+using System.Threading.Tasks;
 
 using Windows.Storage;
 
 
 namespace FileCommander.Controls;
 
-// TODO get selitems and pos when restricted
+// TODO get selitems and pos when restricted:
 // TODO Rename
 // TODO DeleteItems (if not to trash show dialog)
 // TODO Exception handling => banner
@@ -34,6 +35,7 @@ namespace FileCommander.Controls;
 // TODO Copy: 
 // TODO Copy: conflicts: show Conflict Dialog
 // TODO Move
+// TODO MainWindow activates: only focus to webview when there is no dialog
 
 // TODO Viewers
 // TODO Home folder (later Favorites, Remotes)
@@ -314,13 +316,28 @@ public sealed partial class VirtualTable : UserControl
         }
     }
 
-    void ServeIcon(string path, CoreWebView2WebResourceRequestedEventArgs args)
-        => args.Response =
-                WebView.CoreWebView2.Environment.CreateWebResourceResponse(
-                    Icons.Get(path).AsRandomAccessStream(),
-                    200,
-                    "OK",
-                    "Content-Type: image/png");
+    async void ServeIcon(string path, CoreWebView2WebResourceRequestedEventArgs args)
+    {
+        var deferral = args.GetDeferral();
+        try
+        {
+            var stream = await Task.Run(() => Icons.GetAsync(path));
+            args.Response =
+                        WebView.CoreWebView2.Environment.CreateWebResourceResponse(
+                            stream.AsRandomAccessStream(),
+                            200,
+                            "OK",
+                            "Content-Type: image/png");
+        }
+        catch (Exception e)
+        {
+            var t = e;
+        }
+        finally
+        {
+            deferral.Complete();
+        }
+    }
 
     void ServeIconFromRes(string path, CoreWebView2WebResourceRequestedEventArgs args)
     {

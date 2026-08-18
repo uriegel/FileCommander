@@ -275,7 +275,6 @@ function getPosition(pos) {
         return pos;
     else {
         const text = tableView.getItems()[pos].text
-        console.log("Text", text)
         return unrestrictedItems.findIndex(n => n.text == text)
     }
 }
@@ -283,7 +282,10 @@ function getPosition(pos) {
 function stopRestriction() {
     if (unrestrictedItems) {
         restriction.value = ""
-        tableView.setItems(unrestrictedItems, 0)
+        const pos = tableView.getPosition()
+        const text = tableView.getItems()[pos].text
+        const lastPos = unrestrictedItems.findIndex(n => n.text == text)
+        tableView.setItems(unrestrictedItems, lastPos)
         unrestrictedItems = null
         restriction.classList.remove("show")
     }
@@ -310,9 +312,13 @@ async function refresh() {
 
 async function setItems(items) {
     tableView.setItems(items)
-    itemsMap = new Map(items.map(item => [item.text, item]))
+    itemsMap = createItemsMap(items)
     changeDetectionCancellation = true
     detectChanges()
+}
+
+function createItemsMap(items) {
+    return new Map(items.map((item, idx) => [item.text, { item, idx }]))
 }
 
 async function detectChanges() {
@@ -327,7 +333,7 @@ async function detectChanges() {
 
         res.changes.forEach(n => {
             if (n.item) {
-                const item = itemsMap.get(n.item.text)
+                const item = itemsMap.get(n.item.text).item
                 if (item && n.item.exifValue)
                     item.exifValue = n.item.exifValue
                 if (item && n.item.values.length == 3)
@@ -338,22 +344,22 @@ async function detectChanges() {
                     let items = tableView.getItems()
                     items = items.filter((_, i) => i != n.deleted.position)
                     tableView.setItems(items)
-                    itemsMap = new Map(items.map(item => [item.text, item]))
+                    itemsMap = createItemsMap(items)
                     tableView.setPosition(n.deleted.selection)
                 } else {
                     unrestrictedItems = unrestrictedItems.filter((_, i) => i != n.deleted.position)
-                    itemsMap = new Map(unrestrictedItems.map(item => [item.text, item]))
+                    itemsMap = createItemsMap(unrestrictedItems)
                 }
             } else if (n.created) {
                 if (!unrestrictedItems) {
                     let items = tableView.getItems()
                     items = [...items.slice(0, n.created.position), n.created.item, ...items.slice(n.created.position)]
                     tableView.setItems(items)
-                    itemsMap = new Map(items.map(item => [item.text, item]))
+                    itemsMap = createItemsMap(items)
                     tableView.setPosition(n.created.selection)
                 } else {
                     unrestrictedItems = [...unrestrictedItems.slice(0, n.created.position), n.created.item, ...unrestrictedItems.slice(n.created.position)]
-                    itemsMap = new Map(unrestrictedItems.map(item => [item.text, item]))
+                    itemsMap = createItemsMap(unrestrictedItems)
                 }
             } else if (n.renamed) {
                 if (!unrestrictedItems) {
@@ -361,12 +367,12 @@ async function detectChanges() {
                     items = items.filter((_, i) => i != n.renamed.oldPosition)
                     items = [...items.slice(0, n.renamed.position), n.renamed.item, ...items.slice(n.renamed.position)]
                     tableView.setItems(items)
-                    itemsMap = new Map(items.map(item => [item.text, item]))
+                    itemsMap = createItemsMap(items)
                     tableView.setPosition(n.renamed.selection)
                 } else {
                     unrestrictedItems = unrestrictedItems.filter((_, i) => i != n.renamed.oldPosition)
                     unrestrictedItems = [...unrestrictedItems.slice(0, n.renamed.position), n.renamed.item, ...unrestrictedItems.slice(n.renamed.position)]
-                    itemsMap = new Map(unrestrictedItems.map(item => [item.text, item]))
+                    itemsMap = createItemsMap(unrestrictedItems)
                 }
             }
         })
@@ -392,6 +398,7 @@ async function deleteItems() {
 }
 
 async function rename() {
+    stopRestriction()
     const pos = tableView.getPosition()
     if (pos > 0) {
         await fetch(`request/rename/${pos}`)
@@ -399,11 +406,17 @@ async function rename() {
 }
 
 function getSelectedItems() {
-    const items = tableView.getItems()
+    const tableViewItems = tableView.getItems()
     const pos = tableView.getPosition()
-    let selectedItems = items
-        .map((n, i) => n.selected ? i : -1)
-        .filter(n => n != -1)
+    let selectedItems = unrestrictedItems ?
+        tableViewItems
+            .map(n => itemsMap.get(n.text)) 
+            .map(n => n.item.selected ? n.idx : -1)
+            .filter(n => n != -1)
+        : tableViewItems
+            .map((n, i) => n.selected ? i : -1)
+            .filter(n => n != -1)
+    console.log("selectedItems", selectedItems)
     return selectedItems = selectedItems.length > 0
         ? selectedItems
         : pos > 0
