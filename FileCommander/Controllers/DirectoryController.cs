@@ -222,9 +222,30 @@ class DirectoryController : Controller
         }
     }
 
+    public async override void Rename(UIElement content, int pos)
+    {
+        //var pos = MapViewItems().
+        var dialog = new ContentDialog
+        {
+            Title = "Ordner anlegen",
+            Content = new CreateFolderDialog()
+            {
+                FolderName = Context.SelectedPath.EndsWith("..") == false ? Context.SelectedPath.SubstringAfterLast('\\') : ""
+            },
+            PrimaryButtonText = "Ok",
+            CloseButtonText = "Abbrechen",
+            DefaultButton = ContentDialogButton.Primary,
+            XamlRoot = content.XamlRoot
+        };
+        var result = await dialog.ShowAsync();
+        if (result == ContentDialogResult.Primary)
+        {
+        }
+    }
+
     (int Dirs, int Files) GetDirAndFileCount(ItemBase[] items)
         => (items.Count(n => n is DirectoryItem), items.Count(n => n is FileItem));
-
+    
     string GetDirAndFileText(int dirs, int files)
         => dirs == 1 && files == 0
             ? "das Verzeichnis"
@@ -235,6 +256,7 @@ class DirectoryController : Controller
             : dirs == 0 && files > 0
             ? "die Dateien"
             : "die Dateien und Verzeichnisse";
+
     (ItemBase[], int) MapViewItems(string? fromPath)
     {
         var filtered = items
@@ -244,6 +266,7 @@ class DirectoryController : Controller
         var oldPos = fromPath != null ? filtered.TakeWhile(n => n.Name != fromPath).Count() : 0;
         return (filtered, oldPos);
     }
+    
 
     void WatchCreated(object _, FileSystemEventArgs e)
     {

@@ -48,6 +48,7 @@ public sealed partial class FolderView : UserControl
     public void SelectNone() => VirtualTable.SelectNone();
     public void CreateFolder() => VirtualTable.CreateFolder();
     public void DeleteItems() => VirtualTable.DeleteItems();
+    public void Rename() => VirtualTable.Rename();
 
     void UserControl_Loaded(object _, RoutedEventArgs e)
     {

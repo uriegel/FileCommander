@@ -101,6 +101,11 @@ async function onKeyDown(evt) {
         evt.stopPropagation()
         await fetch("request/command/createFolder")
     }
+    else if (evt.key == "F2") {
+        evt.preventDefault();
+        evt.stopPropagation()
+        rename()
+    }
     else if (evt.key == "Escape") 
         stopRestriction()
     else if (evt.key == "Backspace") {
@@ -238,6 +243,8 @@ async function onEvent(evt) {
     }
     if (evt.deleteItems) 
         deleteItems()
+    if (evt.rename)
+        reanme()
 }
 
 async function init() {
@@ -382,6 +389,13 @@ async function deleteItems() {
         },
         body: JSON.stringify(items)
     })
+}
+
+async function rename() {
+    const pos = tableView.getPosition()
+    if (pos > 0) {
+        await fetch(`request/rename/${pos}`)
+    }
 }
 
 function getSelectedItems() {

@@ -6,7 +6,6 @@ using FileCommander.Controls;
 using Microsoft.UI.Input;
 using Microsoft.UI.Windowing;
 using Microsoft.UI.Xaml;
-using Microsoft.UI.Xaml.Controls;
 using Microsoft.UI.Xaml.Input;
 using Microsoft.UI.Xaml.Media;
 using Microsoft.UI.Xaml.Media.Animation;
@@ -50,6 +49,7 @@ public sealed partial class MainWindow : Window
         MainContext.Instance.SelectAllCommand = SelectAllCommand;
         MainContext.Instance.SelectNoneCommand = SelectNoneCommand;
         MainContext.Instance.CreateFolderCommand = CreateFolderCommand;
+        MainContext.Instance.RenameCommand = RenameCommand;
 
         // Assumes "this" is a XAML Window. In projects that don't use 
         // WinUI 1.3 or later, use interop APIs to get the AppWindow.
@@ -184,6 +184,8 @@ public sealed partial class MainWindow : Window
         => activeView?.CreateFolder();
     void DeleteCommand_ExecuteRequested(XamlUICommand sender, ExecuteRequestedEventArgs args)
         => activeView?.DeleteItems();
+    void RenameCommand_ExecuteRequested(XamlUICommand sender, ExecuteRequestedEventArgs args)
+        => activeView?.Rename();
 
     FolderView GetOtherView() => activeView == LeftView ? RightView : LeftView;
 

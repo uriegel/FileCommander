@@ -69,6 +69,12 @@
                         <KeyboardAccelerator Key="Delete" />
                     </XamlUICommand.KeyboardAccelerators>
                 </XamlUICommand>
+                <XamlUICommand x:Name="RenameCommand" Label="Eintrag umbenennen" Description="Ausgewählten Eintrag löschen" 
+                               ExecuteRequested="RenameCommand_ExecuteRequested">
+                    <XamlUICommand.KeyboardAccelerators>
+                        <KeyboardAccelerator Key="F2" />
+                    </XamlUICommand.KeyboardAccelerators>
+                </XamlUICommand>
                 <converters:InfoValueConverter x:Key="InfoValueConverter" />
             </ResourceDictionary>
         </Grid.Resources>

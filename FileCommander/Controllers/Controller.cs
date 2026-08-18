@@ -52,7 +52,8 @@ abstract class Controller : IDisposable
     public virtual bool Process(int pos) => false;
     public virtual void CreateFolder(UIElement content) { }
     public virtual void DeleteItems(UIElement content, int[] items) { }
-
+    public virtual void Rename(UIElement content, int pos) { }
+    
     #region IDisposable
 
     public void Dispose()

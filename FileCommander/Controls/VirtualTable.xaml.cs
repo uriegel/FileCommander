@@ -23,6 +23,7 @@ using Windows.Storage;
 
 namespace FileCommander.Controls;
 
+// TODO get selitems and pos when restricted
 // TODO Rename
 // TODO DeleteItems (if not to trash show dialog)
 // TODO Exception handling => banner
@@ -55,6 +56,7 @@ public sealed partial class VirtualTable : UserControl
     public void SelectNone() => SendEvent(new(SelectNone: new()));
     public async void CreateFolder() => controller.CreateFolder(Content);
     public async void DeleteItems() => SendEvent(new(DeleteItems: new()));
+    public async void Rename() => SendEvent(new(Rename: new()));
 
     public void SetContext(FolderContext context)
     {
@@ -257,6 +259,12 @@ public sealed partial class VirtualTable : UserControl
                     var itemsResult = items != null ? new ItemsResult(null, items, newPos) : null;
                     SendResult(args, new ProcessResult(ItemsResult: itemsResult));
                 }
+                else if (path.StartsWith("rename"))
+                {
+                    var pos = int.Parse(path[7..]);
+                    controller.Rename(Content, pos);
+                    SendResult(args, new ProcessResult());
+                }
                 else if (path.StartsWith("command"))
                 {
                     var cmd = path[8..];
@@ -295,8 +303,12 @@ public sealed partial class VirtualTable : UserControl
                             MainContext.Instance.CreateFolderCommand.Execute(null);
                             SendResult(args, new ProcessResult());
                             break;
-                        }
+                        case "rename":
+                            MainContext.Instance.RenameCommand.Execute(null);
+                            SendResult(args, new ProcessResult());
+                            break;
                     }
+                }
                 break;
             }
         }
