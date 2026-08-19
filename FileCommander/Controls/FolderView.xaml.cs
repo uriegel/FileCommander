@@ -49,7 +49,8 @@ public sealed partial class FolderView : UserControl
     public void CreateFolder() => VirtualTable.CreateFolder();
     public void DeleteItems() => VirtualTable.DeleteItems();
     public void Rename() => VirtualTable.Rename();
-
+    public void RenameAsCopy() => VirtualTable.RenameAsCopy();
+    
     void UserControl_Loaded(object _, RoutedEventArgs e)
     {
         Context = new FolderContext(Id);

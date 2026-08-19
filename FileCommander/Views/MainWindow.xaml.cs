@@ -50,6 +50,7 @@ public sealed partial class MainWindow : Window
         MainContext.Instance.SelectNoneCommand = SelectNoneCommand;
         MainContext.Instance.CreateFolderCommand = CreateFolderCommand;
         MainContext.Instance.RenameCommand = RenameCommand;
+        MainContext.Instance.RenameAsCopyCommand = RenameAsCopyCommand;
 
         // Assumes "this" is a XAML Window. In projects that don't use 
         // WinUI 1.3 or later, use interop APIs to get the AppWindow.
@@ -186,6 +187,8 @@ public sealed partial class MainWindow : Window
         => activeView?.DeleteItems();
     void RenameCommand_ExecuteRequested(XamlUICommand sender, ExecuteRequestedEventArgs args)
         => activeView?.Rename();
+    void RenameAsCopyCommand_ExecuteRequested(XamlUICommand sender, ExecuteRequestedEventArgs args)
+        => activeView?.RenameAsCopy();
 
     FolderView GetOtherView() => activeView == LeftView ? RightView : LeftView;
 

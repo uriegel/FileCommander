@@ -22,8 +22,8 @@ using System.Threading.Tasks;
 using Windows.Storage;
 
 namespace FileCommander.Controls;
- 
-// TODO Rename
+
+// TODO Rename: select until extension
 // TODO DeleteItems (if not to trash show dialog)
 // TODO Exception handling => banner
 // TODO Exception handling CreateDirectory
@@ -57,6 +57,7 @@ public sealed partial class VirtualTable : UserControl
     public async void CreateFolder() => controller.CreateFolder(Content);
     public async void DeleteItems() => SendEvent(new(DeleteItems: new()));
     public async void Rename() => SendEvent(new(Rename: new()));
+    public async void RenameAsCopy() => SendEvent(new(RenameAsCopy: new()));
 
     public void SetContext(FolderContext context)
     {
@@ -222,6 +223,22 @@ public sealed partial class VirtualTable : UserControl
                     deferral.Complete();
                 }
             }
+            case "rename":
+            {
+                var deferral = args.GetDeferral();
+                try
+                {
+                    var stream = args.Request.Content.AsStreamForRead();
+                    var item = JsonSerializer.Deserialize<RenameItem>(stream, Json.Defaults);
+                    var res = await controller.Rename(Content, item?.Item ?? -1, item?.AsCopy == true);
+                    SendResult(args, new RequestResult(res));
+                }
+                finally
+                {
+                    deferral.Complete();
+                }
+                break;
+            }
             default:
             {
                 if (path.StartsWith("process"))
@@ -271,21 +288,6 @@ public sealed partial class VirtualTable : UserControl
                     var itemsResult = items != null ? new ItemsResult(null, items, newPos) : null;
                     SendResult(args, new ProcessResult(ItemsResult: itemsResult));
                 }
-                else if (path.StartsWith("rename"))
-                {
-                    var deferral = args.GetDeferral();
-                    try
-                    {
-                        var pos = int.Parse(path[7..]);
-                        var res = await controller.Rename(Content, pos);
-                        SendResult(args, new RequestResult(res));
-                    }
-                    finally
-                    {
-                        deferral.Complete();
-                    }
-                    break;
-                }
                 else if (path.StartsWith("command"))
                 {
                     var cmd = path[8..];
@@ -328,8 +330,12 @@ public sealed partial class VirtualTable : UserControl
                             MainContext.Instance.RenameCommand.Execute(null);
                             SendResult(args, new ProcessResult());
                             break;
+                        case "renameAsCopy":
+                            MainContext.Instance.RenameAsCopyCommand.Execute(null);
+                            SendResult(args, new ProcessResult());
+                            break;
+                        }
                     }
-                }
                 break;
             }
         }

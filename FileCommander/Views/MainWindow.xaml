@@ -72,6 +72,12 @@
                 <XamlUICommand x:Name="RenameCommand" Label="Eintrag umbenennen" Description="Ausgewählten Eintrag löschen" 
                                ExecuteRequested="RenameCommand_ExecuteRequested">
                     <XamlUICommand.KeyboardAccelerators>
+                        <KeyboardAccelerator Key="F2" Modifiers="Shift" />
+                    </XamlUICommand.KeyboardAccelerators>
+                </XamlUICommand>
+                <XamlUICommand x:Name="RenameAsCopyCommand" Label="Kopie erstellen" Description="Ausgewählten Eintrag kopieren" 
+                               ExecuteRequested="RenameAsCopyCommand_ExecuteRequested">
+                    <XamlUICommand.KeyboardAccelerators>
                         <KeyboardAccelerator Key="F2" />
                     </XamlUICommand.KeyboardAccelerators>
                 </XamlUICommand>
@@ -105,8 +111,12 @@
                         <MenuFlyoutItem Command="{StaticResource RefreshCommand}" />
                         <MenuFlyoutSeparator/>
                         <MenuFlyoutSubItem Text="Datei">
-                            <MenuFlyoutItem Command="{StaticResource CreateFolderCommand}" />
+                            <MenuFlyoutItem Command="{StaticResource RenameCommand}" />
+                            <MenuFlyoutItem Command="{StaticResource RenameAsCopyCommand}" />
+                            <MenuFlyoutSeparator/>
                             <MenuFlyoutItem Command="{StaticResource DeleteCommand}" />
+                            <MenuFlyoutSeparator/>
+                            <MenuFlyoutItem Command="{StaticResource CreateFolderCommand}" />
                         </MenuFlyoutSubItem>
                         <MenuFlyoutSubItem Text="Selection">
                             <MenuFlyoutItem Command="{StaticResource ToggleSelectionCommand}" />

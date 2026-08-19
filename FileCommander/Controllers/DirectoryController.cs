@@ -104,8 +104,8 @@ class DirectoryController : Controller
     }
 
     public override async Task<Change[]?> GetItemChangesAsync() 
-            => await (changes?.GetItemsAsync() 
-                ?? Task.FromResult<Change[]?>(null));
+        => await (changes?.GetItemsAsync() 
+            ?? Task.FromResult<Change[]?>(null));
 
     public override string OnPosition(int pos) 
         => pos < viewItems.Length ? Context.CurrentPath.AppendPath(viewItems[pos].Name) : Context.CurrentPath;
@@ -227,14 +227,16 @@ class DirectoryController : Controller
             return false;
     }
 
-    public override async Task<bool> Rename(UIElement content, int pos)
+    public override async Task<bool> Rename(UIElement content, int pos, bool asCopy)
     {
+        var item = viewItems[pos];
         var dialog = new ContentDialog
         {
-            Title = "Ordner anlegen",
-            Content = new CreateFolderDialog()
+            Title = asCopy ? "Kopie anlegen" : "Umbenennen",
+            Content = new RenameDialog()
             {
-                FolderName = Context.SelectedPath.EndsWith("..") == false ? Context.SelectedPath.SubstringAfterLast('\\') : ""
+                Description = $"Möchtest du {(item is FileItem ? "die Datei" : "das Verzeichnis")} umbenennen?",
+                FileName = item.Name
             },
             PrimaryButtonText = "Ok",
             CloseButtonText = "Abbrechen",
@@ -244,19 +246,20 @@ class DirectoryController : Controller
         var result = await dialog.ShowAsync();
         if (result == ContentDialogResult.Primary)
         {
-            //var res = Api.SHFileOperation(new ShFileOPStruct
-            //{
-            //    Func = input.AsCopy == true ? FileFuncFlags.COPY : FileFuncFlags.RENAME,
-            //    From = input.Path.AppendPath(input.Item) + "\U00000000\U00000000",
-            //    To = input.Path.AppendPath(input.NewName) + "\U00000000\U00000000",
-            //    Flags = FileOpFlags.NOCONFIRMATION | FileOpFlags.ALLOWUNDO
-            //}) switch
-            //{
-            //    0 => 1,
-            //    2 => throw new FileNotFoundException(),
-            //    0x78 => throw new UnauthorizedAccessException(),
-            //    _ => throw new Exception($"Unknown error code: {Marshal.GetLastWin32Error()}")
-            //};
+            var newName = (dialog.Content as RenameDialog)?.FileName;
+            var res = Api.SHFileOperation(new ShFileOPStruct
+            {
+                Func = asCopy == true ? FileFuncFlags.COPY : FileFuncFlags.RENAME,
+                From = Context.CurrentPath.AppendPath(item.Name) + "\U00000000\U00000000",
+                To = Context.CurrentPath.AppendPath(newName) + "\U00000000\U00000000",
+                Flags = FileOpFlags.NOCONFIRMATION | FileOpFlags.ALLOWUNDO
+            }) switch
+            {
+                0 => 1,
+                2 => throw new FileNotFoundException(),
+                0x78 => throw new UnauthorizedAccessException(),
+                _ => throw new Exception($"Unknown error code: {Marshal.GetLastWin32Error()}")
+            };
             return true;
         }
         else

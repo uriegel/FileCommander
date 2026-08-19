@@ -104,7 +104,7 @@ async function onKeyDown(evt) {
     else if (evt.key == "F2") {
         evt.preventDefault();
         evt.stopPropagation()
-        rename()
+        rename(evt.shiftKey)
     }
     else if (evt.key == "Escape") 
         stopRestriction()
@@ -244,7 +244,9 @@ async function onEvent(evt) {
     if (evt.deleteItems) 
         deleteItems()
     if (evt.rename)
-        reanme()
+        rename(false)
+    if (evt.renameAsCopy)
+        rename(true)
 }
 
 async function init() {
@@ -400,15 +402,28 @@ async function deleteItems() {
         stopRestriction()
 }
 
-async function rename() {
+async function rename(asCopy) {
     const items = getSelectedItems()
     if (items.length != 1)
         return
-    const res = await fetch(`request/rename/${items[0]}`)
+    const res = await fetch("request/rename", {
+        method: "POST",
+        headers: {
+            "Content-Type": "application/json"
+        },
+        body: JSON.stringify({
+            item: items[0],
+            asCopy
+        })
+    })
     console.log("res", res)
     stopRestriction()
 }
 
+/**
+ * Rerieving selected items (as indexes)
+ * @returns array of indexes
+ */
 function getSelectedItems() {
     const tableViewItems = tableView.getItems()
     const pos = unrestrictedItems

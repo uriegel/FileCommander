@@ -11,7 +11,8 @@ record Event(
     ChangePath? ChangePath = null,
     ChangedItems? ChangedItems = null,
     DeleteItems? DeleteItems = null,
-    Rename? Rename = null
+    Rename? Rename = null,
+    RenameAsCopy? RenameAsCopy = null
 );
 
 record Refresh();
@@ -25,3 +26,4 @@ record ChangePath(string Path);
 record ChangedItems(Item[] Items);
 record DeleteItems();
 record Rename();
+record RenameAsCopy();
