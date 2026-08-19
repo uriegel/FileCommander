@@ -203,12 +203,24 @@ public sealed partial class VirtualTable : UserControl
             }
             case "deleteItems":
             {
-                var stream = args.Request.Content.AsStreamForRead();
-                var items = JsonSerializer.Deserialize<int[]>(stream);
-                if (items != null)
-                    await controller.DeleteItems(Content, items);
-                SendResult(args, new ProcessResult());
-                break;
+                var deferral = args.GetDeferral();
+                try
+                {
+                    var stream = args.Request.Content.AsStreamForRead();
+                    var items = JsonSerializer.Deserialize<int[]>(stream);
+                    if (items != null)
+                    {
+                        var res = await controller.DeleteItems(Content, items);
+                        SendResult(args, new RequestResult(res));
+                    }
+                        else
+                        SendResult(args, new RequestResult(false));
+                    break;
+                }
+                finally
+                {
+                    deferral.Complete();
+                }
             }
             default:
             {
@@ -261,9 +273,18 @@ public sealed partial class VirtualTable : UserControl
                 }
                 else if (path.StartsWith("rename"))
                 {
-                    var pos = int.Parse(path[7..]);
-                    var res = await controller.Rename(Content, pos);
-                    SendResult(args, new ProcessResult());
+                    var deferral = args.GetDeferral();
+                    try
+                    {
+                        var pos = int.Parse(path[7..]);
+                        var res = await controller.Rename(Content, pos);
+                        SendResult(args, new RequestResult(res));
+                    }
+                    finally
+                    {
+                        deferral.Complete();
+                    }
+                    break;
                 }
                 else if (path.StartsWith("command"))
                 {

@@ -284,7 +284,7 @@ function stopRestriction() {
         restriction.value = ""
         const pos = tableView.getPosition()
         const text = tableView.getItems()[pos].text
-        const lastPos = unrestrictedItems.findIndex(n => n.text == text)
+        const lastPos = Math.max(unrestrictedItems.findIndex(n => n.text == text), 0)
         tableView.setItems(unrestrictedItems, lastPos)
         unrestrictedItems = null
         restriction.classList.remove("show")
@@ -395,14 +395,17 @@ async function deleteItems() {
         },
         body: JSON.stringify(items)
     })
-    stopRestriction()
+    const res = await response.json()
+    if (res.success)
+        stopRestriction()
 }
 
 async function rename() {
     const items = getSelectedItems()
     if (items.length != 1)
         return
-    await fetch(`request/rename/${items[0]}`)
+    const res = await fetch(`request/rename/${items[0]}`)
+    console.log("res", res)
     stopRestriction()
 }
 
