@@ -118,7 +118,7 @@
                             <MenuFlyoutSeparator/>
                             <MenuFlyoutItem Command="{StaticResource CreateFolderCommand}" />
                         </MenuFlyoutSubItem>
-                        <MenuFlyoutSubItem Text="Selection">
+                        <MenuFlyoutSubItem Text="Selektion">
                             <MenuFlyoutItem Command="{StaticResource ToggleSelectionCommand}" />
                             <MenuFlyoutSeparator/>
                             <MenuFlyoutItem Command="{StaticResource SelectAllAboveCommand}" />
