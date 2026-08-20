@@ -24,8 +24,7 @@ using Windows.Storage;
 namespace FileCommander.Controls;
 
 // TODO Rename: select until extension
-// TODO DeleteItems (if not to trash show dialog)
-// TODO Exception handling => banner
+// TODO DeleteItems (if not to trash show dialog) 
 // TODO Exception handling CreateDirectory
 // TODO Exception handling Delete
 // TODO Exception handling GetItems
@@ -231,6 +230,7 @@ public sealed partial class VirtualTable : UserControl
                     var stream = args.Request.Content.AsStreamForRead();
                     var item = JsonSerializer.Deserialize<RenameItem>(stream, Json.Defaults);
                     var res = await controller.Rename(Content, item?.Item ?? -1, item?.AsCopy == true);
+                        MainWindow.ShowError("Das ist ein Versuch, einen Fehler anzuzeigen");
                     SendResult(args, new RequestResult(res));
                 }
                 finally

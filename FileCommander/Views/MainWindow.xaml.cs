@@ -6,6 +6,7 @@ using FileCommander.Controls;
 using Microsoft.UI.Input;
 using Microsoft.UI.Windowing;
 using Microsoft.UI.Xaml;
+using Microsoft.UI.Xaml.Controls;
 using Microsoft.UI.Xaml.Input;
 using Microsoft.UI.Xaml.Media;
 using Microsoft.UI.Xaml.Media.Animation;
@@ -84,6 +85,16 @@ public sealed partial class MainWindow : Window
 
     public static void RunOnUI(Action action)
         => mainWindow.DispatcherQueue.TryEnqueue(() => action());
+
+    public static async void ShowError(string message)
+    {
+        mainWindow.MessageBar.Title = "Error";
+        mainWindow.MessageBar.Message = message;
+        mainWindow.MessageBar.Severity = InfoBarSeverity.Error;
+        mainWindow.MessageBar.IsOpen = true;
+        await Task.Delay(5000);
+        mainWindow.MessageBar.IsOpen = false;
+    }
 
     void AppTitleBar_Loaded(object sender, RoutedEventArgs e)
     {

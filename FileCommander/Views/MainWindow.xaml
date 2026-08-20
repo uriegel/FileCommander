@@ -140,6 +140,7 @@
         </Grid>
 
         <controls:DockPanel Grid.Row="1">
+            <InfoBar x:Name="MessageBar" controls:DockPanel.Dock="Top" IsOpen="False" IsClosable="True" Margin="8" />
             <Border controls:DockPanel.Dock="Bottom" BorderThickness="1" BorderBrush="LightGray" 
                     Background="{Binding StatusBarTextActive, Converter={StaticResource InfoValueConverter}}">
                 <Grid>

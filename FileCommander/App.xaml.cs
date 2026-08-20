@@ -6,6 +6,7 @@ using Microsoft.UI.Xaml.Input;
 using Microsoft.UI.Xaml.Media;
 using Microsoft.UI.Xaml.Navigation;
 using Microsoft.UI.Xaml.Shapes;
+using Microsoft.Windows.Globalization;
 
 using System;
 using System.Collections.Generic;
@@ -35,6 +36,7 @@ public partial class App : Application
     /// </summary>
     public App()
     {
+        ApplicationLanguages.PrimaryLanguageOverride = "de-DE";
         InitializeComponent();
     }
 
