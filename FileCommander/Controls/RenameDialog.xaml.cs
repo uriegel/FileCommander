@@ -1,9 +1,6 @@
 using Microsoft.UI.Xaml;
 using Microsoft.UI.Xaml.Controls;
 
-// To learn more about WinUI, the WinUI project structure,
-// and more about our project templates, see: http://aka.ms/winui-project-info.
-
 namespace FileCommander.Controls;
 
 public sealed partial class RenameDialog : UserControl
@@ -28,5 +25,12 @@ public sealed partial class RenameDialog : UserControl
 
     public RenameDialog() => InitializeComponent();
 
-    void root_Loaded(object sender, RoutedEventArgs e) => Textbox.SelectAll();
+    void root_Loaded(object sender, RoutedEventArgs e)
+    {
+        var pos = FileName.LastIndexOf('.');
+        if (pos == -1)
+            Textbox.SelectAll();
+        else
+            Textbox.Select(0, pos);
+    }
 }

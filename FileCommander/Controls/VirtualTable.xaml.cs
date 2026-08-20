@@ -23,7 +23,7 @@ using Windows.Storage;
 
 namespace FileCommander.Controls;
 
-// TODO Rename: select until extension
+// TODO Exception handling Rename
 // TODO Exception handling CreateDirectory
 // TODO Exception handling Delete
 // TODO Exception handling GetItems
@@ -31,7 +31,6 @@ namespace FileCommander.Controls;
 // TODO Copy: 
 // TODO Copy: conflicts: show Conflict Dialog
 // TODO Move
-// TODO Grids left right with pixel instead of %
 // TODO MainWindow activates: only focus to webview when there is no dialog
 
 // TODO Viewers
