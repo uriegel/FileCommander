@@ -323,7 +323,11 @@ public sealed partial class MainWindow : Window
     async void Window_Activated(object sender, WindowActivatedEventArgs args)
     {
         if (args.WindowActivationState == WindowActivationState.CodeActivated || args.WindowActivationState == WindowActivationState.PointerActivated)
-            DispatcherQueue.TryEnqueue(Microsoft.UI.Dispatching.DispatcherQueuePriority.Low, () => activeView?.Focus(FocusState.Programmatic));
+            DispatcherQueue.TryEnqueue(Microsoft.UI.Dispatching.DispatcherQueuePriority.Low, () =>
+            {
+                if (!Dialog.IsOpen)
+                    activeView?.Focus(FocusState.Programmatic);
+            });
         if (args.WindowActivationState == WindowActivationState.Deactivated)
             TitleBarTextBlock.Foreground = (SolidColorBrush)App.Current.Resources["WindowCaptionForegroundDisabled"];
         else

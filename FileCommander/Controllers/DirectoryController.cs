@@ -137,22 +137,15 @@ class DirectoryController : Controller
 
     public override async void CreateFolder(UIElement content) 
     {
-        var dialog = new ContentDialog
-        {
-            Title = "Ordner anlegen",
-            Content = new CreateFolderDialog()
+        var newName = await Dialog.ShowAsync(content,
+            "Ordner anlegen",
+            dialog => (dialog.Content as CreateFolderDialog)?.FolderName ?? "",
+            new CreateFolderDialog()
             {
                 FolderName = Context.SelectedPath.EndsWith("..") == false ? Context.SelectedPath.SubstringAfterLast('\\') : ""
-            },
-            PrimaryButtonText = "Ok",
-            CloseButtonText = "Abbrechen",
-            DefaultButton = ContentDialogButton.Primary,
-            XamlRoot = content.XamlRoot
-        };
-        var result = await dialog.ShowAsync();
-        if (result == ContentDialogResult.Primary)
-        {
-            var newName = (dialog.Content as CreateFolderDialog)?.FolderName;
+            });
+        if (newName != null)
+        { 
             try
             {
                 System.IO.Directory.CreateDirectory(Context.CurrentPath.AppendPath(newName));
@@ -194,20 +187,10 @@ class DirectoryController : Controller
         var (dirs, files) = GetDirAndFileCount(itemsToDelete);
         var pathsToDelete = itemsToDelete.Select(n => Context.CurrentPath.AppendPath(n.Name)).ToArray();
         var dirAndFileText = GetDirAndFileText(dirs, files);
-        var dialog = new ContentDialog
-        {
-            Title = "Dateien Löschen",
-            Content = new TextBlock()
-            {
-                Text= $"Möchtest du {dirAndFileText} löschen?"
-            },
-            PrimaryButtonText = "Ok",
-            CloseButtonText = "Abbrechen",
-            DefaultButton = ContentDialogButton.Primary,
-            XamlRoot = content.XamlRoot
-        };
-        var result = await dialog.ShowAsync();
-        if (result == ContentDialogResult.Primary)
+
+        if (await Dialog.ShowAsync(content,
+            "Dateien löschen",
+            textContent: $"Möchtest du {dirAndFileText} löschen?"))
         {
             var res = Api.SHFileOperation(new ShFileOPStruct
             {
@@ -230,23 +213,15 @@ class DirectoryController : Controller
     public override async Task<bool> Rename(UIElement content, int pos, bool asCopy)
     {
         var item = viewItems[pos];
-        var dialog = new ContentDialog
-        {
-            Title = asCopy ? "Kopie anlegen" : "Umbenennen",
-            Content = new RenameDialog()
+        var newName = await Dialog.ShowAsync(content, asCopy ? "Kopie anlegen" : "Umbenennen",
+            d => (d.Content as RenameDialog)?.FileName ?? "",
+            new RenameDialog()
             {
                 Description = $"Möchtest du {(item is FileItem ? "die Datei" : "das Verzeichnis")} umbenennen?",
                 FileName = item.Name
-            },
-            PrimaryButtonText = "Ok",
-            CloseButtonText = "Abbrechen",
-            DefaultButton = ContentDialogButton.Primary,
-            XamlRoot = content.XamlRoot
-        };
-        var result = await dialog.ShowAsync();
-        if (result == ContentDialogResult.Primary)
+            });
+        if (newName != null)
         {
-            var newName = (dialog.Content as RenameDialog)?.FileName;
             var res = Api.SHFileOperation(new ShFileOPStruct
             {
                 Func = asCopy == true ? FileFuncFlags.COPY : FileFuncFlags.RENAME,

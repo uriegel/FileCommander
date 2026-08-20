@@ -27,12 +27,10 @@ namespace FileCommander.Controls;
 // TODO Exception handling Rename
 // TODO Exception handling CreateDirectory
 // TODO Exception handling Delete
-// TODO Exception handling GetItems
 // TODO Copy: check conflicts
 // TODO Copy: 
 // TODO Copy: conflicts: show Conflict Dialog
 // TODO Move
-// TODO MainWindow activates: only focus to webview when there is no dialog
 
 // TODO Viewers
 // TODO Home folder (later Favorites, Remotes)
