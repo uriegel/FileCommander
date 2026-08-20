@@ -88,7 +88,7 @@ public sealed partial class MainWindow : Window
 
     public static async void ShowError(string message)
     {
-        mainWindow.MessageBar.Title = "Error";
+        mainWindow.MessageBar.Title = "Fehler";
         mainWindow.MessageBar.Message = message;
         mainWindow.MessageBar.Severity = InfoBarSeverity.Error;
         mainWindow.MessageBar.IsOpen = true;

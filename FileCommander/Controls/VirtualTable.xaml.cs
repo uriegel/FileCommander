@@ -24,13 +24,9 @@ using Windows.Storage;
 
 namespace FileCommander.Controls;
 
-// TODO Exception handling Rename
-// TODO Exception handling CreateDirectory
-// TODO Exception handling Delete
+// TODO Copy and Move: 
 // TODO Copy: check conflicts
-// TODO Copy: 
 // TODO Copy: conflicts: show Conflict Dialog
-// TODO Move
 
 // TODO Viewers
 // TODO Home folder (later Favorites, Remotes)
@@ -234,7 +230,6 @@ public sealed partial class VirtualTable : UserControl
                     var stream = args.Request.Content.AsStreamForRead();
                     var item = JsonSerializer.Deserialize<RenameItem>(stream, Json.Defaults);
                     var res = await controller.Rename(Content, item?.Item ?? -1, item?.AsCopy == true);
-                        MainWindow.ShowError("Das ist ein Versuch, einen Fehler anzuzeigen");
                     SendResult(args, new RequestResult(res));
                 }
                 finally

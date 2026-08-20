@@ -7,18 +7,12 @@ using FileCommander.Controls;
 using FileCommander.Data;
 
 using Microsoft.UI.Xaml;
-using Microsoft.UI.Xaml.Controls;
 
 using System;
 using System.Diagnostics;
 using System.IO;
 using System.Linq;
-using System.Runtime.InteropServices;
-using System.Security.AccessControl;
 using System.Threading.Tasks;
-using System.Xml.Linq;
-
-using Windows.Foundation;
 
 namespace FileCommander.Controllers;
 
@@ -164,17 +158,15 @@ class DirectoryController : Controller
                     To = $"{Context.CurrentPath}\U00000000\U00000000",
                 });
                 System.IO.Directory.Delete(temp, true);
-                switch (res)
-                {
-                    case 0:
-                        return;
-                    case 2:
-                        throw new FileNotFoundException();
-                    case 0x78:
-                        throw new UnauthorizedAccessException();
-                    default:
-                        throw new Exception($"Unknown error code: {Marshal.GetLastWin32Error()}");
-                }
+                ProcessResult(res);
+            }
+            catch (System.IO.IOException ioe)
+            {
+                MainWindow.ShowError(ioe.Message);
+            }
+            catch (Exception e)
+            {
+                MainWindow.ShowError(e.Message);
             }
         }
     }
@@ -197,14 +189,8 @@ class DirectoryController : Controller
                 Func = FileFuncFlags.DELETE,
                 From = string.Join("\U00000000", pathsToDelete) + "\U00000000\U00000000",
                 Flags = FileOpFlags.ALLOWUNDO
-            }) switch
-            {
-                0 => 1,
-                2 => throw new FileNotFoundException(),
-                0x78 => throw new UnauthorizedAccessException(),
-                _ => throw new Exception($"Unknown error code: {Marshal.GetLastWin32Error()}")
-            };
-            return true;
+            });
+            return ProcessResult(res);
         }
         else
             return false;
@@ -212,33 +198,47 @@ class DirectoryController : Controller
 
     public override async Task<bool> Rename(UIElement content, int pos, bool asCopy)
     {
-        var item = viewItems[pos];
-        var newName = await Dialog.ShowAsync(content, asCopy ? "Kopie anlegen" : "Umbenennen",
-            d => (d.Content as RenameDialog)?.FileName ?? "",
-            new RenameDialog()
-            {
-                Description = $"Möchtest du {(item is FileItem ? "die Datei" : "das Verzeichnis")} umbenennen?",
-                FileName = item.Name
-            });
-        if (newName != null)
+        try
         {
-            var res = Api.SHFileOperation(new ShFileOPStruct
+            var item = viewItems[pos];
+            var newName = await Dialog.ShowAsync(content, asCopy ? "Kopie anlegen" : "Umbenennen",
+                d => (d.Content as RenameDialog)?.FileName ?? "",
+                new RenameDialog()
+                {
+                    Description = $"Möchtest du {(item is FileItem ? "die Datei" : "das Verzeichnis")} umbenennen?",
+                    FileName = item.Name
+                });
+            if (newName != null)
             {
-                Func = asCopy == true ? FileFuncFlags.COPY : FileFuncFlags.RENAME,
-                From = Context.CurrentPath.AppendPath(item.Name) + "\U00000000\U00000000",
-                To = Context.CurrentPath.AppendPath(newName) + "\U00000000\U00000000",
-                Flags = FileOpFlags.NOCONFIRMATION | FileOpFlags.ALLOWUNDO
-            }) switch
-            {
-                0 => 1,
-                2 => throw new FileNotFoundException(),
-                0x78 => throw new UnauthorizedAccessException(),
-                _ => throw new Exception($"Unknown error code: {Marshal.GetLastWin32Error()}")
-            };
-            return true;
-        }
-        else
+                var res = Api.SHFileOperation(new ShFileOPStruct
+                {
+                    Func = asCopy == true ? FileFuncFlags.COPY : FileFuncFlags.RENAME,
+                    From = Context.CurrentPath.AppendPath(item.Name) + "\U00000000\U00000000",
+                    To = Context.CurrentPath.AppendPath(newName) + "\U00000000\U00000000",
+                    Flags = FileOpFlags.NOCONFIRMATION | FileOpFlags.ALLOWUNDO
+                });
+                return ProcessResult(res);
+            }
             return false;
+        }
+        catch (Exception e)
+        {
+            MainWindow.ShowError($"Unbekannter Fehler aufgetreten");
+            return false; 
+        }
+    }
+
+    bool ProcessResult(int res)
+    {
+        if (res == 0)
+            return true;
+        else if (res == 2)
+            MainWindow.ShowError($"Nicht gefunden");
+        else if (res == 0x78)
+            MainWindow.ShowError($"Zugriff verweigert");
+        //else if (res == 1223)
+        //    MainWindow.ShowError($"Vorgang abgebrochen");
+        return false;
     }
 
     (int Dirs, int Files) GetDirAndFileCount(ItemBase[] items)
