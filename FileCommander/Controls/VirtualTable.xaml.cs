@@ -13,6 +13,7 @@ using Microsoft.Web.WebView2.Core;
 using System;
 using System.Collections.Generic;
 using System.Collections.Immutable;
+using System.Diagnostics;
 using System.IO;
 using System.Linq;
 using System.Reflection;
@@ -76,13 +77,13 @@ public sealed partial class VirtualTable : UserControl
         MainContext.Instance.PropertyChanged += MainContext_PropertyChanged;
     }
     
-    void CoreWebView2_WebResourceRequested(CoreWebView2 sender, CoreWebView2WebResourceRequestedEventArgs args)
+    async void CoreWebView2_WebResourceRequested(CoreWebView2 sender, CoreWebView2WebResourceRequestedEventArgs args)
     {
         try
         {
             var path = new Uri(args.Request.Uri).AbsolutePath[1..];
             if (path.StartsWith("request"))
-                ServeRequest(path[8..], args);
+                await ServeRequest(path[8..], args);
             else if (path.StartsWith("iconFromRes"))
                 ServeIconFromRes(path[12..], args);
             else if (path.StartsWith("icon"))
@@ -106,10 +107,16 @@ public sealed partial class VirtualTable : UserControl
                 }
             }
         }
-        catch
+        catch (UnauthorizedAccessException uae)
         {
+            Debug.WriteLine($"Fehler aufgetreten: {uae}");
+            MainWindow.ShowError(uae.Message);
             args.Response = WebView.CoreWebView2.Environment.CreateWebResourceResponse(null, 500, "Handler Error", null);
-            return;
+        }
+        catch (Exception e)
+        {
+            Debug.WriteLine($"Fehler aufgetreten: {e}");
+            args.Response = WebView.CoreWebView2.Environment.CreateWebResourceResponse(null, 500, "Handler Error", null);
         }
     }
 
@@ -123,7 +130,7 @@ public sealed partial class VirtualTable : UserControl
         }
     }
 
-    async void ServeRequest(string path, CoreWebView2WebResourceRequestedEventArgs args)
+    async Task ServeRequest(string path, CoreWebView2WebResourceRequestedEventArgs args)
     {
         switch (path)
         {
