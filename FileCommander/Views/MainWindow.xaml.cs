@@ -270,7 +270,7 @@ public sealed partial class MainWindow : Window
         var newLeftWidth = leftStartWidth + delta;
         var newRightWidth = rightStartWidth - delta;
 
-        const double minWidth = 150;
+        const double minWidth = 30;
 
         if (newLeftWidth < minWidth)
         {
@@ -284,8 +284,10 @@ public sealed partial class MainWindow : Window
             newLeftWidth = leftStartWidth + rightStartWidth - minWidth;
         }
 
-        LeftColumn.Width = new GridLength(newLeftWidth, GridUnitType.Pixel);
-        RightColumn.Width = new GridLength(newRightWidth, GridUnitType.Pixel);
+        LeftColumn.Width =
+               new GridLength(newLeftWidth, GridUnitType.Star);
+        RightColumn.Width =
+            new GridLength(newRightWidth, GridUnitType.Star);
 
         e.Handled = true;
     }
