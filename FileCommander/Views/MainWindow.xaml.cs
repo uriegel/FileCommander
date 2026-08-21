@@ -12,6 +12,7 @@ using Microsoft.UI.Xaml.Media;
 using Microsoft.UI.Xaml.Media.Animation;
 
 using System;
+using System.Reflection.Metadata.Ecma335;
 using System.Threading.Tasks;
 
 using Windows.ApplicationModel;
@@ -95,6 +96,9 @@ public sealed partial class MainWindow : Window
         await Task.Delay(5000);
         mainWindow.MessageBar.IsOpen = false;
     }
+
+    public static FolderView GetOtherView(FolderView thisView)
+        => mainWindow.LeftView == thisView ? mainWindow.RightView : mainWindow.LeftView;
 
     void AppTitleBar_Loaded(object sender, RoutedEventArgs e)
     {

@@ -196,6 +196,36 @@ class DirectoryController : Controller
             return false;
     }
 
+    public override async Task<bool> Copy(UIElement content, CopyItems items, VirtualTable otherSide) 
+    { 
+        if (otherSide.Controller is not DirectoryController)
+            return false;
+
+        var path = Context.CurrentPath;
+        var otherPath = otherSide.Context.CurrentPath;
+
+        if (await Dialog.ShowAsync(content,
+            "Dateien löschen",
+            new CopyDialog()
+            {
+                Description = "Möchtest du {dirAndFileText} löschen?"
+            }))
+        {
+            //var res = Api.SHFileOperation(new ShFileOPStruct
+            //{
+            //    Func = FileFuncFlags.DELETE,
+            //    From = string.Join("\U00000000", pathsToDelete) + "\U00000000\U00000000",
+            //    Flags = FileOpFlags.ALLOWUNDO
+            //});
+            //return ProcessResult(res);
+            return false;
+        }
+        else
+            return false;
+
+        return false;
+    }
+
     public override async Task<bool> Rename(UIElement content, int pos, bool asCopy)
     {
         try
@@ -221,7 +251,7 @@ class DirectoryController : Controller
             }
             return false;
         }
-        catch (Exception e)
+        catch
         {
             MainWindow.ShowError($"Unbekannter Fehler aufgetreten");
             return false; 

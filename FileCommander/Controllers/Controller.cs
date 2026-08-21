@@ -1,4 +1,5 @@
 ﻿using FileCommander.Contexts;
+using FileCommander.Controls;
 using FileCommander.Data;
 
 using Microsoft.UI.Xaml;
@@ -52,7 +53,7 @@ abstract class Controller : IDisposable
     public virtual bool Process(int pos) => false;
     public virtual void CreateFolder(UIElement content) { }
     public virtual Task<bool> DeleteItems(UIElement content, int[] items) => Task.FromResult(false);
-    public virtual Task<bool> Copy(UIElement content, CopyItems items) => Task.FromResult(false);
+    public virtual Task<bool> Copy(UIElement content, CopyItems items, VirtualTable otherSide) => Task.FromResult(false);
     public virtual Task<bool> Rename(UIElement content, int pos, bool asCopy) => Task.FromResult(false);
     
     #region IDisposable

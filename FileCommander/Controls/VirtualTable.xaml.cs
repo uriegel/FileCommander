@@ -38,16 +38,19 @@ namespace FileCommander.Controls;
 public sealed partial class VirtualTable : UserControl
 {
     public event Action<bool>? OnTab;
+    public event Func<VirtualTable>? OnOtherVirtualTable;
+
+    internal Controller Controller { get; private set; } = null!;
+    internal FolderContext Context { get; private set; } = null!;
 
     public VirtualTable() => InitializeComponent();
-
     public void Refresh() => SendEvent(new(Reload: new()));
     public void ToggleSelection() => SendEvent(new(ToggleSelection: new()));
     public void SelectAllAbove() => SendEvent(new(SelectAllAbove: new()));
     public void SelectAllBeneath() => SendEvent(new(SelectAllBeneath: new()));
     public void SelectAll() => SendEvent(new(SelectAll: new()));
     public void SelectNone() => SendEvent(new(SelectNone: new()));
-    public async void CreateFolder() => controller.CreateFolder(Content);
+    public async void CreateFolder() => Controller.CreateFolder(Content);
     public async void DeleteItems() => SendEvent(new(DeleteItems: new()));
     public async void Rename() => SendEvent(new(Rename: new()));
     public async void RenameAsCopy() => SendEvent(new(RenameAsCopy: new()));
@@ -56,8 +59,8 @@ public sealed partial class VirtualTable : UserControl
 
     public void SetContext(FolderContext context)
     {
-        this.context = context;
-        controller = Controller.GetInitial(context);
+        this.Context = context;
+        Controller = Controller.GetInitial(context);
     }
 
     internal void SendEvent(Event evt)
@@ -133,12 +136,12 @@ public sealed partial class VirtualTable : UserControl
             case "init":
             {
                 var settings = ApplicationData.Current.LocalSettings.Values;
-                var key = $"{context.Id}-latestPath";
+                var key = $"{Context.Id}-latestPath";
                 var initpath = settings.TryGetValue(key, out var value) ? (string)value : "";
-                var columns = controller.GetColumns();
-                (var items, _, var dirs, var files) = controller.GetItems(initpath, true);
-                context.CurrentFileCount = files;
-                context.CurrentDirectoryCount = dirs;
+                var columns = Controller.GetColumns();
+                (var items, _, var dirs, var files) = Controller.GetItems(initpath, true);
+                Context.CurrentFileCount = files;
+                Context.CurrentDirectoryCount = dirs;
                 var itemsResult = new ItemsResult(columns, items, 0);
                 SendResult(args, itemsResult);
                 break;
@@ -150,7 +153,7 @@ public sealed partial class VirtualTable : UserControl
                 var desc = query.TryGetValue("descending", out var descVal) && descVal == "true";
                 var subcol = query.TryGetValue("subcolumn", out var colVal) && colVal == "true";
                 var pos = query.TryGetValue("pos", out var resPos) ? resPos.ParseInt() ?? 0 : 0;
-                (var items, var newPos) = controller.Sort(index, desc, subcol, pos);
+                (var items, var newPos) = Controller.Sort(index, desc, subcol, pos);
                 var itemsResult = items != null ? new ItemsResult(null, items, newPos) : null;
                 SendResult(args, new ProcessResult(ItemsResult: itemsResult));
                 break;
@@ -165,10 +168,10 @@ public sealed partial class VirtualTable : UserControl
             {
                 var query = MakeQuery(args.Request.Uri);
                 var newpath = query.TryGetValue("path", out var res) ? res ?? "" : "";
-                controller = Controller.GetFromPath(newpath, controller, context);
-                var (items, newPos, dirs, files) = controller.GetItems(newpath, false);
-                context.CurrentFileCount = files;
-                context.CurrentDirectoryCount = dirs;
+                Controller = Controller.GetFromPath(newpath, Controller, Context);
+                var (items, newPos, dirs, files) = Controller.GetItems(newpath, false);
+                Context.CurrentFileCount = files;
+                Context.CurrentDirectoryCount = dirs;
                 var itemsResult = items != null ? new ItemsResult(null, items, newPos) : null;
                 SendResult(args, new ProcessResult(ItemsResult: itemsResult));
                 break;
@@ -178,7 +181,7 @@ public sealed partial class VirtualTable : UserControl
                 var deferral = args.GetDeferral();
                 try
                 {
-                    var items = await controller.GetItemChangesAsync();
+                    var items = await Controller.GetItemChangesAsync();
                     SendResult(args, new ChangesResult(items));
                 }
                 finally
@@ -190,14 +193,14 @@ public sealed partial class VirtualTable : UserControl
             case "history":
             {
                 var query = MakeQuery(args.Request.Uri);
-                var newPath = context.GetHistory(query.TryGetValue("forward", out var val) && val == "true");
+                var newPath = Context.GetHistory(query.TryGetValue("forward", out var val) && val == "true");
                 ItemsResult? itemsResult = null;
                 if (newPath != null)
                 {
-                    controller = Controller.GetFromPath(newPath, controller, context);
-                    var (items, newPos, dirs, files) = controller.GetItems(newPath, false, true);
-                    context.CurrentFileCount = files;
-                    context.CurrentDirectoryCount = dirs;
+                    Controller = Controller.GetFromPath(newPath, Controller, Context);
+                    var (items, newPos, dirs, files) = Controller.GetItems(newPath, false, true);
+                    Context.CurrentFileCount = files;
+                    Context.CurrentDirectoryCount = dirs;
                     itemsResult = items != null ? new ItemsResult(null, items, newPos) : null;
                 }
                 SendResult(args, itemsResult);
@@ -212,7 +215,7 @@ public sealed partial class VirtualTable : UserControl
                     var items = JsonSerializer.Deserialize<int[]>(stream);
                     if (items != null)
                     {
-                        var res = await controller.DeleteItems(Content, items);
+                        var res = await Controller.DeleteItems(Content, items);
                         SendResult(args, new RequestResult(res));
                     }
                         else
@@ -231,9 +234,10 @@ public sealed partial class VirtualTable : UserControl
                 {
                     var stream = args.Request.Content.AsStreamForRead();
                     var items = JsonSerializer.Deserialize<CopyItems>(stream, Json.Defaults);
-                    if (items != null)
+                    var otherSide = OnOtherVirtualTable?.Invoke();
+                    if (items != null && otherSide != null)
                     {
-                        var res = await controller.Copy(Content, items);
+                        var res = await Controller.Copy(Content, items, otherSide);
                         SendResult(args, new RequestResult(res));
                     }
                     else
@@ -252,7 +256,7 @@ public sealed partial class VirtualTable : UserControl
                 {
                     var stream = args.Request.Content.AsStreamForRead();
                     var item = JsonSerializer.Deserialize<RenameItem>(stream, Json.Defaults);
-                    var res = await controller.Rename(Content, item?.Item ?? -1, item?.AsCopy == true);
+                    var res = await Controller.Rename(Content, item?.Item ?? -1, item?.AsCopy == true);
                     SendResult(args, new RequestResult(res));
                 }
                 finally
@@ -266,19 +270,19 @@ public sealed partial class VirtualTable : UserControl
                 if (path.StartsWith("process"))
                 {
                     var pos = int.Parse(path[8..]);
-                    if (controller.Process(pos))
+                    if (Controller.Process(pos))
                         SendResult(args, new ProcessResult());
                     else
                     {
-                        var (controller, cols, newPath, _) = this.controller.CheckPath(pos);
-                        var (items, oldPos, dirCount, fileCount) = controller.GetItems(newPath, controller != this.controller);
-                        if (this.controller != controller)
+                        var (controller, cols, newPath, _) = this.Controller.CheckPath(pos);
+                        var (items, oldPos, dirCount, fileCount) = controller.GetItems(newPath, controller != this.Controller);
+                        if (this.Controller != controller)
                         {
-                            this.controller.Dispose();
-                            this.controller = controller;
+                            this.Controller.Dispose();
+                            this.Controller = controller;
                         }
-                        context.CurrentFileCount = fileCount;
-                        context.CurrentDirectoryCount = dirCount;
+                        Context.CurrentFileCount = fileCount;
+                        Context.CurrentDirectoryCount = dirCount;
                         var itemsResult = new ItemsResult(cols, items, oldPos);
                         SendResult(args, new ProcessResult(ItemsResult: itemsResult));
                     }
@@ -286,17 +290,17 @@ public sealed partial class VirtualTable : UserControl
                 if (path.StartsWith("onposition"))
                 {
                     var pos = int.Parse(path[11..]);
-                    context.SelectedPath = controller.OnPosition(pos);
+                    Context.SelectedPath = Controller.OnPosition(pos);
                     SendResult(args, new ProcessResult());
                 }
                 else if (path.StartsWith("refresh"))
                 {
                     var pos = int.Parse(path[8..]);
-                    var (items, newPos, dirs, files) = controller.Refresh(pos);
+                    var (items, newPos, dirs, files) = Controller.Refresh(pos);
                     if (items != null)
                     {
-                        context.CurrentFileCount = files;
-                        context.CurrentDirectoryCount = dirs;
+                        Context.CurrentFileCount = files;
+                        Context.CurrentDirectoryCount = dirs;
                     }
                     var itemsResult = items != null ? new ItemsResult(null, items, newPos) : null;
                     SendResult(args, new ProcessResult(ItemsResult: itemsResult));
@@ -304,9 +308,9 @@ public sealed partial class VirtualTable : UserControl
                 else if (path.StartsWith("reload"))
                 {
                     var pos = int.Parse(path[7..]);
-                    var (items, newPos, dirs, files) = controller.Reload(pos);
-                    context.CurrentFileCount = files;
-                    context.CurrentDirectoryCount = dirs;
+                    var (items, newPos, dirs, files) = Controller.Reload(pos);
+                    Context.CurrentFileCount = files;
+                    Context.CurrentDirectoryCount = dirs;
                     var itemsResult = items != null ? new ItemsResult(null, items, newPos) : null;
                     SendResult(args, new ProcessResult(ItemsResult: itemsResult));
                 }
@@ -417,7 +421,4 @@ public sealed partial class VirtualTable : UserControl
             line.SubstringUntil('='),
             Uri.UnescapeDataString(line.SubstringAfter('=').Trim())
         );
-
-    Controller controller = null!;
-    FolderContext context = null!;
 }

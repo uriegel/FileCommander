@@ -38,6 +38,7 @@ public sealed partial class FolderView : UserControl
             else
                 OnTab?.Invoke();
         };
+        VirtualTable.OnOtherVirtualTable += () => MainWindow.GetOtherView(this).VirtualTable;
     }
 
     public void Refresh() => VirtualTable.Refresh();

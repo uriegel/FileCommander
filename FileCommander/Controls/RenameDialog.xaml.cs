@@ -10,7 +10,6 @@ public sealed partial class RenameDialog : UserControl
         get => (string)GetValue(FileNameProperty);
         set => SetValue(FileNameProperty, value);
     }
-
     public static readonly DependencyProperty FileNameProperty =
         DependencyProperty.Register(nameof(FileName), typeof(string), typeof(CreateFolderDialog), new PropertyMetadata(default));
 
@@ -19,7 +18,6 @@ public sealed partial class RenameDialog : UserControl
         get => (string)GetValue(DescriptionProperty);
         set => SetValue(DescriptionProperty, value);
     }
-
     public static readonly DependencyProperty DescriptionProperty =
         DependencyProperty.Register(nameof(Description), typeof(string), typeof(CreateFolderDialog), new PropertyMetadata(default));
 

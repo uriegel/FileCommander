@@ -6,7 +6,7 @@ using System.Threading.Tasks;
 
 namespace FileCommander.Controls;
 
-public sealed partial class Dialog : UserControl
+static class Dialog
 {
     public static bool IsOpen { get; private set; }
 
@@ -46,11 +46,5 @@ public sealed partial class Dialog : UserControl
         d => (object)true,
         xamlContent,
         textContent) == (object)true;
-    }
-
-
-    public Dialog()
-    {
-        InitializeComponent();
     }
 }
