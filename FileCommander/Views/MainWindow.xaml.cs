@@ -200,6 +200,10 @@ public sealed partial class MainWindow : Window
         => activeView?.Rename();
     void RenameAsCopyCommand_ExecuteRequested(XamlUICommand sender, ExecuteRequestedEventArgs args)
         => activeView?.RenameAsCopy();
+    void CopyCommand_ExecuteRequested(XamlUICommand sender, ExecuteRequestedEventArgs args)
+        => activeView?.Copy();
+    void MoveCommand_ExecuteRequested(XamlUICommand sender, ExecuteRequestedEventArgs args)
+        => activeView?.Move();
 
     FolderView GetOtherView() => activeView == LeftView ? RightView : LeftView;
 

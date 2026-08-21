@@ -106,6 +106,16 @@ async function onKeyDown(evt) {
         evt.stopPropagation()
         rename(evt.shiftKey)
     }
+    else if (evt.key == "F5") {
+        evt.preventDefault();
+        evt.stopPropagation()
+        copy(false)
+    }
+    else if (evt.key == "F6") {
+        evt.preventDefault();
+        evt.stopPropagation()
+        copy(true)
+    }
     else if (evt.key == "Escape") 
         stopRestriction()
     else if (evt.key == "Backspace") {
@@ -247,6 +257,10 @@ async function onEvent(evt) {
         rename(false)
     if (evt.renameAsCopy)
         rename(true)
+    if (evt.copy)
+        copy(false)
+    if (evt.move)
+        copy(true)
 }
 
 async function init() {
@@ -400,6 +414,23 @@ async function deleteItems() {
     const res = await response.json()
     if (res.success)
         stopRestriction()
+}
+
+async function copy(move) {
+    const items = getSelectedItems()
+    if (items.length == 0)
+        return
+    const response = await fetch("request/copy", {
+        method: "POST",
+        headers: {
+            "Content-Type": "application/json"
+        },
+        body: JSON.stringify({
+            items,
+            move 
+        })
+    })
+    await response.json()
 }
 
 async function rename(asCopy) {

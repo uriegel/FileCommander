@@ -51,6 +51,8 @@ public sealed partial class VirtualTable : UserControl
     public async void DeleteItems() => SendEvent(new(DeleteItems: new()));
     public async void Rename() => SendEvent(new(Rename: new()));
     public async void RenameAsCopy() => SendEvent(new(RenameAsCopy: new()));
+    public async void Copy() => SendEvent(new(Copy: new()));
+    public async void Move() => SendEvent(new(Move: new()));
 
     public void SetContext(FolderContext context)
     {
@@ -214,6 +216,27 @@ public sealed partial class VirtualTable : UserControl
                         SendResult(args, new RequestResult(res));
                     }
                         else
+                        SendResult(args, new RequestResult(false));
+                    break;
+                }
+                finally
+                {
+                    deferral.Complete();
+                }
+            }
+            case "copy":
+            {
+                var deferral = args.GetDeferral();
+                try
+                {
+                    var stream = args.Request.Content.AsStreamForRead();
+                    var items = JsonSerializer.Deserialize<CopyItems>(stream, Json.Defaults);
+                    if (items != null)
+                    {
+                        var res = await controller.Copy(Content, items);
+                        SendResult(args, new RequestResult(res));
+                    }
+                    else
                         SendResult(args, new RequestResult(false));
                     break;
                 }

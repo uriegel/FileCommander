@@ -81,6 +81,18 @@
                         <KeyboardAccelerator Key="F2" />
                     </XamlUICommand.KeyboardAccelerators>
                 </XamlUICommand>
+                <XamlUICommand x:Name="CopyCommand" Label="Kopieren" Description="Ausgewählte Einträge kopieren" 
+                               ExecuteRequested="CopyCommand_ExecuteRequested">
+                    <XamlUICommand.KeyboardAccelerators>
+                        <KeyboardAccelerator Key="F5" />
+                    </XamlUICommand.KeyboardAccelerators>
+                </XamlUICommand>
+                <XamlUICommand x:Name="MoveCommand" Label="Verschieben" Description="Ausgewählte Einträge verschieben" 
+                               ExecuteRequested="MoveCommand_ExecuteRequested">
+                    <XamlUICommand.KeyboardAccelerators>
+                        <KeyboardAccelerator Key="F6" />
+                    </XamlUICommand.KeyboardAccelerators>
+                </XamlUICommand>
                 <converters:InfoValueConverter x:Key="InfoValueConverter" />
             </ResourceDictionary>
         </Grid.Resources>
@@ -114,6 +126,8 @@
                             <MenuFlyoutItem Command="{StaticResource RenameCommand}" />
                             <MenuFlyoutItem Command="{StaticResource RenameAsCopyCommand}" />
                             <MenuFlyoutSeparator/>
+                            <MenuFlyoutItem Command="{StaticResource CopyCommand}" />
+                            <MenuFlyoutItem Command="{StaticResource MoveCommand}" />
                             <MenuFlyoutItem Command="{StaticResource DeleteCommand}" />
                             <MenuFlyoutSeparator/>
                             <MenuFlyoutItem Command="{StaticResource CreateFolderCommand}" />

@@ -12,7 +12,9 @@ record Event(
     ChangedItems? ChangedItems = null,
     DeleteItems? DeleteItems = null,
     Rename? Rename = null,
-    RenameAsCopy? RenameAsCopy = null
+    RenameAsCopy? RenameAsCopy = null,
+    Copy? Copy = null,
+    Move? Move = null
 );
 
 record Refresh();
@@ -27,3 +29,5 @@ record ChangedItems(Item[] Items);
 record DeleteItems();
 record Rename();
 record RenameAsCopy();
+record Copy();
+record Move();
