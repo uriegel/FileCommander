@@ -196,7 +196,7 @@ class DirectoryController : Controller
             return false;
     }
 
-    public override async Task<bool> Copy(UIElement content, CopyItems items, VirtualTable otherSide) 
+    public override async Task<bool> Copy(UIElement content, CopyItems items, VirtualTable otherSide, bool fromRight) 
     { 
         if (otherSide.Controller is not DirectoryController)
             return false;
@@ -208,7 +208,8 @@ class DirectoryController : Controller
             "Dateien löschen",
             new CopyDialog()
             {
-                Description = "Möchtest du {dirAndFileText} löschen?"
+                Description = "Möchtest du {dirAndFileText} löschen?",
+                FromRight = fromRight
             }))
         {
             //var res = Api.SHFileOperation(new ShFileOPStruct

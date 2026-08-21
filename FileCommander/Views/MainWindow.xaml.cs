@@ -100,6 +100,8 @@ public sealed partial class MainWindow : Window
     public static FolderView GetOtherView(FolderView thisView)
         => mainWindow.LeftView == thisView ? mainWindow.RightView : mainWindow.LeftView;
 
+    public static bool IsRightView(FolderView thisView) => mainWindow.RightView == thisView;
+
     void AppTitleBar_Loaded(object sender, RoutedEventArgs e)
     {
         if (ExtendsContentIntoTitleBar == true)

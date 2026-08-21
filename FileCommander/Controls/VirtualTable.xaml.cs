@@ -38,7 +38,7 @@ namespace FileCommander.Controls;
 public sealed partial class VirtualTable : UserControl
 {
     public event Action<bool>? OnTab;
-    public event Func<VirtualTable>? OnOtherVirtualTable;
+    internal event Func<OtherSide>? OnOtherVirtualTable;
 
     internal Controller Controller { get; private set; } = null!;
     internal FolderContext Context { get; private set; } = null!;
@@ -237,7 +237,7 @@ public sealed partial class VirtualTable : UserControl
                     var otherSide = OnOtherVirtualTable?.Invoke();
                     if (items != null && otherSide != null)
                     {
-                        var res = await Controller.Copy(Content, items, otherSide);
+                        var res = await Controller.Copy(Content, items, otherSide.Other, otherSide.IsRight);
                         SendResult(args, new RequestResult(res));
                     }
                     else
@@ -422,3 +422,5 @@ public sealed partial class VirtualTable : UserControl
             Uri.UnescapeDataString(line.SubstringAfter('=').Trim())
         );
 }
+
+record OtherSide(VirtualTable Other, bool IsRight);

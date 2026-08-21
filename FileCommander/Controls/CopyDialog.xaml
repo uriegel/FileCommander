@@ -8,7 +8,7 @@
     xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
     mc:Ignorable="d" Name="root" >
     <StackPanel x:Name="Root" Spacing="12" HorizontalAlignment="Stretch">
-        <ProgressBar IsIndeterminate="True" Height="4"/>
+        <ProgressBar IsIndeterminate="True" Height="4"     FlowDirection="RightToLeft" />
         <TextBlock Text="{Binding ElementName=root, Path=Description}" TextWrapping="Wrap"/>
     </StackPanel>
 </UserControl>
