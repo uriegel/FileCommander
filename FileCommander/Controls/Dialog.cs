@@ -40,11 +40,7 @@ static class Dialog
         UserControl? xamlContent = null,
         string? textContent = null)
     {
-        return ShowAsync(
-        content,
-        title,
-        d => (object)true,
-        xamlContent,
-        textContent) == (object)true;
+        var res = await ShowAsync(content, title, d => (object)true, xamlContent, textContent);
+        return res != null && (bool)res == true;
     }
 }

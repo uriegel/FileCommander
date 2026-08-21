@@ -24,7 +24,6 @@ using Windows.Storage;
 
 namespace FileCommander.Controls;
 
-// TODO Copy and Move: 
 // TODO Copy: check conflicts
 // TODO Copy: conflicts: show Conflict Dialog
 

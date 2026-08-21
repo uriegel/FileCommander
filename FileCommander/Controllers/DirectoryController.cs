@@ -201,30 +201,50 @@ class DirectoryController : Controller
         if (otherSide.Controller is not DirectoryController)
             return false;
 
+        var itemsToCopy = items.Items
+            .Select(n => (viewItems[n]))
+            .ToArray();
+        var (dirs, files) = GetDirAndFileCount(itemsToCopy);
+        var titleAction = items.Move ? "verschieben" : "kopieren";
+        var title = (dirs, files) switch
+        {
+            (0, 1) => $"Datei {titleAction}",
+            (1, 0) => $"Verzeichnis {titleAction}",
+            (_, 0) => $"Verzeichnisse {titleAction}",
+            (0, _) => $"Dateien {titleAction}",
+            _ => $"Verzeichnisse und Dateien {titleAction}"
+        };
+        var dirAndFileText = (dirs, files) switch
+        {
+            (0, 1) => "die Datei",
+            (1, 0) => "das Verzeichnis",
+            (_, 0) => "die Verzeichnisse",
+            (0, _) => "die Dateien",
+            _ => "die Verzeichnisse und Dateien"
+        };
+
         var path = Context.CurrentPath;
         var otherPath = otherSide.Context.CurrentPath;
 
-        if (await Dialog.ShowAsync(content,
-            "Dateien löschen",
+        var dialogRes = await Dialog.ShowAsync(content,
+            title,
             new CopyDialog()
             {
-                Description = "Möchtest du {dirAndFileText} löschen?",
+                Description = $"Möchtest du {dirAndFileText} {titleAction}?",
                 FromRight = fromRight
-            }))
-        {
-            //var res = Api.SHFileOperation(new ShFileOPStruct
-            //{
-            //    Func = FileFuncFlags.DELETE,
-            //    From = string.Join("\U00000000", pathsToDelete) + "\U00000000\U00000000",
-            //    Flags = FileOpFlags.ALLOWUNDO
-            //});
-            //return ProcessResult(res);
-            return false;
+            });
+        if (dialogRes) {
+            var res = Api.SHFileOperation(new ShFileOPStruct
+            {
+                Func = items.Move ? FileFuncFlags.MOVE : FileFuncFlags.COPY,
+                From = string.Join("\U00000000", itemsToCopy.Select(n => Context.CurrentPath.AppendPath(n.Name))) + "\U00000000\U00000000",
+                To = string.Join("\U00000000", itemsToCopy.Select(n => otherSide.Context.CurrentPath.AppendPath(n.Name))) + "\U00000000\U00000000",
+                Flags = FileOpFlags.NOCONFIRMATION | FileOpFlags.NOCONFIRMMKDIR | FileOpFlags.MULTIDESTFILES,
+            });
+            return ProcessResult(res);
         }
         else
             return false;
-
-        return false;
     }
 
     public override async Task<bool> Rename(UIElement content, int pos, bool asCopy)
