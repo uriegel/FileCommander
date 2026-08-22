@@ -228,34 +228,32 @@ class DirectoryController : Controller
         var conflicts = CopyTools.GetConflicts(viewItems, targets);
         if (conflicts.Any())
         {
-            var window = new ConflictDialog(conflicts, $"Überschreiben beim {titleAction.CapitalizeFirst()}", fromRight);
-            window.Activate();
-            return false;
+            var conflictResult = await ConflictDialog.ShowAsync(conflicts, titleAction.CapitalizeFirst(), fromRight);
+            if (conflictResult == ConflictDialogResult.Canceled)
+                return false;
+        } 
+        else
+        {
+            if (!await Dialog.ShowAsync(content, title, new CopyDialog() 
+            {
+                Description = $"Möchtest du {dirAndFileText} {titleAction}?",
+                FromRight = fromRight
+            }))
+                return false;
         }
 
         bool noConfirmation = false;
         var path = Context.CurrentPath;
         var otherPath = otherSide.Context.CurrentPath;
 
-        var dialogRes = await Dialog.ShowAsync(content,
-            title,
-            new CopyDialog()
-            {
-                Description = $"Möchtest du {dirAndFileText} {titleAction}?",
-                FromRight = fromRight
-            });
-        if (dialogRes) {
-            var res = Api.SHFileOperation(new ShFileOPStruct
-            {
-                Func = items.Move ? FileFuncFlags.MOVE : FileFuncFlags.COPY,
-                From = string.Join("\U00000000", itemsToCopy.Select(n => Context.CurrentPath.AppendPath(n.Name))) + "\U00000000\U00000000",
-                To = string.Join("\U00000000", itemsToCopy.Select(n => otherSide.Context.CurrentPath.AppendPath(n.Name))) + "\U00000000\U00000000",
-                Flags = (noConfirmation ? FileOpFlags.NOCONFIRMATION : FileOpFlags.NOCONFIRMMKDIR) | FileOpFlags.NOCONFIRMMKDIR | FileOpFlags.MULTIDESTFILES,
-            });
-            return ProcessResult(res);
-        }
-        else
-            return false;
+        var res = Api.SHFileOperation(new ShFileOPStruct
+        {
+            Func = items.Move ? FileFuncFlags.MOVE : FileFuncFlags.COPY,
+            From = string.Join("\U00000000", itemsToCopy.Select(n => Context.CurrentPath.AppendPath(n.Name))) + "\U00000000\U00000000",
+            To = string.Join("\U00000000", itemsToCopy.Select(n => otherSide.Context.CurrentPath.AppendPath(n.Name))) + "\U00000000\U00000000",
+            Flags = (noConfirmation ? FileOpFlags.NOCONFIRMATION : FileOpFlags.NOCONFIRMMKDIR) | FileOpFlags.NOCONFIRMMKDIR | FileOpFlags.MULTIDESTFILES,
+        });
+        return ProcessResult(res);
     }
 
     public override async Task<bool> Rename(UIElement content, int pos, bool asCopy)

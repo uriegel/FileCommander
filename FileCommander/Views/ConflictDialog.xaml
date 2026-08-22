@@ -6,7 +6,7 @@
     xmlns:local="using:FileCommander.Views"
     xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
     xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
-    mc:Ignorable="d" x:Name="root" Title="Konflikte">
+    mc:Ignorable="d" x:Name="root" Title="Konflikte" Closed="root_Closed">
 
     <Window.SystemBackdrop>
         <DesktopAcrylicBackdrop />
@@ -49,9 +49,15 @@
             </ItemsRepeater>
         </ScrollViewer>
 
-        <StackPanel Grid.Row="2" Orientation="Horizontal" HorizontalAlignment="Right" Spacing="8">
-            <Button Content="Ja"/>
-            <Button Content="Nein"/>
-        </StackPanel>
+        <Grid Grid.Row="2" HorizontalAlignment="Right" Width="300">
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition Width="*" />
+                <ColumnDefinition Width="*" />
+            </Grid.ColumnDefinitions>
+            <Grid.Children>
+                <Button Name ="Yes" Content="Ja" HorizontalAlignment="Stretch" Margin="5" />
+                <Button Name="No" Grid.Column="1" Content="Nein" HorizontalAlignment="Stretch" Margin="5" />
+            </Grid.Children>
+        </Grid>
     </Grid>
 </Window>

@@ -21,6 +21,7 @@ static class Dialog
         var dialog = new ContentDialog
         {
             Title = title,
+
             Content = (object?)xamlContent ?? new TextBlock() { Text = textContent },
             PrimaryButtonText = "Ok",
             CloseButtonText = "Abbrechen",

@@ -4,18 +4,25 @@ using Microsoft.UI.Xaml;
 
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
+using System.Threading.Tasks;
 
 using Windows.Graphics;
 using Windows.System;
 
 namespace FileCommander.Views;
 
-// TODO await Dialog with response
-// TODO Buttons same size
-// TODO Default Button 
+// TODO Fill list
+// TODO control AccentButton from conflicts and default action
 
 public sealed partial class ConflictDialog : Window
 {
+    internal static Task<ConflictDialogResult> ShowAsync(IEnumerable<ConflictItem> conflicts, string action, bool fromRight) 
+    {
+        var window = new ConflictDialog(conflicts, $"Überschreiben beim {action}", fromRight);
+        window.Activate();
+        return window.completion.Task;
+    }
+
     public bool FromRight { get; }
 
     ObservableCollection<ConflictItem> Items { get; } = [];
@@ -25,6 +32,8 @@ public sealed partial class ConflictDialog : Window
         InitializeComponent();
         AppWindow.Resize(new SizeInt32(1000, 800));
         ListView.ItemsSource = Items;
+        No.Style = (Style)Application.Current.Resources["AccentButtonStyle"];
+        No.
     }
 
     internal ConflictDialog(IEnumerable<ConflictItem> conflicts, string description, bool fromRight) 
@@ -49,5 +58,16 @@ public sealed partial class ConflictDialog : Window
         if (e.Key == VirtualKey.Escape)
             Close();
     }
+
+    void root_Closed(object sender, WindowEventArgs args) => completion.TrySetResult(result);
+
+    ConflictDialogResult result = ConflictDialogResult.Canceled;
+    readonly TaskCompletionSource<ConflictDialogResult> completion = new();
 }
 
+enum ConflictDialogResult
+{
+    Overwrite,
+    DoNotOverwrite,
+    Canceled,
+}

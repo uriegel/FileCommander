@@ -7,7 +7,7 @@
     xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
     xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
     mc:Ignorable="d" Name="root" Loaded="root_Loaded">
-    <StackPanel x:Name="Root" Spacing="12" HorizontalAlignment="Stretch">
+    <StackPanel x:Name="Root" Spacing="12" HorizontalAlignment="Stretch" >
         <TextBlock Text="{Binding ElementName=root, Path=Description}" TextWrapping="Wrap"/>
         <TextBox Name="Textbox" Text="{Binding ElementName=root, Path=FileName, Mode=TwoWay}"></TextBox>
     </StackPanel>
