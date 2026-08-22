@@ -4,7 +4,6 @@ using CsTools.Extensions;
 using FileCommander.Contexts;
 using FileCommander.Data;
 
-using System;
 using System.IO;
 using System.Linq;
 
@@ -64,7 +63,7 @@ class RootController : Controller
     RootItem[] items = [];
 }
 
-record RootItem(string Name, string Description, long Size, bool IsMounted, bool IsRemovable)
+record RootItem(string Name, string Description, long Size, bool IsMounted, bool IsRemovable) : ItemBase(Name, false)
 {
     public static RootItem Create(DriveInfo driveInfo)
         => new(
@@ -73,7 +72,7 @@ record RootItem(string Name, string Description, long Size, bool IsMounted, bool
             driveInfo.IsReady ? driveInfo.TotalSize : 0, 
             driveInfo.IsReady,
             driveInfo.DriveType == DriveType.Removable);
-    public string GetIcon()
+    public override string GetIcon(string _ = "")
         => "iconFromRes/" + (Name == @"C:\"
             ? "WindowsDrive"
             : IsRemovable

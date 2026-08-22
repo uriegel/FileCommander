@@ -5,6 +5,7 @@ using CsTools.Extensions;
 using FileCommander.Contexts;
 using FileCommander.Controls;
 using FileCommander.Data;
+using FileCommander.Views;
 
 using Microsoft.UI.Xaml;
 
@@ -223,6 +224,16 @@ class DirectoryController : Controller
             _ => "die Verzeichnisse und Dateien"
         };
 
+        var targets = otherSide.Controller.GetViewItems();
+        var conflicts = CopyTools.GetConflicts(viewItems, targets);
+        if (conflicts.Any())
+        {
+            var window = new ConflictDialog(conflicts, $"Überschreiben beim {titleAction.CapitalizeFirst()}", fromRight);
+            window.Activate();
+            return false;
+        }
+
+        bool noConfirmation = false;
         var path = Context.CurrentPath;
         var otherPath = otherSide.Context.CurrentPath;
 
@@ -239,7 +250,7 @@ class DirectoryController : Controller
                 Func = items.Move ? FileFuncFlags.MOVE : FileFuncFlags.COPY,
                 From = string.Join("\U00000000", itemsToCopy.Select(n => Context.CurrentPath.AppendPath(n.Name))) + "\U00000000\U00000000",
                 To = string.Join("\U00000000", itemsToCopy.Select(n => otherSide.Context.CurrentPath.AppendPath(n.Name))) + "\U00000000\U00000000",
-                Flags = FileOpFlags.NOCONFIRMATION | FileOpFlags.NOCONFIRMMKDIR | FileOpFlags.MULTIDESTFILES,
+                Flags = (noConfirmation ? FileOpFlags.NOCONFIRMATION : FileOpFlags.NOCONFIRMMKDIR) | FileOpFlags.NOCONFIRMMKDIR | FileOpFlags.MULTIDESTFILES,
             });
             return ProcessResult(res);
         }
@@ -279,7 +290,9 @@ class DirectoryController : Controller
         }
     }
 
-    bool ProcessResult(int res)
+    public override ItemBase[] GetViewItems() => viewItems;
+
+    static bool ProcessResult(int res)
     {
         if (res == 0)
             return true;
@@ -294,8 +307,8 @@ class DirectoryController : Controller
 
     (int Dirs, int Files) GetDirAndFileCount(ItemBase[] items)
         => (items.Count(n => n is DirectoryItem), items.Count(n => n is FileItem));
-    
-    string GetDirAndFileText(int dirs, int files)
+
+    static string GetDirAndFileText(int dirs, int files)
         => dirs == 1 && files == 0
             ? "das Verzeichnis"
             : dirs == 0 && files == 1
@@ -483,3 +496,12 @@ class DirectoryController : Controller
     #endregion
 }
 
+static class DirectoryControllerExtensions
+{
+    public static string CapitalizeFirst(this string text)
+    {
+        return string.IsNullOrEmpty(text)
+            ? text
+            : char.ToUpper(text[0]) + text[1..];
+    }
+}

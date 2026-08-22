@@ -12,7 +12,6 @@ using Microsoft.UI.Xaml.Media;
 using Microsoft.UI.Xaml.Media.Animation;
 
 using System;
-using System.Reflection.Metadata.Ecma335;
 using System.Threading.Tasks;
 
 using Windows.ApplicationModel;
@@ -110,7 +109,7 @@ public sealed partial class MainWindow : Window
             SetRegionsForCustomTitleBar();
         }
     }
-
+    
     void AppTitleBar_SizeChanged(object sender, SizeChangedEventArgs e)
     {
         if (ExtendsContentIntoTitleBar == true)

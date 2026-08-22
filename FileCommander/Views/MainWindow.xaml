@@ -101,7 +101,7 @@
             <RowDefinition/>
         </Grid.RowDefinitions>
 
-        <Grid x:Name="AppTitleBar" Height="48">
+        <Grid x:Name="AppTitleBar" Height="40">
             <Grid.ColumnDefinitions>
                 <ColumnDefinition x:Name="LeftPaddingColumn" Width="0"/>
                 <ColumnDefinition x:Name="IconColumn" Width="Auto"/>
@@ -112,13 +112,15 @@
                 <ColumnDefinition x:Name="RightDragColumn" Width="*" MinWidth="48"/>
                 <ColumnDefinition x:Name="RightPaddingColumn" Width="0"/>
             </Grid.ColumnDefinitions>
-            <Image x:Name="TitleBarIcon" Source="ms-appx:///Assets/StoreLogo.png" Grid.Column="1"
-                   Width="16" Height="16" Margin="8,0,4,0"/>
+            <!--<Image x:Name="TitleBarIcon" Source="ms-appx:///Assets/StoreLogo.png" Grid.Column="1"
+                   Width="16" Height="16" Margin="8,0,4,0"/>-->
 
-            <AppBarButton x:Name="HamburgerButton" Grid.Column="2" FontFamily="Segoe Fluent Icons" 
-                          Content="&#xE700;" Width="36" Height="32">
+            <AppBarButton x:Name="HamburgerButton" Grid.Column="2"  >
+                <AppBarButton.Icon>
+                    <FontIcon FontFamily="Segoe Fluent Icons" Glyph="&#xE700;"/>
+                </AppBarButton.Icon>
                 <AppBarButton.Flyout>
-                    <MenuFlyout Placement="BottomEdgeAlignedLeft">
+                    <MenuFlyout Placement="BottomEdgeAlignedLeft" >
                         <ToggleMenuFlyoutItem Command="{StaticResource ShowHiddenCommand}" IsChecked="{Binding ShowHidden, Mode=TwoWay}" />
                         <MenuFlyoutItem Command="{StaticResource RefreshCommand}" />
                         <MenuFlyoutSeparator/>
@@ -146,15 +148,16 @@
             </AppBarButton>
 
             <TextBlock x:Name="TitleBarTextBlock"
-                       Text="App title" 
+                       Text="File Commander" 
                        Style="{StaticResource CaptionTextBlockStyle}"
+                       FontSize="14"
                        Grid.Column="3"
                        VerticalAlignment="Center">
             </TextBlock>
         </Grid>
 
         <controls:DockPanel Grid.Row="1">
-            <InfoBar x:Name="MessageBar" controls:DockPanel.Dock="Top" IsOpen="False" IsClosable="True" Margin="8" />
+            <InfoBar x:Name="MessageBar" controls:DockPanel.Dock="Top" IsOpen="False" IsClosable="True" />
             <Border controls:DockPanel.Dock="Bottom" BorderThickness="1" BorderBrush="LightGray" 
                     Background="{Binding StatusBarTextActive, Converter={StaticResource InfoValueConverter}}">
                 <Grid>

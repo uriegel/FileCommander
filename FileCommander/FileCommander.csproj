@@ -31,6 +31,7 @@
 		<None Remove="Resources\QuestionMark.ico" />
 		<None Remove="Resources\Warning.ico" />
 		<None Remove="Resources\WindowsDrive.ico" />
+		<None Remove="Views\ConflictDialog.xaml" />
 		<None Remove="website\styles\tableview.css" />
 	</ItemGroup>
 
@@ -93,9 +94,6 @@
     </Page>
   </ItemGroup>
   <ItemGroup>
-    <Folder Include="Views\" />
-  </ItemGroup>
-  <ItemGroup>
     <Page Update="Controls\VirtualTable.xaml">
       <Generator>MSBuild:Compile</Generator>
     </Page>
@@ -143,6 +141,12 @@
 		<EmbeddedResource Include="website/virtualtable/*.js">
 			<LogicalName>$([System.String]::new('%(RelativeDir)').SubString(8).Replace('\','/'))%(FileName)%(Extension)</LogicalName>
 		</EmbeddedResource>
+	</ItemGroup>
+
+	<ItemGroup>
+	  <Page Update="Views\ConflictDialog.xaml">
+	    <Generator>MSBuild:Compile</Generator>
+	  </Page>
 	</ItemGroup>
 
 	<ItemGroup>

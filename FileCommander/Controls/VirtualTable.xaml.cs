@@ -5,6 +5,7 @@ using FileCommander.Contexts;
 using FileCommander.Controllers;
 using FileCommander.Data;
 using FileCommander.Icon;
+using FileCommander.Views;
 
 using Microsoft.UI.Xaml;
 using Microsoft.UI.Xaml.Controls;
