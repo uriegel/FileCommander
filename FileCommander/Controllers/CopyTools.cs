@@ -5,6 +5,8 @@ using System.Collections.Generic;
 using System.Diagnostics;
 using System.Linq;
 
+using WinUITools.ItemsRepeaterExtensions;
+
 namespace FileCommander.Controllers;
 
 static class CopyTools
@@ -27,12 +29,22 @@ static class CopyTools
     
 }
 
-record ConflictItem(
-    string Name, 
-    string? Path, 
-    DateTime SourceDate, 
-    DateTime TargetDate, 
-    long SourceSize, 
-    long TargetSize,
-    FileVersionInfo? SourceVersion,
-    FileVersionInfo? TargetVersion);
+class ConflictItem(
+    string name,
+    string? path, 
+    DateTime sourceDate, 
+    DateTime targetDate, 
+    long sourceSize, 
+    long targetSize,
+    FileVersionInfo? sourceVersion,
+    FileVersionInfo? targetVersion) : ColumnViewItem 
+{
+    public string Name { get => name;  }
+    public string? Path { get => path; }
+    public DateTime SourceDate { get => sourceDate; }
+    public DateTime TargetDate { get => targetDate; }
+    public long SourceSize { get => sourceSize; }
+    public long TargetSize { get => targetSize; }
+    public FileVersionInfo? SourceVersion { get => sourceVersion; }
+    public FileVersionInfo? TargetVersion { get => targetVersion; } 
+}
