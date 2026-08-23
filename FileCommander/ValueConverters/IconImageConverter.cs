@@ -10,10 +10,8 @@ using Microsoft.UI.Xaml.Media.Imaging;
 
 using System;
 using System.Collections.Concurrent;
-using System.Drawing;
 using System.Drawing.Imaging;
 using System.IO;
-using System.Runtime.InteropServices;
 using System.Threading.Tasks;
 
 namespace FileCommander.ValueConverters;
@@ -21,19 +19,10 @@ namespace FileCommander.ValueConverters;
 public class IconImageConverter : IValueConverter
 {
     public object? Convert(object value, Type targetType, object parameter, string language)
-    {
-        if (value is ConflictItem conflict)
-        {
-            var ext = conflict.Name.GetFileExtension();
-            var iconIndex = ext?.EndsWith(".exe", StringComparison.InvariantCultureIgnoreCase) == true
-                ? conflict.Path.AppendPath(conflict.Name)
-                : ext;
-            return ShellIconCache.GetIcon(iconIndex);
-        }
-        else
-            return null;
-    }
-    
+        => (value is ConflictItem conflict)
+            ? ShellIconCache.GetIcon(conflict.IconIndex)
+            : null;
+  
     public object ConvertBack(object value, Type targetType, object parameter, string language) => throw new NotImplementedException();
 }
 

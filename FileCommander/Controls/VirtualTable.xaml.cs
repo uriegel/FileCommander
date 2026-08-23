@@ -25,8 +25,12 @@ using Windows.Storage;
 
 namespace FileCommander.Controls;
 
-// TODO Copy: check conflicts
-// TODO Copy: conflicts: show Conflict Dialog
+// TODO Conflict Dialog: Date, size and version
+// TODO Conflict Dialog: green and red flags, control default button and action
+// TODO Copy: use conflict result
+// TODO Conflict Dialog: dialogs
+
+// TODO Adapt path
 
 // TODO Viewers
 // TODO Home folder (later Favorites, Remotes)

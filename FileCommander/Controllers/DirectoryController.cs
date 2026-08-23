@@ -225,7 +225,7 @@ class DirectoryController : Controller
         };
 
         var targets = otherSide.Controller.GetViewItems();
-        var conflicts = CopyTools.GetConflicts(viewItems, targets);
+        var conflicts = CopyTools.GetConflicts(viewItems, targets, Context.CurrentPath);
         if (conflicts.Any())
         {
             var conflictResult = await ConflictDialog.ShowAsync([.. conflicts], titleAction.CapitalizeFirst(), fromRight);

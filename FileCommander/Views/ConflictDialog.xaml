@@ -28,7 +28,7 @@
                             <ColumnDefinition Width="Auto" />
                             <ColumnDefinition Width="*" />
                         </Grid.ColumnDefinitions>
-                        <Image VerticalAlignment="Top" Source="{Binding Converter={StaticResource IconImageConverter}}" Width="32" Height="32" Margin="0,0,5,0"/>
+                        <Image VerticalAlignment="Top" Source="{Binding Converter={StaticResource IconImageConverter}}" Width="32" Height="32" Margin="0,0,15,0"/>
                         <TextBlock Grid.Column="1" Text="{Binding Name}" TextTrimming="CharacterEllipsis"/>
                     </Grid>
                     <StackPanel Grid.Column="1" Padding="5, 0">

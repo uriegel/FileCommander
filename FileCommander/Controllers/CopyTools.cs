@@ -11,7 +11,7 @@ namespace FileCommander.Controllers;
 
 static class CopyTools
 {
-    public static IEnumerable<ConflictItem> GetConflicts(ItemBase[] source, ItemBase[] target)
+    public static IEnumerable<ConflictItem> GetConflicts(ItemBase[] source, ItemBase[] target, string path)
     {
         var sourceFiles = source.OfType<FileItem>();
         var targetFiles = target.OfType<FileItem>();
@@ -22,16 +22,23 @@ static class CopyTools
         {
             if (!targetDictionary.TryGetValue(item.Name, out var target))
                 return null;
-            return new ConflictItem(item.Name, null, item.DateTime, target.DateTime, item.Size, target.Size, item.Version, target.Version);
+            var iconIndex = GetIconIndex(item.Name, path);
+            return new ConflictItem(item.Name, iconIndex, item.DateTime, target.DateTime, item.Size, target.Size, item.Version, target.Version);
         }
     }
 
-    
+    static string? GetIconIndex(string name, string path)
+    {
+        var ext = name.GetFileExtension();
+        return ext?.EndsWith(".exe", StringComparison.InvariantCultureIgnoreCase) == true
+            ? path.AppendPath(name)
+            : ext;
+    }
 }
 
 class ConflictItem(
     string name,
-    string? path, 
+    string? iconIndex, 
     DateTime sourceDate, 
     DateTime targetDate, 
     long sourceSize, 
@@ -40,7 +47,7 @@ class ConflictItem(
     FileVersionInfo? targetVersion) : ColumnViewItem 
 {
     public string Name { get => name;  }
-    public string? Path { get => path; }
+    public string? IconIndex { get => iconIndex; }
     public DateTime SourceDate { get => sourceDate; }
     public DateTime TargetDate { get => targetDate; }
     public long SourceSize { get => sourceSize; }

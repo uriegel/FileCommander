@@ -64,13 +64,7 @@ public sealed partial class ConflictDialog : Window
     async static Task ResolveIcons(ConflictItem[] conflicts)
     {
         foreach (var item in conflicts)
-        {
-            var ext = item.Name.GetFileExtension();
-            var iconIndex = ext?.EndsWith(".exe", StringComparison.InvariantCultureIgnoreCase) == true
-                ? item.Path.AppendPath(item.Name)
-                : ext;
-            await ShellIconCache.GetAsync(iconIndex);
-        }
+            await ShellIconCache.GetAsync(item.IconIndex);
     }
 
     void Grid_KeyDown(object sender, KeyRoutedEventArgs e)
