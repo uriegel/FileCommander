@@ -36,13 +36,15 @@ public sealed partial class ConflictDialog : Window
     public ConflictDialog()
     {
         InitializeComponent();
+
         navigation = new Navigation(ListView, Scroller);
         AppWindow.Resize(new SizeInt32(1000, 800));
 
         Headers.SetColumns([
             new TextColumnViewHeader("Name"),
             new TextColumnViewHeader("Datum"),
-            new TextColumnViewHeader("Größe")
+            new TextColumnViewHeader("Größe"),
+            new TextColumnViewHeader("Version")
         ]);
 
         bool no = Items.Any(n => n.SourceDate > n.TargetDate);
@@ -59,6 +61,14 @@ public sealed partial class ConflictDialog : Window
 
         foreach (var item in conflicts)
             Items.Add(item);
+
+        Focus();
+
+        async void Focus()
+        {
+            await Task.Delay(100);
+            ListView.Focus(FocusState.Programmatic);
+        }
     }
 
     async static Task ResolveIcons(ConflictItem[] conflicts)
