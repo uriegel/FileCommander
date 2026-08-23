@@ -241,7 +241,7 @@ class DirectoryController : Controller
             }))
                 return false;
         }
-
+        return false;
         bool noConfirmation = false;
         var path = Context.CurrentPath;
         var otherPath = otherSide.Context.CurrentPath;

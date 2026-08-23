@@ -24,7 +24,6 @@ using Windows.Storage;
 
 namespace FileCommander.Controls;
 
-// TODO Conflict Dialog: control default button and action
 // TODO Copy: use conflict result
 // TODO Conflict Dialog: dialogs
 

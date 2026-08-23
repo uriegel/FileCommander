@@ -92,8 +92,8 @@
                 <ColumnDefinition Width="*" />
             </Grid.ColumnDefinitions>
             <Grid.Children>
-                <Button Name ="Yes" Content="Ja" HorizontalAlignment="Stretch" Margin="5" />
-                <Button Name="No" Grid.Column="1" Content="Nein" HorizontalAlignment="Stretch" Margin="5" />
+                <Button Name ="Yes" Content="Ja" HorizontalAlignment="Stretch" Margin="5" Click="Yes_Click" />
+                <Button Name="No" Grid.Column="1" Content="Nein" HorizontalAlignment="Stretch" Margin="5" Click="No_Click" />
             </Grid.Children>
         </Grid>
     </Grid>

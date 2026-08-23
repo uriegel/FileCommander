@@ -57,6 +57,7 @@ public sealed partial class ConflictDialog : Window
     internal ConflictDialog(ConflictItem[] conflicts, string description, bool fromRight, bool no) 
         : this()
     {
+        this.no = no;
         FromRight = fromRight;
         Description.Text = description;
         var btn = no ? No : Yes;
@@ -84,11 +85,29 @@ public sealed partial class ConflictDialog : Window
     {
         if (e.Key == VirtualKey.Escape)
             Close();
+        else if (e.Key == VirtualKey.Enter)
+        {
+            result = no ? ConflictDialogResult.DoNotOverwrite : ConflictDialogResult.Overwrite;
+            Close();
+        }
+    }
+
+    void Yes_Click(object sender, RoutedEventArgs e)
+    {
+        result = ConflictDialogResult.Overwrite;
+        Close();
+    }
+
+    void No_Click(object sender, RoutedEventArgs e)
+    {
+        result = ConflictDialogResult.DoNotOverwrite;
+        Close();
     }
 
     void Dialog_Closed(object sender, WindowEventArgs args) => completion.TrySetResult(result);
 
     ConflictDialogResult result = ConflictDialogResult.Canceled;
+    readonly bool no;
     readonly TaskCompletionSource<ConflictDialogResult> completion = new();
     readonly Navigation navigation;
 }
