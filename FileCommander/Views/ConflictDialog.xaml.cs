@@ -63,7 +63,7 @@ public sealed partial class ConflictDialog : Window
             Close();
     }
 
-    void root_Closed(object sender, WindowEventArgs args) => completion.TrySetResult(result);
+    void Dialog_Closed(object sender, WindowEventArgs args) => completion.TrySetResult(result);
 
     ConflictDialogResult result = ConflictDialogResult.Canceled;
     readonly TaskCompletionSource<ConflictDialogResult> completion = new();

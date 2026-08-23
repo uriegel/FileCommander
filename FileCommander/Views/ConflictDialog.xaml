@@ -7,7 +7,7 @@
     xmlns:local="using:FileCommander.Views"
     xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
     xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
-    mc:Ignorable="d" x:Name="root" Title="Konflikte" Closed="root_Closed">
+    mc:Ignorable="d" x:Name="Dialog" Title="Konflikte" Closed="Dialog_Closed">
 
     <Window.SystemBackdrop>
         <DesktopAcrylicBackdrop />
@@ -41,7 +41,7 @@
         </Grid.RowDefinitions>
 
         <StackPanel Grid.Row="0" Spacing="12" Margin="0,24">
-            <ProgressBar Height="4" IsIndeterminate="True" FlowDirection="{Binding ElementName=root, Path=FromRight, Converter={ StaticResource FromRightConverter}}"/>
+            <ProgressBar Height="4" IsIndeterminate="True" FlowDirection="{Binding ElementName=Dialog, Path=FromRight, Converter={ StaticResource FromRightConverter}}"/>
             <TextBlock Name="Description" FontSize="24" FontWeight="SemiBold" TextWrapping="Wrap"/>
         </StackPanel>
 
