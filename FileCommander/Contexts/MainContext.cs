@@ -19,6 +19,7 @@ class MainContext : INotifyPropertyChanged
     public ICommand CreateFolderCommand { get; set; } = null!;
     public ICommand RenameCommand { get; set; } = null!;
     public ICommand RenameAsCopyCommand { get; set; } = null!;
+    public ICommand AdaptPathCommand { get; set; } = null!;
     
     public bool ShowHidden
     {

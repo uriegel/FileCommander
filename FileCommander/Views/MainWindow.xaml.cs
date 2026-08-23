@@ -40,7 +40,7 @@ public sealed partial class MainWindow : Window
             if ((bool)settings["WindowMaximized"])
                 ((OverlappedPresenter)AppWindow.Presenter).Maximize();
         }
-        
+
         MainGrid.DataContext = MainContext.Instance;
         MainContext.Instance.ShowHiddenCommand = ShowHiddenCommand;
         MainContext.Instance.RefreshCommand = RefreshCommand;
@@ -52,6 +52,7 @@ public sealed partial class MainWindow : Window
         MainContext.Instance.CreateFolderCommand = CreateFolderCommand;
         MainContext.Instance.RenameCommand = RenameCommand;
         MainContext.Instance.RenameAsCopyCommand = RenameAsCopyCommand;
+        MainContext.Instance.AdaptPathCommand = AdaptPathCommand;
 
         // Assumes "this" is a XAML Window. In projects that don't use 
         // WinUI 1.3 or later, use interop APIs to get the AppWindow.
@@ -109,7 +110,7 @@ public sealed partial class MainWindow : Window
             SetRegionsForCustomTitleBar();
         }
     }
-    
+
     void AppTitleBar_SizeChanged(object sender, SizeChangedEventArgs e)
     {
         if (ExtendsContentIntoTitleBar == true)
@@ -162,7 +163,7 @@ public sealed partial class MainWindow : Window
                     break;
             }
         }
-        }
+    }
 
     void LeftView_GotFocus(object sender, RoutedEventArgs e)
     {
@@ -209,6 +210,8 @@ public sealed partial class MainWindow : Window
         => activeView?.Copy();
     void MoveCommand_ExecuteRequested(XamlUICommand sender, ExecuteRequestedEventArgs args)
         => activeView?.Move();
+    void AdaptPathCommand_ExecuteRequested(XamlUICommand sender, ExecuteRequestedEventArgs args)
+        => activeView?.AdaptPath();
 
     FolderView GetOtherView() => activeView == LeftView ? RightView : LeftView;
 
@@ -234,11 +237,11 @@ public sealed partial class MainWindow : Window
     bool IsWindowVisible()
     {
         var rect = new Rect()
-        { 
-            Left = AppWindow.Position.X, 
-            Top = AppWindow.Position.Y, 
-            Right= AppWindow.Position.X + AppWindow.Size.Width, 
-            Bottom = AppWindow.Position.Y + AppWindow.Size.Height 
+        {
+            Left = AppWindow.Position.X,
+            Top = AppWindow.Position.Y,
+            Right = AppWindow.Position.X + AppWindow.Size.Width,
+            Bottom = AppWindow.Position.Y + AppWindow.Size.Height
         };
         return Api.MonitorFromRect(ref rect, MonitorDefaultTo.Null) != 0;
     }

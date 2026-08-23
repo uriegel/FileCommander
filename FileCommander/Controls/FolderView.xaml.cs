@@ -39,6 +39,8 @@ public sealed partial class FolderView : UserControl
                 OnTab?.Invoke();
         };
         VirtualTable.OnOtherVirtualTable += () => new(MainWindow.GetOtherView(this).VirtualTable, MainWindow.IsRightView(this));
+        VirtualTable.OnAdaptPath += path => MainWindow.GetOtherView(this).VirtualTable
+              .SendEvent(new Data.Event(ChangePath: new ChangePath(path)));
     }
 
     public void Refresh() => VirtualTable.Refresh();
@@ -53,7 +55,8 @@ public sealed partial class FolderView : UserControl
     public void RenameAsCopy() => VirtualTable.RenameAsCopy();
     public void Copy() => VirtualTable.Copy();
     public void Move() => VirtualTable.Move();
-
+    public void AdaptPath() => VirtualTable.AdaptPath();
+    
     void UserControl_Loaded(object _, RoutedEventArgs e)
     {
         Context = new FolderContext(Id);

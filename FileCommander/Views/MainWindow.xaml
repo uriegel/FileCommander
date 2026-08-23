@@ -93,6 +93,12 @@
                         <KeyboardAccelerator Key="F6" />
                     </XamlUICommand.KeyboardAccelerators>
                 </XamlUICommand>
+                <XamlUICommand x:Name="AdaptPathCommand" Label="Gleichen Ordner öffnen" Description="Gleichen Ordner öffnen" 
+                               ExecuteRequested="AdaptPathCommand_ExecuteRequested">
+                    <XamlUICommand.KeyboardAccelerators>
+                        <KeyboardAccelerator Key="F9" />
+                    </XamlUICommand.KeyboardAccelerators>
+                </XamlUICommand>
                 <converters:InfoValueConverter x:Key="InfoValueConverter" />
             </ResourceDictionary>
         </Grid.Resources>
@@ -133,6 +139,9 @@
                             <MenuFlyoutItem Command="{StaticResource DeleteCommand}" />
                             <MenuFlyoutSeparator/>
                             <MenuFlyoutItem Command="{StaticResource CreateFolderCommand}" />
+                        </MenuFlyoutSubItem>
+                        <MenuFlyoutSubItem Text="Navigation">
+                            <MenuFlyoutItem Command="{StaticResource AdaptPathCommand}" />
                         </MenuFlyoutSubItem>
                         <MenuFlyoutSubItem Text="Selektion">
                             <MenuFlyoutItem Command="{StaticResource ToggleSelectionCommand}" />

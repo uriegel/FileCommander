@@ -14,7 +14,8 @@ record Event(
     Rename? Rename = null,
     RenameAsCopy? RenameAsCopy = null,
     Copy? Copy = null,
-    Move? Move = null
+    Move? Move = null,
+    AdaptPath? AdaptPath = null
 );
 
 record Refresh();
@@ -31,3 +32,4 @@ record Rename();
 record RenameAsCopy();
 record Copy();
 record Move();
+record AdaptPath();

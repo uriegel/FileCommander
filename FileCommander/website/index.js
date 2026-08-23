@@ -116,6 +116,11 @@ async function onKeyDown(evt) {
         evt.stopPropagation()
         copy(true)
     }
+    else if (evt.key == "F9") {
+        evt.preventDefault();
+        evt.stopPropagation()
+        adaptPath()
+    }
     else if (evt.key == "Escape") 
         stopRestriction()
     else if (evt.key == "Backspace") {
@@ -261,6 +266,8 @@ async function onEvent(evt) {
         copy(false)
     if (evt.move)
         copy(true)
+    if (evt.adaptPath)
+        adaptPath()
 }
 
 async function init() {
@@ -431,6 +438,10 @@ async function copy(move) {
         })
     })
     await response.json()
+}
+
+async function adaptPath() {
+    const res = await fetch("request/adaptpath")
 }
 
 async function rename(asCopy) {

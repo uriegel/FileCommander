@@ -5,7 +5,6 @@ using FileCommander.Contexts;
 using FileCommander.Controllers;
 using FileCommander.Data;
 using FileCommander.Icon;
-using FileCommander.Views;
 
 using Microsoft.UI.Xaml;
 using Microsoft.UI.Xaml.Controls;
@@ -29,8 +28,6 @@ namespace FileCommander.Controls;
 // TODO Copy: use conflict result
 // TODO Conflict Dialog: dialogs
 
-// TODO Adapt path
-
 // TODO Viewers
 // TODO Home folder (later Favorites, Remotes)
 
@@ -42,6 +39,7 @@ public sealed partial class VirtualTable : UserControl
 {
     public event Action<bool>? OnTab;
     internal event Func<OtherSide>? OnOtherVirtualTable;
+    public event Action<string>? OnAdaptPath;
 
     internal Controller Controller { get; private set; } = null!;
     internal FolderContext Context { get; private set; } = null!;
@@ -59,7 +57,8 @@ public sealed partial class VirtualTable : UserControl
     public async void RenameAsCopy() => SendEvent(new(RenameAsCopy: new()));
     public async void Copy() => SendEvent(new(Copy: new()));
     public async void Move() => SendEvent(new(Move: new()));
-
+    public async void AdaptPath() => SendEvent(new(AdaptPath: new()));
+    
     public void SetContext(FolderContext context)
     {
         this.Context = context;
@@ -267,6 +266,12 @@ public sealed partial class VirtualTable : UserControl
                     deferral.Complete();
                 }
                 break;
+            }
+            case "adaptpath":
+            {
+                OnAdaptPath?.Invoke(Context.CurrentPath);
+                SendResult(args, new ProcessResult());
+                break;    
             }
             default:
             {
