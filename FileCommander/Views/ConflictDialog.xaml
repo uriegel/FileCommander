@@ -32,17 +32,23 @@
                         <Image VerticalAlignment="Top" Source="{Binding Converter={StaticResource IconImageConverter}}" Width="32" Height="32" Margin="0,0,15,0"/>
                         <TextBlock Grid.Column="1" Text="{Binding Name}" TextTrimming="CharacterEllipsis"/>
                     </Grid>
-                    <StackPanel Grid.Column="1" Padding="5, 0">
+                    <StackPanel Grid.Column="1" Padding="5, 0" Background="{Binding Converter={StaticResource DateTimeConflictConverter}}">
                         <TextBlock Text="{Binding SourceDate, Converter={StaticResource DateTimeConverter}}" TextTrimming="CharacterEllipsis"/>
                         <TextBlock Text="{Binding TargetDate, Converter={StaticResource DateTimeConverter}}" TextTrimming="CharacterEllipsis"/>
                     </StackPanel>
                     <StackPanel Grid.Column="2" Padding="5, 0">
-                        <TextBlock Text="{Binding SourceSize, Converter={StaticResource SizeConverter}}" TextTrimming="CharacterEllipsis" HorizontalAlignment="Right"/>
-                        <TextBlock Text="{Binding TargetSize, Converter={StaticResource SizeConverter}}" TextTrimming="CharacterEllipsis" HorizontalAlignment="Right"/>
+                        <TextBlock Text="{Binding SourceSize, Converter={StaticResource SizeConverter}}" 
+                                   TextTrimming="CharacterEllipsis" HorizontalAlignment="Right" 
+                                   Opacity="{Binding Converter={StaticResource SizeConflictConverter}}"/>
+                        <TextBlock Text="{Binding TargetSize, Converter={StaticResource SizeConverter}}" 
+                                   TextTrimming="CharacterEllipsis" HorizontalAlignment="Right"
+                                   Opacity="{Binding Converter={StaticResource SizeConflictConverter}}"/>
                     </StackPanel>
-                    <StackPanel Grid.Column="3" Padding="5, 0">
-                        <TextBlock Text="{Binding SourceVersion, Converter={StaticResource VersionConverter}}" TextTrimming="CharacterEllipsis" />
-                        <TextBlock Text="{Binding TargetVersion, Converter={StaticResource VersionConverter}}" TextTrimming="CharacterEllipsis" />
+                    <StackPanel Grid.Column="3" Padding="5, 0" Background="{Binding Converter={StaticResource VersionConflictConverter}}">
+                        <TextBlock Text="{Binding SourceVersion, Converter={StaticResource VersionConverter}}" 
+                                   TextTrimming="CharacterEllipsis" />
+                        <TextBlock Text="{Binding TargetVersion, Converter={StaticResource VersionConverter}}" 
+                                   TextTrimming="CharacterEllipsis" />
                     </StackPanel>
                 </cvh:ColumnViewItemGrid>
             </DataTemplate>
@@ -50,6 +56,9 @@
             <converters:DateTimeConverter x:Key="DateTimeConverter" />
             <converters:SizeConverter x:Key="SizeConverter" />
             <converters:VersionConverter x:Key="VersionConverter" />
+            <converters:DateTimeConflictConverter x:Key="DateTimeConflictConverter" />
+            <converters:VersionConflictConverter x:Key="VersionConflictConverter" />
+            <converters:SizeConflictConverter x:Key="SizeConflictConverter" />
         </Grid.Resources>        
         <Grid.RowDefinitions>
             <RowDefinition Height="Auto"/>

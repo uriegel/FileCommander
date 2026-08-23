@@ -42,6 +42,17 @@ class ItemsComparer(int sortIndex, bool subColumn, bool descending) : IComparer<
         return descending ? -result : result;
     }
 
+    public static int CompareVersion(FileVersionInfo? x, FileVersionInfo? y)
+    {
+        return (x != null && y != null)
+            ? InternalCompareVersion(x, y)
+            : x == null && y == null
+            ? 0
+            : y == null
+            ? 1
+            : -1;
+    }
+
     static int CompareDate(ItemBase x, ItemBase y)
     {
         DateTime dx = x switch
@@ -74,7 +85,7 @@ class ItemsComparer(int sortIndex, bool subColumn, bool descending) : IComparer<
         var sx = x is FileItem f1 ? f1.Version : null;
         var sy = y is FileItem f2 ? f2.Version : null;
         return (sx != null && sy != null)
-            ? CompareVersion(sx, sy)
+            ? InternalCompareVersion(sx, sy)
             : sx == null && sy == null
             ? 0
             : sy == null
@@ -82,7 +93,7 @@ class ItemsComparer(int sortIndex, bool subColumn, bool descending) : IComparer<
             : -1;
     }
 
-    static int CompareVersion(FileVersionInfo x, FileVersionInfo y)
+    static int InternalCompareVersion(FileVersionInfo x, FileVersionInfo y)
         => x.FileMajorPart != y.FileMajorPart
             ? x.FileMajorPart - y.FileMajorPart
             : x.FileMinorPart != y.FileMinorPart

@@ -54,6 +54,6 @@ static class ItemExtensions
     }
 
     public static string Format(this FileVersionInfo version)
-        => $"{version.ProductMajorPart}.{version.ProductMinorPart}.{version.ProductBuildPart}.{version.ProductPrivatePart}";
+        => $"{version.FileMajorPart}.{version.FileMinorPart}.{version.FileBuildPart}.{version.FilePrivatePart}";
 }
 

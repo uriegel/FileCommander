@@ -24,7 +24,10 @@ public sealed partial class ConflictDialog : Window
     internal static async Task<ConflictDialogResult> ShowAsync(ConflictItem[] conflicts, string action, bool fromRight) 
     {
         await ResolveIcons(conflicts);
-        var window = new ConflictDialog(conflicts, $"Überschreiben beim {action}", fromRight);
+
+
+        bool no = conflicts.Any(n => n.SourceDate < n.TargetDate || ItemsComparer.CompareVersion(n.SourceVersion, n.TargetVersion) > 0);
+        var window = new ConflictDialog(conflicts, $"Überschreiben beim {action}", fromRight, no);
         window.Activate();
         return await window.completion.Task;
     }
@@ -49,15 +52,15 @@ public sealed partial class ConflictDialog : Window
 
         bool no = Items.Any(n => n.SourceDate > n.TargetDate);
         ListView.ItemsSource = Items;
-        var btn = no ? No : Yes;
-        btn.Style = (Style)Application.Current.Resources["AccentButtonStyle"];
     }
 
-    internal ConflictDialog(ConflictItem[] conflicts, string description, bool fromRight) 
+    internal ConflictDialog(ConflictItem[] conflicts, string description, bool fromRight, bool no) 
         : this()
     {
         FromRight = fromRight;
         Description.Text = description;
+        var btn = no ? No : Yes;
+        btn.Style = (Style)Application.Current.Resources["AccentButtonStyle"];
 
         foreach (var item in conflicts)
             Items.Add(item);
