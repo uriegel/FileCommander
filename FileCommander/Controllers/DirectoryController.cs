@@ -228,7 +228,7 @@ class DirectoryController : Controller
         var conflicts = CopyTools.GetConflicts(viewItems, targets);
         if (conflicts.Any())
         {
-            var conflictResult = await ConflictDialog.ShowAsync(conflicts, titleAction.CapitalizeFirst(), fromRight);
+            var conflictResult = await ConflictDialog.ShowAsync([.. conflicts], titleAction.CapitalizeFirst(), fromRight);
             if (conflictResult == ConflictDialogResult.Canceled)
                 return false;
         } 

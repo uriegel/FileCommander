@@ -1,9 +1,12 @@
+using CsTools.Extensions;
+
 using FileCommander.Controllers;
+using FileCommander.ValueConverters;
 
 using Microsoft.UI.Xaml;
 using Microsoft.UI.Xaml.Input;
 
-using System.Collections.Generic;
+using System;
 using System.Collections.ObjectModel;
 using System.Linq;
 using System.Threading.Tasks;
@@ -18,11 +21,12 @@ namespace FileCommander.Views;
 
 public sealed partial class ConflictDialog : Window
 {
-    internal static Task<ConflictDialogResult> ShowAsync(IEnumerable<ConflictItem> conflicts, string action, bool fromRight) 
+    internal static async Task<ConflictDialogResult> ShowAsync(ConflictItem[] conflicts, string action, bool fromRight) 
     {
+        await ResolveIcons(conflicts);
         var window = new ConflictDialog(conflicts, $"Überschreiben beim {action}", fromRight);
         window.Activate();
-        return window.completion.Task;
+        return await window.completion.Task;
     }
 
     public bool FromRight { get; }
@@ -34,7 +38,7 @@ public sealed partial class ConflictDialog : Window
         InitializeComponent();
         navigation = new Navigation(ListView, Scroller);
         AppWindow.Resize(new SizeInt32(1000, 800));
-        
+
         Headers.SetColumns([
             new TextColumnViewHeader("Name"),
             new TextColumnViewHeader("Datum"),
@@ -47,7 +51,7 @@ public sealed partial class ConflictDialog : Window
         btn.Style = (Style)Application.Current.Resources["AccentButtonStyle"];
     }
 
-    internal ConflictDialog(IEnumerable<ConflictItem> conflicts, string description, bool fromRight) 
+    internal ConflictDialog(ConflictItem[] conflicts, string description, bool fromRight) 
         : this()
     {
         FromRight = fromRight;
@@ -55,6 +59,18 @@ public sealed partial class ConflictDialog : Window
 
         foreach (var item in conflicts)
             Items.Add(item);
+    }
+
+    async static Task ResolveIcons(ConflictItem[] conflicts)
+    {
+        foreach (var item in conflicts)
+        {
+            var ext = item.Name.GetFileExtension();
+            var iconIndex = ext?.EndsWith(".exe", StringComparison.InvariantCultureIgnoreCase) == true
+                ? item.Path.AppendPath(item.Name)
+                : ext;
+            await ShellIconCache.GetAsync(iconIndex);
+        }
     }
 
     void Grid_KeyDown(object sender, KeyRoutedEventArgs e)

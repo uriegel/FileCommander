@@ -162,7 +162,7 @@ public sealed partial class MainWindow : Window
                     break;
             }
         }
-    }
+        }
 
     void LeftView_GotFocus(object sender, RoutedEventArgs e)
     {

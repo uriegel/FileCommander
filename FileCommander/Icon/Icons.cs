@@ -26,7 +26,7 @@ static class Icons
         return stream;
     }
 
-    static nint GetIconHandle(string pathOrExtension, int size)
+    public static nint GetIconHandle(string pathOrExtension, int size)
     {
         var info = new ShFileInfo();
         var result = Api.SHGetFileInfo(pathOrExtension, ClrWinApi.FileAttributes.Normal, ref info, Marshal.SizeOf<ShFileInfo>(),

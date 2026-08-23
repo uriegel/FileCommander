@@ -7,6 +7,7 @@
     xmlns:local="using:FileCommander.Views"
     xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
     xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+    xmlns:converters="using:FileCommander.ValueConverters"
     mc:Ignorable="d" x:Name="Dialog" Title="Konflikte" Closed="Dialog_Closed">
 
     <Window.SystemBackdrop>
@@ -16,13 +17,20 @@
     <Grid Padding="24" KeyDown="Grid_KeyDown">
         <Grid.Resources>
             <DataTemplate x:Key="ItemDataTemplate">
-                <cvh:ColumnViewItemGrid Margin="2, 0, 5, 0">
+                <cvh:ColumnViewItemGrid>
                     <Grid.ColumnDefinitions>
                         <ColumnDefinition Width="*" />
                         <ColumnDefinition Width="auto" />
                         <ColumnDefinition Width="auto" />
                     </Grid.ColumnDefinitions>
-                    <TextBlock Text="{Binding Name}" TextTrimming="CharacterEllipsis"/>
+                    <Grid Margin="2, 0, 5, 0"  >
+                        <Grid.ColumnDefinitions>
+                            <ColumnDefinition Width="Auto" />
+                            <ColumnDefinition Width="*" />
+                        </Grid.ColumnDefinitions>
+                        <Image VerticalAlignment="Top" Source="{Binding Converter={StaticResource IconImageConverter}}" Width="32" Height="32" Margin="0,0,5,0"/>
+                        <TextBlock Grid.Column="1" Text="{Binding Name}" TextTrimming="CharacterEllipsis"/>
+                    </Grid>
                     <StackPanel Grid.Column="1" Padding="5, 0">
                         <TextBlock Text="{Binding SourceDate}" TextTrimming="CharacterEllipsis"/>
                         <TextBlock Text="{Binding TargetDate}" TextTrimming="CharacterEllipsis"/>
@@ -33,6 +41,7 @@
                     </StackPanel>
                 </cvh:ColumnViewItemGrid>
             </DataTemplate>
+            <converters:IconImageConverter x:Key="IconImageConverter" />
         </Grid.Resources>        
         <Grid.RowDefinitions>
             <RowDefinition Height="Auto"/>
