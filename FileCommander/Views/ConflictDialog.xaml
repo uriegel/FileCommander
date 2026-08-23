@@ -22,14 +22,14 @@
                         <ColumnDefinition Width="auto" />
                         <ColumnDefinition Width="auto" />
                     </Grid.ColumnDefinitions>
-                    <TextBlock Grid.Column="0" Text="{Binding Name}" VerticalAlignment="Center" TextTrimming="CharacterEllipsis"/>
+                    <TextBlock Text="{Binding Name}" TextTrimming="CharacterEllipsis"/>
                     <StackPanel Grid.Column="1" Padding="5, 0">
-                        <TextBlock Text="{Binding SourceDate}" VerticalAlignment="Center" TextTrimming="CharacterEllipsis"/>
-                        <TextBlock Text="{Binding TargetDate}" VerticalAlignment="Center" TextTrimming="CharacterEllipsis"/>
+                        <TextBlock Text="{Binding SourceDate}" TextTrimming="CharacterEllipsis"/>
+                        <TextBlock Text="{Binding TargetDate}" TextTrimming="CharacterEllipsis"/>
                     </StackPanel>
-                    <StackPanel Grid.Column="2" Padding="5, 0">
-                        <TextBlock Text="{Binding SourceSize}" VerticalAlignment="Center" TextTrimming="CharacterEllipsis"/>
-                        <TextBlock Text="{Binding TargetSize}" VerticalAlignment="Center" TextTrimming="CharacterEllipsis"/>
+                    <StackPanel Grid.Column="2" Padding="5, 10">
+                        <TextBlock Text="{Binding SourceSize}" TextTrimming="CharacterEllipsis"/>
+                        <TextBlock Text="{Binding TargetSize}" TextTrimming="CharacterEllipsis"/>
                     </StackPanel>
                 </cvh:ColumnViewItemGrid>
             </DataTemplate>

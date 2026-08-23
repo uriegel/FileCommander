@@ -1,6 +1,7 @@
 using FileCommander.Controllers;
 
 using Microsoft.UI.Xaml;
+using Microsoft.UI.Xaml.Input;
 
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
@@ -14,8 +15,6 @@ using WinUITools.ItemsRepeaterExtensions;
 
 namespace FileCommander.Views;
 
-// TODO Fill list
-// TODO control AccentButton from conflicts and default action
 
 public sealed partial class ConflictDialog : Window
 {
@@ -33,6 +32,7 @@ public sealed partial class ConflictDialog : Window
     public ConflictDialog()
     {
         InitializeComponent();
+        navigation = new Navigation(ListView, Scroller);
         AppWindow.Resize(new SizeInt32(1000, 800));
         
         Headers.SetColumns([
@@ -57,7 +57,7 @@ public sealed partial class ConflictDialog : Window
             Items.Add(item);
     }
 
-    void Grid_KeyDown(object sender, Microsoft.UI.Xaml.Input.KeyRoutedEventArgs e)
+    void Grid_KeyDown(object sender, KeyRoutedEventArgs e)
     {
         if (e.Key == VirtualKey.Escape)
             Close();
@@ -67,6 +67,7 @@ public sealed partial class ConflictDialog : Window
 
     ConflictDialogResult result = ConflictDialogResult.Canceled;
     readonly TaskCompletionSource<ConflictDialogResult> completion = new();
+    readonly Navigation navigation;
 }
 
 enum ConflictDialogResult
