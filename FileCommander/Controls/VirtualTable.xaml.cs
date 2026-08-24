@@ -24,7 +24,7 @@ using Windows.Storage;
 
 namespace FileCommander.Controls;
 
-// TODO Conflict Dialog: Directories
+// TODO Conflict Dialog: FolderIcon 32x32
 // TODO after copy: refresh other view or get versions after file changed
 // TODO Home folder (later Favorites, Remotes)
 // TODO Connect remote drives

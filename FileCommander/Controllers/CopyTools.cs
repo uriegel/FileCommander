@@ -13,17 +13,30 @@ static class CopyTools
 {
     public static IEnumerable<ConflictItem> GetConflicts(ItemBase[] source, ItemBase[] target, string path)
     {
+        var sourceDirs = source.OfType<DirectoryItem>();
+        var targetDirs = target.OfType<DirectoryItem>();
         var sourceFiles = source.OfType<FileItem>();
         var targetFiles = target.OfType<FileItem>();
-        var targetDictionary = targetFiles.ToDictionary(n => n.Name);
-        return sourceFiles.SelectFilterNull(RetrieveConflict);
+        var targetDirsDictionary = targetDirs.ToDictionary(n => n.Name);
+        var targetFilesDictionary = targetFiles.ToDictionary(n => n.Name);
+        var conflictDirs = sourceDirs.SelectFilterNull(RetrieveDirConflict);
+        var conflictFiles = sourceFiles.SelectFilterNull(RetrieveFileConflict);
+        return [.. conflictDirs, .. conflictFiles];
 
-        ConflictItem? RetrieveConflict(FileItem item)
+        ConflictItem? RetrieveDirConflict(DirectoryItem item)
         {
-            if (!targetDictionary.TryGetValue(item.Name, out var target))
+            if (!targetDirsDictionary.TryGetValue(item.Name, out var target))
                 return null;
             var iconIndex = GetIconIndex(item.Name, path);
-            return new ConflictItem(item.Name, iconIndex, item.DateTime, target.DateTime, item.Size, target.Size, item.Version, target.Version);
+            return new ConflictItem(item.Name, iconIndex, item.DateTime, target.DateTime, default, default, null, null, true);
+        }
+
+        ConflictItem? RetrieveFileConflict(FileItem item)
+        {
+            if (!targetFilesDictionary.TryGetValue(item.Name, out var target))
+                return null;
+            var iconIndex = GetIconIndex(item.Name, path);
+            return new ConflictItem(item.Name, iconIndex, item.DateTime, target.DateTime, item.Size, target.Size, item.Version, target.Version, false);
         }
     }
 
@@ -44,9 +57,12 @@ class ConflictItem(
     long sourceSize, 
     long targetSize,
     FileVersionInfo? sourceVersion,
-    FileVersionInfo? targetVersion) : ColumnViewItem 
+    FileVersionInfo? targetVersion,
+    bool isDirectory) : ColumnViewItem 
 {
     public string Name { get => name;  }
+
+    public bool IsDirectory {  get => isDirectory; }
     public string? IconIndex { get => iconIndex; }
     public DateTime SourceDate { get => sourceDate; }
     public DateTime TargetDate { get => targetDate; }

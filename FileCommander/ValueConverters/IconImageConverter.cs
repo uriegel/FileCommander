@@ -1,6 +1,6 @@
 ﻿using ClrWinApi;
 
-using CsTools.Extensions;
+using CsTools;
 
 using FileCommander.Controllers;
 using FileCommander.Icon;
@@ -20,7 +20,9 @@ public class IconImageConverter : IValueConverter
 {
     public object? Convert(object value, Type targetType, object parameter, string language)
         => (value is ConflictItem conflict)
-            ? ShellIconCache.GetIcon(conflict.IconIndex)
+            ? conflict.IsDirectory 
+            ? new BitmapImage(new Uri("ms-appx:///Assets/Folder.png"))
+            : ShellIconCache.GetIcon(conflict.IconIndex)
             : null;
   
     public object ConvertBack(object value, Type targetType, object parameter, string language) => throw new NotImplementedException();

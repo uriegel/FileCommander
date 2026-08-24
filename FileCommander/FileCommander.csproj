@@ -145,6 +145,12 @@
 	</ItemGroup>
 
 	<ItemGroup>
+	  <Content Update="Assets\Folder.png">
+	    <LogicalName>Folder</LogicalName>
+	  </Content>
+	</ItemGroup>
+
+	<ItemGroup>
 	  <Page Update="Views\ConflictDialog.xaml">
 	    <Generator>MSBuild:Compile</Generator>
 	  </Page>
