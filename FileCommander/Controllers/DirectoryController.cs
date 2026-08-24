@@ -225,12 +225,17 @@ class DirectoryController : Controller
         };
 
         var targets = otherSide.Controller.GetViewItems();
-        var conflicts = CopyTools.GetConflicts(itemsToCopy, targets, Context.CurrentPath);
-        if (conflicts.Any())
+        var conflicts = CopyTools.GetConflicts(itemsToCopy, targets, Context.CurrentPath).ToArray();
+        bool noConfirmation = false;
+        if (conflicts.Length > 0)
         {
             var conflictResult = await ConflictDialog.ShowAsync([.. conflicts], titleAction.CapitalizeFirst(), fromRight);
             if (conflictResult == ConflictDialogResult.Canceled)
                 return false;
+            if (conflictResult == ConflictDialogResult.DoNotOverwrite)
+                itemsToCopy = ExceptConflicts(itemsToCopy, conflicts);
+            else 
+                noConfirmation = true;
         } 
         else
         {
@@ -241,8 +246,7 @@ class DirectoryController : Controller
             }))
                 return false;
         }
-        return false;
-        bool noConfirmation = false;
+
         var path = Context.CurrentPath;
         var otherPath = otherSide.Context.CurrentPath;
 
@@ -254,6 +258,17 @@ class DirectoryController : Controller
             Flags = (noConfirmation ? FileOpFlags.NOCONFIRMATION : FileOpFlags.NOCONFIRMMKDIR) | FileOpFlags.NOCONFIRMMKDIR | FileOpFlags.MULTIDESTFILES,
         });
         return ProcessResult(res);
+
+        ItemBase[] ExceptConflicts(ItemBase[] items, ConflictItem[] conflicts)
+        {
+            var conflictNames = conflicts
+                .Select(c => c.Name)
+                .ToHashSet();
+            return itemsToCopy = [
+                .. items
+                    .Where(n => !conflictNames.Contains(n.Name))
+            ];
+        }
     }
 
     public override async Task<bool> Rename(UIElement content, int pos, bool asCopy)
