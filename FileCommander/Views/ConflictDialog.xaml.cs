@@ -26,7 +26,7 @@ public sealed partial class ConflictDialog : Window
         await ResolveIcons(conflicts);
 
 
-        bool no = conflicts.Any(n => n.SourceDate < n.TargetDate || ItemsComparer.CompareVersion(n.SourceVersion, n.TargetVersion) > 0);
+        bool no = conflicts.Any(n => n.SourceDate < n.TargetDate || ItemsComparer.CompareVersion(n.SourceVersion, n.TargetVersion) < 0);
         var window = new ConflictDialog(conflicts, $"Überschreiben beim {action}", fromRight, no);
         window.Activate();
         return await window.completion.Task;

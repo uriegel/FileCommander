@@ -24,7 +24,6 @@ using Windows.Storage;
 
 namespace FileCommander.Controls;
 
-// TODO Copy: use conflict versions not available on one side: DoNotOverwrite!!
 // TODO Conflict Dialog: Directories
 // TODO after copy: refresh other view or get versions after file changed
 // TODO Home folder (later Favorites, Remotes)
