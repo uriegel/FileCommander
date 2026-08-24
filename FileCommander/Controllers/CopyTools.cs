@@ -54,8 +54,8 @@ class ConflictItem(
     string? iconIndex, 
     DateTime sourceDate, 
     DateTime targetDate, 
-    long sourceSize, 
-    long targetSize,
+    long? sourceSize, 
+    long? targetSize,
     FileVersionInfo? sourceVersion,
     FileVersionInfo? targetVersion,
     bool isDirectory) : ColumnViewItem 
@@ -66,8 +66,8 @@ class ConflictItem(
     public string? IconIndex { get => iconIndex; }
     public DateTime SourceDate { get => sourceDate; }
     public DateTime TargetDate { get => targetDate; }
-    public long SourceSize { get => sourceSize; }
-    public long TargetSize { get => targetSize; }
+    public long? SourceSize { get => sourceSize; }
+    public long? TargetSize { get => targetSize; }
     public FileVersionInfo? SourceVersion { get => sourceVersion; }
     public FileVersionInfo? TargetVersion { get => targetVersion; } 
 }

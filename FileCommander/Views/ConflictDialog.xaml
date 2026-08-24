@@ -14,7 +14,7 @@
         <DesktopAcrylicBackdrop />
     </Window.SystemBackdrop>
 
-    <Grid Padding="24" KeyDown="Grid_KeyDown">
+    <Grid x:Name="Root" Padding="24" KeyDown="Grid_KeyDown">
         <Grid.Resources>
             <DataTemplate x:Key="ItemDataTemplate">
                 <cvh:ColumnViewItemGrid>

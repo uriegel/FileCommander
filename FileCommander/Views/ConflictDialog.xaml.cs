@@ -1,8 +1,7 @@
-using CsTools.Extensions;
-
 using FileCommander.Controllers;
 using FileCommander.ValueConverters;
 
+using Microsoft.UI;
 using Microsoft.UI.Xaml;
 using Microsoft.UI.Xaml.Input;
 
@@ -25,7 +24,6 @@ public sealed partial class ConflictDialog : Window
     {
         await ResolveIcons(conflicts);
 
-
         bool no = conflicts.Any(n => n.SourceDate < n.TargetDate || ItemsComparer.CompareVersion(n.SourceVersion, n.TargetVersion) < 0);
         var window = new ConflictDialog(conflicts, $"Überschreiben beim {action}", fromRight, no);
         window.Activate();
@@ -39,6 +37,8 @@ public sealed partial class ConflictDialog : Window
     public ConflictDialog()
     {
         InitializeComponent();
+
+        ExtendsContentIntoTitleBar = true;
 
         navigation = new Navigation(ListView, Scroller);
         AppWindow.Resize(new SizeInt32(1000, 800));
@@ -105,6 +105,28 @@ public sealed partial class ConflictDialog : Window
     }
 
     void Dialog_Closed(object sender, WindowEventArgs args) => completion.TrySetResult(result);
+
+    void SetTitleBarTheme()
+    {
+        var titleBar = AppWindow.TitleBar;
+
+        if (Root.ActualTheme == ElementTheme.Dark)
+        {
+            titleBar.BackgroundColor = Colors.Transparent;
+            titleBar.ForegroundColor = Colors.White;
+
+            titleBar.InactiveBackgroundColor = Colors.Transparent;
+            titleBar.InactiveForegroundColor = Colors.Gray;
+        }
+        else
+        {
+            titleBar.BackgroundColor = Colors.Transparent;
+            titleBar.ForegroundColor = Colors.Black;
+
+            titleBar.InactiveBackgroundColor = Colors.Transparent;
+            titleBar.InactiveForegroundColor = Colors.Gray;
+        }
+    }
 
     ConflictDialogResult result = ConflictDialogResult.Canceled;
     readonly bool no;
