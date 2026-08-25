@@ -11,6 +11,10 @@
     Activated="Window_Activated"
     Closed="Window_Closed">
 
+    <Window.SystemBackdrop>
+        <DesktopAcrylicBackdrop />
+    </Window.SystemBackdrop>
+
     <Grid Name="MainGrid">
         <Grid.Resources>
             <ResourceDictionary>
