@@ -56,7 +56,9 @@ abstract class Controller : IDisposable
     public virtual Task<bool> Copy(UIElement content, CopyItems items, VirtualTable otherSide, bool fromRight) => Task.FromResult(false);
     public virtual Task<bool> Rename(UIElement content, int pos, bool asCopy) => Task.FromResult(false);
     public virtual ItemBase[] GetViewItems() => [];
-    
+    public virtual void Execute(int pos) { }
+    public virtual void OnEnter(int pos, bool openWith) { }
+
     #region IDisposable
 
     public void Dispose()

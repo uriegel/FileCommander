@@ -167,6 +167,10 @@ async function onKeyDown(evt) {
     }
     else if (evt.code == "Delete")
         deleteItems()
+    else if (evt.code == "Enter" && evt.altKey)
+        showProperties()
+    else if (evt.code == "Enter" && evt.ctrlKey)
+        openWith()
     else if (evt.key.length == 1) {
         if (!unrestrictedItems) {
             const items = tableView.getItems()
@@ -268,6 +272,12 @@ async function onEvent(evt) {
         copy(true)
     if (evt.adaptPath)
         adaptPath()
+    if (evt.execute)
+        execute()
+    if (evt.showProperties)
+        showProperties()
+    if (evt.openWith)
+        openWith()
 }
 
 async function init() {
@@ -442,6 +452,18 @@ async function copy(move) {
 
 async function adaptPath() {
     const res = await fetch("request/adaptpath")
+}
+
+async function execute() {
+    const res = await fetch(`request/execute/${tableView.getPosition()}`)
+}
+
+async function showProperties() {
+    const res = await fetch(`request/showProperties/${tableView.getPosition()}`)
+}
+
+async function openWith() {
+    const res = await fetch(`request/openWith/${tableView.getPosition()}`)
 }
 
 async function rename(asCopy) {

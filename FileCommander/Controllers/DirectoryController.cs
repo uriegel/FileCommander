@@ -13,7 +13,9 @@ using System;
 using System.Diagnostics;
 using System.IO;
 using System.Linq;
+using System.Runtime.InteropServices;
 using System.Threading.Tasks;
+using System.Xml.Linq;
 
 namespace FileCommander.Controllers;
 
@@ -92,9 +94,11 @@ class DirectoryController : Controller
     public override bool Process(int pos)
     {
         if (pos >= viewItems.TakeWhile(n => n is not FileItem).Count())
-            // TODO process item
+        {
+            Execute(pos);
             return true;
-        else        
+        }
+        else
             return false;
     }
 
@@ -301,6 +305,29 @@ class DirectoryController : Controller
             MainWindow.ShowError($"Unbekannter Fehler aufgetreten");
             return false; 
         }
+    }
+
+    public override void Execute(int pos)
+    {
+        using var proc = new Process()
+        {
+            StartInfo = new ProcessStartInfo(Context.CurrentPath.AppendPath(viewItems[pos].Name))
+            {
+                UseShellExecute = true,
+            },
+        };
+        proc.Start();
+    }
+
+    public override void OnEnter(int pos, bool openWith)
+    {
+        var info = new ShellExecuteInfo();
+        info.Size = Marshal.SizeOf(info);
+        info.Verb = openWith ? "openas" : "properties";
+        info.File = Context.CurrentPath.AppendPath(viewItems[pos].Name);
+        info.Show = ShowWindowFlag.Show;
+        info.Mask = ShellExecuteFlag.InvokeIDList;
+        Api.ShellExecuteEx(ref info);
     }
 
     public override ItemBase[] GetViewItems() => viewItems;

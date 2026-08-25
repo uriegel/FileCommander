@@ -1,4 +1,6 @@
-﻿namespace FileCommander.Data;
+﻿using static ABI.System.Windows.Input.ICommand_Delegates;
+
+namespace FileCommander.Data;
 
 record Event(
     Refresh? Refresh = null,
@@ -15,7 +17,10 @@ record Event(
     RenameAsCopy? RenameAsCopy = null,
     Copy? Copy = null,
     Move? Move = null,
-    AdaptPath? AdaptPath = null
+    AdaptPath? AdaptPath = null,
+    Execute? Execute = null,
+    ShowProperties? ShowProperties = null,
+    OpenWith? OpenWith = null
 );
 
 record Refresh();
@@ -33,3 +38,6 @@ record RenameAsCopy();
 record Copy();
 record Move();
 record AdaptPath();
+record Execute();
+record ShowProperties();
+record OpenWith();

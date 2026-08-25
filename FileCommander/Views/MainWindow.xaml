@@ -103,6 +103,24 @@
                         <KeyboardAccelerator Key="F9" />
                     </XamlUICommand.KeyboardAccelerators>
                 </XamlUICommand>
+                <XamlUICommand x:Name="ExecuteCommand" Label="Datei ausführen" Description="Datei ausführen" 
+                               ExecuteRequested="ExecuteCommand_ExecuteRequested">
+                    <XamlUICommand.KeyboardAccelerators>
+                        <KeyboardAccelerator Key="Enter" />
+                    </XamlUICommand.KeyboardAccelerators>
+                </XamlUICommand>
+                <XamlUICommand x:Name="OpenWithCommand" Label="Öffnen mit..." Description="Datei öffnen mit..." 
+                               ExecuteRequested="OpenWithCommand_ExecuteRequested">
+                    <XamlUICommand.KeyboardAccelerators>
+                        <KeyboardAccelerator Key="Enter" Modifiers="Control" />
+                    </XamlUICommand.KeyboardAccelerators>
+                </XamlUICommand>
+                <XamlUICommand x:Name="ShowPropertiesCommand" Label="Eigenschaften..." Description="Dateieigenschaften" 
+                               ExecuteRequested="ShowPropertiesCommand_ExecuteRequested">
+                    <XamlUICommand.KeyboardAccelerators>
+                        <KeyboardAccelerator Key="Enter" Modifiers="Menu" />
+                    </XamlUICommand.KeyboardAccelerators>
+                </XamlUICommand>
                 <converters:InfoValueConverter x:Key="InfoValueConverter" />
             </ResourceDictionary>
         </Grid.Resources>
@@ -143,6 +161,10 @@
                             <MenuFlyoutItem Command="{StaticResource DeleteCommand}" />
                             <MenuFlyoutSeparator/>
                             <MenuFlyoutItem Command="{StaticResource CreateFolderCommand}" />
+                            <MenuFlyoutSeparator/>
+                            <MenuFlyoutItem Command="{StaticResource ExecuteCommand}" />
+                            <MenuFlyoutItem Command="{StaticResource OpenWithCommand}" />
+                            <MenuFlyoutItem Command="{StaticResource ShowPropertiesCommand}" />
                         </MenuFlyoutSubItem>
                         <MenuFlyoutSubItem Text="Navigation">
                             <MenuFlyoutItem Command="{StaticResource AdaptPathCommand}" />

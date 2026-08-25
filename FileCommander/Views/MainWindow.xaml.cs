@@ -212,6 +212,12 @@ public sealed partial class MainWindow : Window
         => activeView?.Move();
     void AdaptPathCommand_ExecuteRequested(XamlUICommand sender, ExecuteRequestedEventArgs args)
         => activeView?.AdaptPath();
+    void ExecuteCommand_ExecuteRequested(XamlUICommand sender, ExecuteRequestedEventArgs args)
+        => activeView?.Execute();
+    void ShowPropertiesCommand_ExecuteRequested(XamlUICommand sender, ExecuteRequestedEventArgs args)
+        => activeView?.ShowProperties();
+    void OpenWithCommand_ExecuteRequested(XamlUICommand sender, ExecuteRequestedEventArgs args)
+        => activeView?.OpenWith();
 
     FolderView GetOtherView() => activeView == LeftView ? RightView : LeftView;
 

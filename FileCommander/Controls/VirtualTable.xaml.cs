@@ -57,7 +57,10 @@ public sealed partial class VirtualTable : UserControl
     public async void Copy() => SendEvent(new(Copy: new()));
     public async void Move() => SendEvent(new(Move: new()));
     public async void AdaptPath() => SendEvent(new(AdaptPath: new()));
-    
+    public async void Execute() => SendEvent(new(Execute: new()));
+    public async void ShowProperties() => SendEvent(new(ShowProperties: new()));
+    public async void OpenWith() => SendEvent(new(OpenWith: new()));
+
     public void SetContext(FolderContext context)
     {
         this.Context = context;
@@ -83,7 +86,7 @@ public sealed partial class VirtualTable : UserControl
         {
             var path = new Uri(args.Request.Uri).AbsolutePath[1..];
             if (path.StartsWith("request"))
-                await ServeRequest(path[8..], args);
+            await ServeRequest(path[8..], args);
             else if (path.StartsWith("iconFromRes"))
                 ServeIconFromRes(path[12..], args);
             else if (path.StartsWith("icon"))
@@ -321,6 +324,24 @@ public sealed partial class VirtualTable : UserControl
                     var itemsResult = items != null ? new ItemsResult(null, items, newPos) : null;
                     SendResult(args, new ProcessResult(ItemsResult: itemsResult));
                 }
+                else if (path.StartsWith("execute"))
+                {
+                    var pos = int.Parse(path[8..]);
+                    Controller.Execute(pos);
+                    SendResult(args, new ProcessResult());
+                }
+                else if (path.StartsWith("showProperties"))
+                {
+                    var pos = int.Parse(path[15..]);
+                    Controller.OnEnter(pos, false);
+                    SendResult(args, new ProcessResult());
+                }
+                else if (path.StartsWith("openWith"))
+                {
+                    var pos = int.Parse(path[9..]);
+                    Controller.OnEnter(pos, true);
+                    SendResult(args, new ProcessResult());
+                }
                 else if (path.StartsWith("command"))
                 {
                     var cmd = path[8..];
@@ -367,8 +388,8 @@ public sealed partial class VirtualTable : UserControl
                             MainContext.Instance.RenameAsCopyCommand.Execute(null);
                             SendResult(args, new ProcessResult());
                             break;
-                        }
                     }
+                }
                 break;
             }
         }

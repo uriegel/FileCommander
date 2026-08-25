@@ -423,7 +423,7 @@ export class VirtualTable extends HTMLElement {
             this.currentPosition = 0
             this.scrollToOffset()
         }
-        else if (evt.key == "Enter") {
+        else if (evt.key == "Enter" && !evt.altKey && !evt.ctrlKey) {
             evt.preventDefault()
             evt.stopPropagation()
             this.onSelected()

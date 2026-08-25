@@ -56,7 +56,10 @@ public sealed partial class FolderView : UserControl
     public void Copy() => VirtualTable.Copy();
     public void Move() => VirtualTable.Move();
     public void AdaptPath() => VirtualTable.AdaptPath();
-    
+    public void Execute() => VirtualTable.Execute();
+    public void ShowProperties() => VirtualTable.ShowProperties();
+    public void OpenWith() => VirtualTable.OpenWith();
+
     void UserControl_Loaded(object _, RoutedEventArgs e)
     {
         Context = new FolderContext(Id);
