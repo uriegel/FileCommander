@@ -498,11 +498,22 @@ class DirectoryController : Controller
         {
             var fileInfo = new FileInfo(e.FullPath);
             fi.DateTime = fileInfo.LastWriteTime;
-            fi.Size = fileInfo.Length;
-            Debug.WriteLine($"Changed: {fileInfo.LastWriteTime} {fileInfo.Length}");
-            changes?.AddChangedItem(Item.Get(fi, Context.CurrentPath));
+            try
+            {
+                fi.Size = fileInfo.Length;
+                Debug.WriteLine($"Changed: {fileInfo.LastWriteTime} {fileInfo.Length}");
+                changes?.AddChangedItem(Item.Get(fi, Context.CurrentPath));
 
-            metaFileData.QueueMetadata(e.FullPath);
+                metaFileData.QueueMetadata(e.FullPath);
+            }
+            catch (System.IO.FileNotFoundException fnfe) 
+            {
+                Debug.WriteLine(fnfe);
+            }
+            catch (Exception ex)
+            {
+                Debug.WriteLine(ex);
+            }
         }
     }
 

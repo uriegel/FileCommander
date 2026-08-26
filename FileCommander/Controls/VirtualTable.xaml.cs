@@ -29,8 +29,6 @@ namespace FileCommander.Controls;
 // TODO cancel extended infos after file change when change path was called
 // TODO Favorites
 
-// TODO Open docx, save => exception
-
 // TODO Connect remote drives
 
 // TODO Viewers
