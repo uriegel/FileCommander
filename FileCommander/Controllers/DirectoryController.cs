@@ -1,4 +1,11 @@
-﻿using ClrWinApi;
+﻿using System;
+using System.Diagnostics;
+using System.IO;
+using System.Linq;
+using System.Runtime.InteropServices;
+using System.Threading.Tasks;
+
+using ClrWinApi;
 
 using CsTools.Extensions;
 
@@ -8,14 +15,6 @@ using FileCommander.Data;
 using FileCommander.Views;
 
 using Microsoft.UI.Xaml;
-
-using System;
-using System.Diagnostics;
-using System.IO;
-using System.Linq;
-using System.Runtime.InteropServices;
-using System.Threading.Tasks;
-using System.Xml.Linq;
 
 namespace FileCommander.Controllers;
 
@@ -345,6 +344,16 @@ class DirectoryController : Controller
         return false;
     }
 
+    Item[] MapItems()
+        => [.. viewItems.Select(n =>
+            n switch
+            {
+                ParentItem p => new Item(p.Name, n.GetIcon(Context.CurrentPath), ["", "", ""]),
+                DirectoryItem d => Item.Get(d),
+                FileItem f => Item.Get(f, Context.CurrentPath),
+                _ => throw new Exception("Unknown ItemBase")
+            })];
+
     (int Dirs, int Files) GetDirAndFileCount(ItemBase[] items)
         => (items.Count(n => n is DirectoryItem), items.Count(n => n is FileItem));
 
@@ -401,6 +410,9 @@ class DirectoryController : Controller
                 ? Item.Get((newItem as FileItem)!, Context.CurrentPath)
                 : Item.Get((newItem as DirectoryItem)!);
             changes?.AddCreateItem(item, pos, selpos);
+
+            if (isFile)
+                metaFileData.QueueMetadata(e.FullPath);
         }
         catch (Exception ex)
         {
@@ -489,20 +501,13 @@ class DirectoryController : Controller
             fi.Size = fileInfo.Length;
             Debug.WriteLine($"Changed: {fileInfo.LastWriteTime} {fileInfo.Length}");
             changes?.AddChangedItem(Item.Get(fi, Context.CurrentPath));
+
+            metaFileData.QueueMetadata(e.FullPath);
         }
     }
 
-    Item[] MapItems()
-        => [.. viewItems.Select(n =>
-            n switch
-            {
-                ParentItem p => new Item(p.Name, n.GetIcon(Context.CurrentPath), ["", "", ""]),
-                DirectoryItem d => Item.Get(d),
-                FileItem f => Item.Get(f, Context.CurrentPath),
-                _ => throw new Exception("Unknown ItemBase")
-            })];
-
     readonly FileSystemWatcher watcher = new();
+    readonly MetaFileData metaFileData = new();
 
     ItemBase[] items = null!;
     ItemBase[] viewItems = null!;
