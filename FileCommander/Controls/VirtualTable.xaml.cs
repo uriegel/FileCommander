@@ -24,15 +24,17 @@ using Windows.Storage;
 
 namespace FileCommander.Controls;
 
-// TODO after copy: refresh other view or get versions after file changed
-// TODO Home folder (later Favorites, Remotes)
+// TODO File SystemWatcher start exif and version: after create check exifs from all newly create items, until creation time is older than 10s// TODO Home folder (later Favorites, Remotes)
+// TODO Versions
+// TODO cancel extended infos after file change when change path was called
+
+// TODO Open docx, save => exception
+
 // TODO Connect remote drives
 
 // TODO Viewers
 
 // TODO exif dark mode
-
-// TODO File SystemWatcher start exif and version: after create check exifs from all newly create items, until creation time is older than 10s
 
 public sealed partial class VirtualTable : UserControl
 {

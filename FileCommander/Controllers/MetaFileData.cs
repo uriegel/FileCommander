@@ -6,6 +6,8 @@ using System.Threading;
 using System.Threading.Channels;
 using System.Threading.Tasks;
 
+using CsTools;
+
 namespace FileCommander.Controllers;
 
 class MetaFileData
@@ -20,7 +22,6 @@ class MetaFileData
     {
         if (!metadataPending.TryAdd(path, 0))
             return;
-
         metadataQueue.Writer.TryWrite(path);
     }
 
@@ -52,23 +53,22 @@ class MetaFileData
     {
         if (!await WaitUntilStable(path, cancellationToken))
             return;
-
         if (!File.Exists(path))
             return;
-
         var extension = Path.GetExtension(path);
 
         if (!extension.Equals(".jpg", StringComparison.OrdinalIgnoreCase) &&
             !extension.Equals(".jpeg", StringComparison.OrdinalIgnoreCase))
             return;
 
-        //var exifDate = await Task.Run(
-        //    () => ReadExifDate(path),
-        //    cancellationToken);
+        var exifDate = await Task.Run(
+            () => ExifReader.GetExifData(path),
+            cancellationToken);
 
-        //if (exifDate == null)
-        //    return;
+        if (exifDate == null)
+            return;
 
+        Debug.WriteLine($"Aufgelöst: {path} {exifDate.DateTime}");
         //var item = items.FirstOrDefault(
         //    n => n.Name.Equals(
         //        Path.GetFileName(path),
