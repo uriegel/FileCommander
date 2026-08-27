@@ -24,7 +24,7 @@ using Windows.Storage;
 
 namespace FileCommander.Controls;
 
-// TODO File SystemWatcher start exif and version: after create check exifs from all newly create items, until creation time is older than 10s// TODO Home folder (later Favorites, Remotes)
+// TODO Path from Path in send changes
 // TODO Versions
 // TODO cancel extended infos after file change when change path was called
 // TODO Favorites
