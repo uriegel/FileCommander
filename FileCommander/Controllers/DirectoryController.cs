@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.Diagnostics;
 using System.IO;
 using System.Linq;
@@ -60,11 +61,11 @@ class DirectoryController : Controller
             .ToArray();
         var fromPath = !controllerChanged && dirInfo.FullName.Length < Context.CurrentPath.Length ? Context.CurrentPath[dirInfo.FullName.Length..].Trim('\\') : null;
         SetNewPath(dirInfo.FullName, fromHistory);
-        items = [new ParentItem(), .. dirItems, .. fileItems];
+        items = ((ItemBase[])[new ParentItem(), .. dirItems, .. fileItems]).ToDictionary(n => n.Name);
         changes?.Dispose();
         changes = new();
         extendedFileInfos?.Dispose();
-        extendedFileInfos = new(changes, Context.CurrentPath, Context, items.SelectFilterNull(n => n as FileItem));
+        extendedFileInfos = new(changes, Context.CurrentPath, Context, items.Values.SelectFilterNull(n => n as FileItem));
         (viewItems, var oldPos) = MapViewItems(fromPath);
 
         var enableEvents = watcher.Path == "";
@@ -370,7 +371,7 @@ class DirectoryController : Controller
 
     (ItemBase[], int) MapViewItems(string? fromPath)
     {
-        var filtered = items
+        var filtered = items.Values
             .Where(n => MainContext.Instance.ShowHidden || !n.IsHidden)
             .Order(new ItemsComparer(sortIndex, sortSubcolumn, sortDescending))
             .ToArray();
@@ -387,10 +388,7 @@ class DirectoryController : Controller
             var newItem = isFile 
                 ? (ItemBase)FileItem.Create(new FileInfo(e.FullPath)) 
                 : DirectoryItem.Create(new DirectoryInfo(e.FullPath));
-            items = [
-                newItem,
-                .. items
-                ];
+            items.TryAdd(newItem.Name, newItem);
             (viewItems, _) = MapViewItems(null);
             MainWindow.RunOnUI(() =>
             {
@@ -412,7 +410,7 @@ class DirectoryController : Controller
             changes?.AddCreateItem(item, pos, selpos);
 
             if (isFile)
-                metaFileData.QueueMetadata(e.FullPath);
+                metaFileData.QueueMetadata(newItem, e.FullPath);
         }
         catch (Exception ex)
         {
@@ -430,8 +428,9 @@ class DirectoryController : Controller
             if (pos == viewItems.Length)
                 pos = 0;
             var delPos = viewItems.TakeWhile(n => n.Name != e.Name).Count();
-            var isFile = items.FirstOrDefault(n => n.Name == e.Name) is FileItem;
-            items = [.. items.Where(n => n.Name != e.Name)];
+            var isFile = e.Name != null && items.TryGetValue(e.Name, out var val) && val is FileItem;
+            if (e.Name != null)
+                items.Remove(e.Name);
             (viewItems, _) = MapViewItems(null);
             MainWindow.RunOnUI(() =>
             {
@@ -454,18 +453,23 @@ class DirectoryController : Controller
     {
         try
         {
-            var oldItem = items.FirstOrDefault(n => n.Name == e.OldName);
-            if (oldItem == null)
+            ItemBase? oldItem = null;
+            if ((e.OldName == null || items.TryGetValue(e.OldName, out oldItem)) == false)
             {
                 WatchCreated(this, new FileSystemEventArgs(WatcherChangeTypes.Created, e.FullPath, e.Name));
                 return;
             }
+            if (e.OldName == null || oldItem == null)
+                return;
             var oldPos = Array.IndexOf(viewItems, oldItem);
             var newItem = oldItem with { Name = e.Name ?? "" };
-            items = [
-                newItem,
-                .. items.Where(n => n.Name != e.OldName)
-            ]; var selectedItem = Context.SelectedPath.SubstringAfterLast('\\');
+
+            items.TryAdd(newItem.Name, newItem);
+            if (e.OldName != null)
+                items.Remove(e.OldName);
+
+            var selectedItem = Context.SelectedPath.SubstringAfterLast('\\');
+
             (viewItems, _) = MapViewItems(null);
 
             var selpos = viewItems.TakeWhile(n => n.Name != selectedItem).Count();
@@ -487,7 +491,9 @@ class DirectoryController : Controller
     void WatchChanged(object _, FileSystemEventArgs e)
     {
         Debug.WriteLine($"Changed: {e.Name}");
-        var item = items.FirstOrDefault(n => n.Name == e.Name);
+
+        if ((e.Name != null && items.TryGetValue(e.Name, out var item)) == false)
+            return;
         if (item is DirectoryItem di)
         {
             var dirInfo = new DirectoryInfo(e.FullPath);
@@ -504,7 +510,7 @@ class DirectoryController : Controller
                 Debug.WriteLine($"Changed: {fileInfo.LastWriteTime} {fileInfo.Length}");
                 changes?.AddChangedItem(Item.Get(fi, Context.CurrentPath));
 
-                metaFileData.QueueMetadata(e.FullPath);
+                metaFileData.QueueMetadata(item, e.FullPath);
             }
             catch (System.IO.FileNotFoundException fnfe) 
             {
@@ -520,7 +526,7 @@ class DirectoryController : Controller
     readonly FileSystemWatcher watcher = new();
     readonly MetaFileData metaFileData = new();
 
-    ItemBase[] items = null!;
+    Dictionary<string, ItemBase> items = null!;
     ItemBase[] viewItems = null!;
 
     int sortIndex;

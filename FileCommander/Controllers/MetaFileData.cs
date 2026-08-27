@@ -18,7 +18,7 @@ class MetaFileData
             _ = MetadataWorker(metadataCts.Token);
     }
 
-    public void QueueMetadata(string path)
+    public void QueueMetadata(ItemBase item, string path)
     {
         if (!metadataPending.TryAdd(path, 0))
             return;
