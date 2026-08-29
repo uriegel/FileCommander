@@ -37,7 +37,6 @@ class DirectoryController : Controller
                     | NotifyFilters.FileName
                     | NotifyFilters.LastWrite
                     | NotifyFilters.Size;
-        this.metaFileData = new(() => changes);
     }
 
     public override Column[] GetColumns()
@@ -410,7 +409,7 @@ class DirectoryController : Controller
             changes?.AddCreateItem(item, pos, selpos);
 
             if (newItem is FileItem fileItem)
-                metaFileData.QueueMetadata(fileItem, e.FullPath);
+                changes?.QueueMetadata(fileItem, e.FullPath);
         }
         catch (Exception ex)
         {
@@ -510,7 +509,7 @@ class DirectoryController : Controller
                 Debug.WriteLine($"Changed: {fileInfo.LastWriteTime} {fileInfo.Length}");
                 changes?.AddChangedItem(Item.Get(fi, Context.CurrentPath));
 
-                metaFileData.QueueMetadata(fi, e.FullPath);
+                changes?.QueueMetadata(fi, e.FullPath);
             }
             catch (System.IO.FileNotFoundException fnfe) 
             {
@@ -524,8 +523,7 @@ class DirectoryController : Controller
     }
 
     readonly FileSystemWatcher watcher = new();
-    readonly MetaFileData metaFileData;
-
+    
     Dictionary<string, ItemBase> items = null!;
     ItemBase[] viewItems = null!;
 

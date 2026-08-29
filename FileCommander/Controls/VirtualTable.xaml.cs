@@ -24,9 +24,6 @@ using Windows.Storage;
 
 namespace FileCommander.Controls;
 
-// TODO cancel extended infos after file change when change path was called
-// TODO On copy/ondelete => refresh view
-
 // TODO Versions
 // TODO Favorites
 
@@ -226,7 +223,7 @@ public sealed partial class VirtualTable : UserControl
                         var res = await Controller.DeleteItems(Content, items);
                         SendResult(args, new RequestResult(res));
                     }
-                        else
+                    else
                         SendResult(args, new RequestResult(false));
                     break;
                 }
@@ -247,6 +244,7 @@ public sealed partial class VirtualTable : UserControl
                     {
                         var res = await Controller.Copy(Content, items, otherSide.Other, otherSide.IsRight);
                         SendResult(args, new RequestResult(res));
+                        otherSide.Other.Refresh();
                     }
                     else
                         SendResult(args, new RequestResult(false));

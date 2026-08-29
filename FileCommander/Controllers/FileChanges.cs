@@ -21,7 +21,9 @@ class FileChanges : IDisposable
 
     public void AddRenameItem(Item item, int oldPosition, int position, int selection)
         => changedItems.Writer.TryWrite(new() { Renamed = new(item, oldPosition, position, selection) });
-    
+
+    public void QueueMetadata(FileItem item, string path) => metaFileData.QueueMetadata(item, path);
+
     public async Task<Change[]?> GetItemsAsync()
     {
         var items = new List<Change>();
@@ -44,12 +46,15 @@ class FileChanges : IDisposable
         return items.Count > 0 ? [.. items] : null;
     }
 
+    public FileChanges() => metaFileData = new(this);
+
     readonly Channel<Change> changedItems = Channel.CreateUnbounded<Change>(new UnboundedChannelOptions
     {
         SingleReader = true,
         SingleWriter = true
     });
 
+    readonly MetaFileData metaFileData;
     readonly CancellationTokenSource cancellation = new();
 
     #region IDisposable
@@ -69,6 +74,7 @@ class FileChanges : IDisposable
             {
                 // Verwalteten Zustand (verwaltete Objekte) bereinigen
                 cancellation.Cancel();
+                metaFileData.Dispose();
             }
 
             // Nicht verwaltete Ressourcen (nicht verwaltete Objekte) freigeben und Finalizer überschreiben

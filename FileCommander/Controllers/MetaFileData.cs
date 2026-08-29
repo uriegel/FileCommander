@@ -13,13 +13,13 @@ using System.Threading.Tasks;
 
 namespace FileCommander.Controllers;
 
-class MetaFileData
+class MetaFileData : IDisposable
 {
-    public MetaFileData(Func<FileChanges?> getChanges)
+    public MetaFileData(FileChanges changes)
     {
         for (int i = 0; i < 4; i++)
-            _ = MetadataWorker(metadataCts.Token);
-        this.getChanges = getChanges;
+            _ = MetadataWorker(cts.Token);
+        this.changes = changes;
     }
 
     public void QueueMetadata(FileItem item, string path)
@@ -74,7 +74,7 @@ class MetaFileData
 
         Debug.WriteLine($"Aufgelöst: {job.Path} {exifData.DateTime}");
         job.Item.ExifData = exifData;
-        getChanges()?.AddChangedItem(Item.Get(job.Item, job.Path.SubstringAfterLast('\\'))); 
+        changes.AddChangedItem(Item.Get(job.Item, job.Path.SubstringAfterLast('\\'))); 
     }
 
     static async Task<bool> WaitUntilStable(string path, CancellationToken cancellationToken)
@@ -122,10 +122,44 @@ class MetaFileData
     }
 
     readonly Channel<Job> metadataQueue = Channel.CreateUnbounded<Job>();
-    readonly CancellationTokenSource metadataCts = new();
     readonly ConcurrentDictionary<string, byte> metadataPending = new(StringComparer.OrdinalIgnoreCase);
-    readonly Func<FileChanges?> getChanges;
+    readonly FileChanges changes;
+    readonly CancellationTokenSource cts = new();
 
     record Job(string Path, FileItem Item);
+
+    #region IDisposable
+
+    public void Dispose()
+    {
+        // Ändere diesen Code nicht. Füge Bereinigungscode in der Methode "Dispose(bool disposing)" ein.
+        Dispose(disposing: true);
+        GC.SuppressFinalize(this);
+    }
+
+    protected virtual void Dispose(bool disposing)
+    {
+        if (!disposedValue)
+        {
+            if (disposing)
+                // Verwalteten Zustand (verwaltete Objekte) bereinigen
+                cts.Cancel();
+
+            // Nicht verwaltete Ressourcen (nicht verwaltete Objekte) freigeben und Finalizer überschreiben
+            // Große Felder auf NULL setzen
+            disposedValue = true;
+        }
+    }
+
+    // Finalizer nur überschreiben, wenn "Dispose(bool disposing)" Code für die Freigabe nicht verwalteter Ressourcen enthält
+    // ~MetaFileData()
+    // {
+    //     // Ändere diesen Code nicht. Füge Bereinigungscode in der Methode "Dispose(bool disposing)" ein.
+    //     Dispose(disposing: false);
+    // }
+
+    bool disposedValue;
+
+    #endregion
 }
 
