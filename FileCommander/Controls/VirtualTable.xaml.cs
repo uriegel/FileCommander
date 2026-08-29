@@ -24,16 +24,12 @@ using Windows.Storage;
 
 namespace FileCommander.Controls;
 
-// TODO file changes hidden not hidden
-
 // TODO Favorites
-
-// TODO Connect remote drives
-
-// TODO Viewers
 
 // TODO exif dark mode
 
+// TODO Connect remote drives
+// TODO Viewers
 // TODO Drag n drop
 
 public sealed partial class VirtualTable : UserControl

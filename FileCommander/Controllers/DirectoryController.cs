@@ -406,10 +406,13 @@ class DirectoryController : Controller
             var item = isFile 
                 ? Item.Get((newItem as FileItem)!, Context.CurrentPath)
                 : Item.Get((newItem as DirectoryItem)!);
-            changes?.AddCreateItem(item, pos, selpos);
+            if (MainContext.Instance.ShowHidden || !item.Hidden)
+            {
+                changes?.AddCreateItem(item, pos, selpos);
 
-            if (newItem is FileItem fileItem)
-                changes?.QueueMetadata(fileItem, e.FullPath);
+                if (newItem is FileItem fileItem)
+                    changes?.QueueMetadata(fileItem, e.FullPath);
+            }
         }
         catch (Exception ex)
         {
