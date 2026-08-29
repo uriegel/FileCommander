@@ -26,9 +26,9 @@ namespace FileCommander.Controls;
 
 // TODO Favorites
 
+// TODO Connect remote drives
 // TODO exif dark mode
 
-// TODO Connect remote drives
 // TODO Viewers
 // TODO Drag n drop
 
