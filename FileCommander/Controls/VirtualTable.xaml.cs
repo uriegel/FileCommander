@@ -24,9 +24,12 @@ using Windows.Storage;
 
 namespace FileCommander.Controls;
 
-// TODO Path from Path in send changes
-// TODO Versions
+    // TODO Path from Path in send changes
+
+// TODO ChangeFile/CreateFile sometimes ignores the position
 // TODO cancel extended infos after file change when change path was called
+
+// TODO Versions
 // TODO Favorites
 
 // TODO Connect remote drives

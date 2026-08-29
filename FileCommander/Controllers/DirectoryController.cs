@@ -5,10 +5,10 @@ using System.IO;
 using System.Linq;
 using System.Runtime.InteropServices;
 using System.Threading.Tasks;
-
 using ClrWinApi;
 
 using CsTools.Extensions;
+
 
 using FileCommander.Contexts;
 using FileCommander.Controls;
@@ -190,12 +190,12 @@ class DirectoryController : Controller
             "Dateien löschen",
             textContent: $"Möchtest du {dirAndFileText} löschen?"))
         {
-            var res = Api.SHFileOperation(new ShFileOPStruct
+            var res = await Task.Run(() => Api.SHFileOperation(new ShFileOPStruct
             {
                 Func = FileFuncFlags.DELETE,
                 From = string.Join("\U00000000", pathsToDelete) + "\U00000000\U00000000",
                 Flags = FileOpFlags.ALLOWUNDO
-            });
+            }));
             return ProcessResult(res);
         }
         else
@@ -254,14 +254,13 @@ class DirectoryController : Controller
 
         var path = Context.CurrentPath;
         var otherPath = otherSide.Context.CurrentPath;
-
-        var res = Api.SHFileOperation(new ShFileOPStruct
+        var res = await Task.Run(() => Api.SHFileOperation(new ShFileOPStruct
         {
             Func = items.Move ? FileFuncFlags.MOVE : FileFuncFlags.COPY,
             From = string.Join("\U00000000", itemsToCopy.Select(n => Context.CurrentPath.AppendPath(n.Name))) + "\U00000000\U00000000",
             To = string.Join("\U00000000", itemsToCopy.Select(n => otherSide.Context.CurrentPath.AppendPath(n.Name))) + "\U00000000\U00000000",
             Flags = (noConfirmation ? FileOpFlags.NOCONFIRMATION : FileOpFlags.NOCONFIRMMKDIR) | FileOpFlags.NOCONFIRMMKDIR | FileOpFlags.MULTIDESTFILES,
-        });
+        }));
         return ProcessResult(res);
 
         ItemBase[] ExceptConflicts(ItemBase[] items, ConflictItem[] conflicts)
