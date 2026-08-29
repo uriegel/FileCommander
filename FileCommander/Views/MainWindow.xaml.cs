@@ -12,6 +12,7 @@ using Microsoft.UI.Xaml.Media;
 using Microsoft.UI.Xaml.Media.Animation;
 
 using System;
+using System.Text.Json;
 using System.Threading.Tasks;
 
 using Windows.ApplicationModel;
@@ -28,7 +29,7 @@ public sealed partial class MainWindow : Window
         mainWindow = this;
 
         var settings = ApplicationData.Current.LocalSettings.Values;
-        if (settings?.ContainsKey("WindowX") == true)
+        if (settings?.ContainsKey("WindowX") == true && (int)settings["WindowWidth"] > 10)
         {
             if (IsWindowVisible())
                 AppWindow.MoveAndResize(new RectInt32(
@@ -39,6 +40,8 @@ public sealed partial class MainWindow : Window
 
             if ((bool)settings["WindowMaximized"])
                 ((OverlappedPresenter)AppWindow.Presenter).Maximize();
+
+            var favs = settings["Favorites"] is string favstr ? JsonSerializer.Deserialize<Favorite[]>(favstr) : [];
         }
 
         MainGrid.DataContext = MainContext.Instance;
@@ -234,6 +237,9 @@ public sealed partial class MainWindow : Window
             settings["WindowY"] = AppWindow.Position.Y;
             settings["WindowWidth"] = AppWindow.Size.Width;
             settings["WindowHeight"] = AppWindow.Size.Height;
+
+            settings["Favorites"] = "[]";
+            //settings["Favorites"] = JsonSerializer.Serialize<Favorite[]>([ new Favorite("Schön", "c:\\"), new Favorite("Schön", "c:\\windows") ]);
         }
 
         settings["WindowMaximized"] =
@@ -354,9 +360,11 @@ public sealed partial class MainWindow : Window
 
     static MainWindow mainWindow = null!;
     FolderView? activeView;
-    InputSystemCursor cursor = InputSystemCursor.Create(InputSystemCursorShape.SizeWestEast);
+    readonly InputSystemCursor cursor = InputSystemCursor.Create(InputSystemCursorShape.SizeWestEast);
     double dragStartX;
     double leftStartWidth;
     double rightStartWidth;
     bool IsPointerCaptured;
 }
+
+record Favorite(string Name, string Path);
