@@ -60,7 +60,7 @@ tableView.addEventListener("process-selected", async evt => {
     if (res.itemsResult) {
         stopRestriction()
         checkColumns(res.itemsResult.columns)
-        setItems(res.itemsResult.items)
+        setItems(res.itemsResult.items, true)
         tableView.setPosition(res.itemsResult.pos)
     }
 })
@@ -136,7 +136,7 @@ async function onKeyDown(evt) {
                 stopRestriction()
             else {
                 const restricted = unrestrictedItems.filter(n => n.text.toLowerCase().startsWith(restriction.value))
-                tableView.setItems(restricted, 0)
+                tableView.setItems(restricted)
             }
         }
     }
@@ -177,14 +177,14 @@ async function onKeyDown(evt) {
             const restricted = items.filter(n => n.text.toLowerCase().startsWith(evt.key))
             if (restricted.length > 0) {
                 unrestrictedItems = items
-                tableView.setItems(restricted, 0)
+                tableView.setItems(restricted)
                 restriction.classList.add("show")
                 restriction.value += evt.key
             }
         } else {
             const restricted = unrestrictedItems.filter(n => n.text.toLowerCase().startsWith(restriction.value + evt.key))
             if (restricted.length > 0) {
-                tableView.setItems(restricted, 0)
+                tableView.setItems(restricted)
                 restriction.value += evt.key
             }
         }
@@ -206,7 +206,7 @@ async function onEvent(evt) {
         const response = await fetch(`request/reload/${getPosition()}`)
         const res = await response.json()
         if (res.itemsResult) {
-            setItems(res.itemsResult.items)
+            setItems(res.itemsResult.items, true)
             tableView.setPosition(res.itemsResult.pos)
         }
     }
@@ -285,7 +285,7 @@ async function init() {
     const response = await fetch("request/init")
     const itemsResult = await response.json()
     checkColumns(itemsResult.columns)
-    setItems(itemsResult.items)
+    setItems(itemsResult.items, true)
     tableView.setPosition(itemsResult.pos)
 }
 
@@ -318,7 +318,8 @@ function stopRestriction() {
         const pos = tableView.getPosition()
         const text = tableView.getItems()[pos].text
         const lastPos = Math.max(unrestrictedItems.findIndex(n => n.text == text), 0)
-        tableView.setItems(unrestrictedItems, lastPos)
+        tableView.setItems(unrestrictedItems, true)
+        tableView.setPosition(lastPos)
         unrestrictedItems = null
         restriction.classList.remove("show")
     }
@@ -329,7 +330,7 @@ async function onSort(e) {
     const response = await fetch(`request/sort?column=${e.index}&descending=${e.descending}${e.subColumn ? "&subcolumn=true" : ""}&pos=${tableView.getPosition()}`)
     const res = await response.json()
     if (res.itemsResult) {
-        tableView.setItems(res.itemsResult.items)
+        tableView.setItems(res.itemsResult.items, true)
         tableView.setPosition(res.itemsResult.pos)
     }
 }
@@ -338,7 +339,7 @@ async function refresh() {
     const response = await fetch(`request/refresh/${getPosition()}`)
     const res = await response.json()
     if (res.itemsResult) {
-        tableView.setItems(res.itemsResult.items)
+        tableView.setItems(res.itemsResult.items, true)
         tableView.setPosition(res.itemsResult.pos)
     }
 }
@@ -375,7 +376,7 @@ async function detectChanges() {
                 if (!unrestrictedItems) {
                     let items = tableView.getItems()
                     items = items.filter((_, i) => i != n.deleted.position)
-                    tableView.setItems(items)
+                    tableView.setItems(items, true)
                     itemsMap = createItemsMap(items)
                     tableView.setPosition(n.deleted.selection)
                 } else {
@@ -386,7 +387,7 @@ async function detectChanges() {
                 if (!unrestrictedItems) {
                     let items = tableView.getItems()
                     items = [...items.slice(0, n.created.position), n.created.item, ...items.slice(n.created.position)]
-                    tableView.setItems(items)
+                    tableView.setItems(items, true)
                     itemsMap = createItemsMap(items)
                     tableView.setPosition(n.created.selection)
                 } else {
@@ -398,7 +399,7 @@ async function detectChanges() {
                     let items = tableView.getItems()
                     items = items.filter((_, i) => i != n.renamed.oldPosition)
                     items = [...items.slice(0, n.renamed.position), n.renamed.item, ...items.slice(n.renamed.position)]
-                    tableView.setItems(items)
+                    tableView.setItems(items, true)
                     itemsMap = createItemsMap(items)
                     tableView.setPosition(n.renamed.selection)
                 } else {

@@ -1,4 +1,5 @@
 ﻿using CsTools;
+using CsTools.Extensions;
 
 using FileCommander.Data;
 
@@ -73,7 +74,7 @@ class MetaFileData
 
         Debug.WriteLine($"Aufgelöst: {job.Path} {exifData.DateTime}");
         job.Item.ExifData = exifData;
-        getChanges()?.AddChangedItem(Item.Get(job.Item, job.Path)); // Test
+        getChanges()?.AddChangedItem(Item.Get(job.Item, job.Path.SubstringAfterLast('\\'))); 
     }
 
     static async Task<bool> WaitUntilStable(string path, CancellationToken cancellationToken)

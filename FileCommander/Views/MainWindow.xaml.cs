@@ -85,7 +85,7 @@ public sealed partial class MainWindow : Window
     }
 
     public static void RunOnUI(Action action)
-        => mainWindow.DispatcherQueue.TryEnqueue(() => action());
+        => mainWindow.DispatcherQueue?.TryEnqueue(() => action());
 
     public static async void ShowError(string message)
     {
