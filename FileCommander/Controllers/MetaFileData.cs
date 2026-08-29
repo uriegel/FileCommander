@@ -62,19 +62,23 @@ class MetaFileData : IDisposable
         var extension = Path.GetExtension(job.Path);
 
         if (!extension.Equals(".jpg", StringComparison.OrdinalIgnoreCase) &&
-            !extension.Equals(".jpeg", StringComparison.OrdinalIgnoreCase))
+            !extension.Equals(".jpeg", StringComparison.OrdinalIgnoreCase) &&
+            !extension.Equals(".exe", StringComparison.OrdinalIgnoreCase) &&
+            !extension.Equals(".dll", StringComparison.OrdinalIgnoreCase))
             return;
 
-        var exifData = await Task.Run(
-            () => ExifReader.GetExifData(job.Path),
-            cancellationToken);
-
-        if (exifData == null)
-            return;
-
-        Debug.WriteLine($"Aufgelöst: {job.Path} {exifData.DateTime}");
-        job.Item.ExifData = exifData;
-        changes.AddChangedItem(Item.Get(job.Item, job.Path.SubstringAfterLast('\\'))); 
+        var exifData = await Task.Run(() => ExifReader.GetExifData(job.Path), cancellationToken);
+        if (exifData != null)
+        {
+            job.Item.ExifData = exifData;
+            changes.AddChangedItem(Item.Get(job.Item, job.Path.SubstringAfterLast('\\')));
+        }
+        var version = await Task.Run(() => FileVersionInfo.GetVersionInfo(job.Path), cancellationToken);
+        if (version != null)
+        {
+            job.Item.Version = version;
+            changes.AddChangedItem(Item.Get(job.Item, job.Path.SubstringAfterLast('\\')));
+        }
     }
 
     static async Task<bool> WaitUntilStable(string path, CancellationToken cancellationToken)

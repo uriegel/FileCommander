@@ -367,6 +367,8 @@ async function detectChanges() {
 
         res.changes.forEach(n => {
             if (n.item) {
+                console.log("version", n.item)
+
                 const item = itemsMap.get(n.item.text).item
                 if (item && n.item.exifValue)
                     item.exifValue = n.item.exifValue

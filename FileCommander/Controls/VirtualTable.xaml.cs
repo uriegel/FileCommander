@@ -24,7 +24,8 @@ using Windows.Storage;
 
 namespace FileCommander.Controls;
 
-// TODO Versions
+// TODO file changes hidden not hidden
+
 // TODO Favorites
 
 // TODO Connect remote drives
