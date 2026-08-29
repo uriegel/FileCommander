@@ -24,7 +24,7 @@ using Windows.Storage;
 
 namespace FileCommander.Controls;
 
-    // TODO Path from Path in send changes
+// TODO Path from Path in send changes
 
 // TODO ChangeFile/CreateFile sometimes ignores the position
 // TODO cancel extended infos after file change when change path was called
@@ -37,6 +37,8 @@ namespace FileCommander.Controls;
 // TODO Viewers
 
 // TODO exif dark mode
+
+// TODO Drag n drop
 
 public sealed partial class VirtualTable : UserControl
 {
