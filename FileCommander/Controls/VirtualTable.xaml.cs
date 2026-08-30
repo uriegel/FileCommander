@@ -24,7 +24,10 @@ using Windows.Storage;
 
 namespace FileCommander.Controls;
 
-// TODO Favorites
+// TODO Favorites: DeleteItems
+// TODO Favorites: Rename
+// TODO Favorites: Sort items
+// TODO Favorites: changePath
 // TODO Icon
 // TODO Home
 // TODO Connect remote drives

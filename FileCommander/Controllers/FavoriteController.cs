@@ -4,7 +4,11 @@ using FileCommander.Contexts;
 using FileCommander.Controls;
 using FileCommander.Data;
 
-using System;
+using System.Linq;
+using System.Text.Json;
+using System.Threading.Tasks;
+
+using Windows.Storage;
 
 namespace FileCommander.Controllers;
 
@@ -26,8 +30,11 @@ class FavoriteController : Controller
 
     public override (Item[] Items, int oldPos, int dirCount, int fileCount) GetItems(string path, bool controllerChanged, bool fromHistory = false)
     {
+        var settings = ApplicationData.Current.LocalSettings.Values;
+        var favs = settings["Favorites"] is string favstr ? JsonSerializer.Deserialize<Favorite[]>(favstr) ?? [] : [];
         items = [ 
             new Item("..", "iconFromRes/GoUp", [ "" ]),
+            .. favs.Select(n => new Item(n.Name, "iconFromRes/Starred", [ n.Path ], IsSelectable: true)),
             new Item("Hinzufügen...", "iconFromRes/Plus", [ "" ])
         ];
         SetNewPath(Name, fromHistory);
@@ -52,22 +59,30 @@ class FavoriteController : Controller
         var columns = controller.GetColumns();
         return (controller, columns, items[pos].Text, Name);
     }
-    
+
+    public override async Task<bool> DeleteItems(int[] items)
+    {
+        return false;
+    }
+
     public FavoriteController(FolderContext context) : base(context) { }
 
     async void AddFavorite()
     {
         var otherContext = MainWindow.GetOtherContext(Context);
-        var newName = await Dialog.ShowAsync(MainWindow.Content, "Favoriten anlegen",
+        var res = await Dialog.ShowAsync(MainWindow.Content, "Favoriten anlegen",
             d => new Favorite((d.Content as NewFavorite)?.FavoriteName ?? "", (d.Content as NewFavorite)?.Path ?? ""),
             new NewFavorite()
             {
                 FavoriteName = otherContext.CurrentPath,
                 Path = otherContext.CurrentPath,
             });
-        if (newName != null)
+        if (res != null)
         {
+            var settings = ApplicationData.Current.LocalSettings.Values;
+            var favs = settings["Favorites"] is string favstr ? JsonSerializer.Deserialize<Favorite[]>(favstr) ?? [] : [];
 
+            settings["Favorites"] = JsonSerializer.Serialize<Favorite[]>([ ..favs, res ]);
         }
     }
 

@@ -9,13 +9,11 @@ using ClrWinApi;
 
 using CsTools.Extensions;
 
-
 using FileCommander.Contexts;
 using FileCommander.Controls;
 using FileCommander.Data;
 using FileCommander.Views;
 
-using Microsoft.UI.Xaml;
 
 namespace FileCommander.Controllers;
 

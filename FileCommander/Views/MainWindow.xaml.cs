@@ -12,13 +12,11 @@ using Microsoft.UI.Xaml.Media;
 using Microsoft.UI.Xaml.Media.Animation;
 
 using System;
-using System.Text.Json;
 using System.Threading.Tasks;
 
 using Windows.ApplicationModel;
 using Windows.Graphics;
 using Windows.Storage;
-using Windows.UI.ViewManagement;
 
 namespace FileCommander;
 
@@ -41,8 +39,6 @@ public sealed partial class MainWindow : Window
 
             if ((bool)settings["WindowMaximized"])
                 ((OverlappedPresenter)AppWindow.Presenter).Maximize();
-
-            var favs = settings["Favorites"] is string favstr ? JsonSerializer.Deserialize<Favorite[]>(favstr) : [];
         }
 
         MainGrid.DataContext = MainContext.Instance;
@@ -248,9 +244,6 @@ public sealed partial class MainWindow : Window
             settings["WindowY"] = AppWindow.Position.Y;
             settings["WindowWidth"] = AppWindow.Size.Width;
             settings["WindowHeight"] = AppWindow.Size.Height;
-
-            settings["Favorites"] = "[]";
-            //settings["Favorites"] = JsonSerializer.Serialize<Favorite[]>([ new Favorite("Schön", "c:\\"), new Favorite("Schön", "c:\\windows") ]);
         }
 
         settings["WindowMaximized"] =
