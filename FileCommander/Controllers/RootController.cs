@@ -42,14 +42,16 @@ class RootController : Controller
         return ([.. items.Select(n => new Item(n.Name, n.GetIcon(), [
             n.Description,
             n.Size.FormatSize().EmptyWhen0()
-          ], null, !n.IsMounted))], 0, items.Length, 0);
+          ], null, !n.IsMounted)), new(FavoriteController.NAME, "iconFromRes/Starred", ["Favoriten"])], 0, items.Length, 0);
     }
 
     public override (Controller Controller, Column[]? Columns, string Path, string OldPath) CheckPath(int pos)
     {
-        var controller = new DirectoryController(Context);
+        var controller = pos == items.Length 
+            ? (Controller)new FavoriteController(Context)
+            : new DirectoryController(Context);
         var columns = controller.GetColumns();
-        return (controller, columns, items[pos].Name, Name);
+        return (controller, columns, pos < items.Length ? items[pos].Name : "", Name);
     }
     
     public override string OnPosition(int pos) => items[pos].Name;

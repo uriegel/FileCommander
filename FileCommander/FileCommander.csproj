@@ -28,7 +28,9 @@
 	<ItemGroup>
 		<None Remove="Resources\Error.ico" />
 		<None Remove="Resources\Info.ico" />
+		<None Remove="Resources\Plus.png" />
 		<None Remove="Resources\QuestionMark.ico" />
+		<None Remove="Resources\starred.png" />
 		<None Remove="Resources\Warning.ico" />
 		<None Remove="Resources\WindowsDrive.ico" />
 		<None Remove="Views\ConflictDialog.xaml" />
@@ -61,6 +63,12 @@
 	    <EmbeddedResource Include="./Resources/WindowsDrive.png">
           <LogicalName>WindowsDrive</LogicalName>
         </EmbeddedResource>
+		<EmbeddedResource Include="./Resources/starred.png">
+			<LogicalName>Starred</LogicalName>
+		</EmbeddedResource>
+		<EmbeddedResource Include="./Resources/Plus.png">
+			<LogicalName>Plus</LogicalName>
+		</EmbeddedResource>
     </ItemGroup>
 
   <ItemGroup>

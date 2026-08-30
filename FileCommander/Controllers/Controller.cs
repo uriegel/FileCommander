@@ -27,6 +27,8 @@ abstract class Controller : IDisposable
     {
         if (path == null || path == "/.." || path.Length == 0 || path == RootController.NAME)
             return RootController.Get(current, context);
+        else if(path == FavoriteController.NAME)
+            return FavoriteController.Get(current, context);
         else
             return DirectoryController.Get(current, context); ;
     }
