@@ -96,10 +96,10 @@ async function onKeyDown(evt) {
         evt.stopPropagation()
         await fetch("request/command/refresh")
     }
-    else if (evt.key == "F7") {
+    else if (evt.key == "F1") {
         evt.preventDefault();
         evt.stopPropagation()
-        await fetch("request/command/createFolder")
+        showFavorites()
     }
     else if (evt.key == "F2") {
         evt.preventDefault();
@@ -115,6 +115,11 @@ async function onKeyDown(evt) {
         evt.preventDefault();
         evt.stopPropagation()
         copy(true)
+    }
+    else if (evt.key == "F7") {
+        evt.preventDefault();
+        evt.stopPropagation()
+        await fetch("request/command/createFolder")
     }
     else if (evt.key == "F9") {
         evt.preventDefault();
@@ -278,6 +283,8 @@ async function onEvent(evt) {
         showProperties()
     if (evt.openWith)
         openWith()
+    if (evt.showFavorites)
+        showFavorites()
 }
 
 async function init() {
@@ -465,6 +472,14 @@ async function showProperties() {
 
 async function openWith() {
     const res = await fetch(`request/openWith/${tableView.getPosition()}`)
+}
+
+async function showFavorites() {
+    stopRestriction()
+    const response = await fetch("request/changePath?path=fav")
+    const res = await response.json()
+    if (res.itemsResult)
+        setItems(res.itemsResult.items)
 }
 
 async function rename(asCopy) {

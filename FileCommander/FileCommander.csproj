@@ -22,6 +22,7 @@
     <None Remove="Assets\FolderView.xaml" />
     <None Remove="Controls\CopyDialog.xaml" />
     <None Remove="Controls\CreateFolderDialog.xaml" />
+    <None Remove="Controls\NewFavorite.xaml" />
     <None Remove="Controls\RenameDialog.xaml" />
     <None Remove="Controls\VirtualTable.xaml" />
   </ItemGroup>
@@ -156,6 +157,12 @@
 	  <Content Update="Assets\Folder.png">
 	    <LogicalName>Folder</LogicalName>
 	  </Content>
+	</ItemGroup>
+
+	<ItemGroup>
+	  <Page Update="Controls\NewFavorite.xaml">
+	    <Generator>MSBuild:Compile</Generator>
+	  </Page>
 	</ItemGroup>
 
 	<ItemGroup>

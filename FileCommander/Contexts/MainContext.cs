@@ -20,7 +20,8 @@ class MainContext : INotifyPropertyChanged
     public ICommand RenameCommand { get; set; } = null!;
     public ICommand RenameAsCopyCommand { get; set; } = null!;
     public ICommand AdaptPathCommand { get; set; } = null!;
-    
+    public ICommand FavoritesCommand { get; set; } = null!;
+
     public bool ShowHidden
     {
         get;

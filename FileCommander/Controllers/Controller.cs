@@ -2,8 +2,6 @@
 using FileCommander.Controls;
 using FileCommander.Data;
 
-using Microsoft.UI.Xaml;
-
 using System;
 using System.Threading.Tasks;
 
@@ -53,10 +51,10 @@ abstract class Controller : IDisposable
     public virtual (Item[]? Items, int newPos) Sort(int index, bool descending, bool subcolumn, int pos) => (null, 0);
     public abstract (Controller Controller, Column[]? Columns, string Path, string OldPath) CheckPath(int pos);
     public virtual bool Process(int pos) => false;
-    public virtual void CreateFolder(UIElement content) { }
-    public virtual Task<bool> DeleteItems(UIElement content, int[] items) => Task.FromResult(false);
-    public virtual Task<bool> Copy(UIElement content, CopyItems items, VirtualTable otherSide, bool fromRight) => Task.FromResult(false);
-    public virtual Task<bool> Rename(UIElement content, int pos, bool asCopy) => Task.FromResult(false);
+    public virtual void CreateFolder() { }
+    public virtual Task<bool> DeleteItems(int[] items) => Task.FromResult(false);
+    public virtual Task<bool> Copy(CopyItems items, VirtualTable otherSide, bool fromRight) => Task.FromResult(false);
+    public virtual Task<bool> Rename(int pos, bool asCopy) => Task.FromResult(false);
     public virtual ItemBase[] GetViewItems() => [];
     public virtual void Execute(int pos) { }
     public virtual void OnEnter(int pos, bool openWith) { }

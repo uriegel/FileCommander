@@ -1,6 +1,7 @@
 ﻿using CsTools.Extensions;
 
 using FileCommander.Contexts;
+using FileCommander.Controls;
 using FileCommander.Data;
 
 using System;
@@ -37,20 +38,38 @@ class FavoriteController : Controller
     
     public override (Item[] Items, int newPos, int dirs, int files) Reload(int pos)
     {
-        var (items, oldPos, dir, file) = GetItems("", false);
+        var (items, _, _, _) = GetItems("", false);
         return (items, 0, items.Length - 2, 0);
     }
     
     public override (Controller Controller, Column[]? Columns, string Path, string OldPath) CheckPath(int pos)
     {
-        var controller = pos == 0
+        Controller controller = pos == 0
             ? new RootController(Context)
+            : pos == items.Length - 1
+            ? this.SideEffect(_ => AddFavorite())
             : new RootController(Context);
         var columns = controller.GetColumns();
         return (controller, columns, items[pos].Text, Name);
     }
     
     public FavoriteController(FolderContext context) : base(context) { }
+
+    async void AddFavorite()
+    {
+        var otherContext = MainWindow.GetOtherContext(Context);
+        var newName = await Dialog.ShowAsync(MainWindow.Content, "Favoriten anlegen",
+            d => new Favorite((d.Content as NewFavorite)?.FavoriteName ?? "", (d.Content as NewFavorite)?.Path ?? ""),
+            new NewFavorite()
+            {
+                FavoriteName = otherContext.CurrentPath,
+                Path = otherContext.CurrentPath,
+            });
+        if (newName != null)
+        {
+
+        }
+    }
 
     Item[] items = [];
 }

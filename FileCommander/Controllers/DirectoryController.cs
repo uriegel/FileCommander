@@ -134,9 +134,9 @@ class DirectoryController : Controller
         return (items, newPos);
     }
 
-    public override async void CreateFolder(UIElement content) 
+    public override async void CreateFolder() 
     {
-        var newName = await Dialog.ShowAsync(content,
+        var newName = await Dialog.ShowAsync(MainWindow.Content,
             "Ordner anlegen",
             dialog => (dialog.Content as CreateFolderDialog)?.FolderName ?? "",
             new CreateFolderDialog()
@@ -176,7 +176,7 @@ class DirectoryController : Controller
         }
     }
 
-    public override async Task<bool> DeleteItems(UIElement content, int[] items) 
+    public override async Task<bool> DeleteItems(int[] items) 
     {
         var itemsToDelete = items
             .Select(n => (viewItems[n] as ItemBase))
@@ -185,7 +185,7 @@ class DirectoryController : Controller
         var pathsToDelete = itemsToDelete.Select(n => Context.CurrentPath.AppendPath(n.Name)).ToArray();
         var dirAndFileText = GetDirAndFileText(dirs, files);
 
-        if (await Dialog.ShowAsync(content,
+        if (await Dialog.ShowAsync(MainWindow.Content,
             "Dateien löschen",
             textContent: $"Möchtest du {dirAndFileText} löschen?"))
         {
@@ -201,7 +201,7 @@ class DirectoryController : Controller
             return false;
     }
 
-    public override async Task<bool> Copy(UIElement content, CopyItems items, VirtualTable otherSide, bool fromRight) 
+    public override async Task<bool> Copy(CopyItems items, VirtualTable otherSide, bool fromRight) 
     { 
         if (otherSide.Controller is not DirectoryController)
             return false;
@@ -243,7 +243,7 @@ class DirectoryController : Controller
         } 
         else
         {
-            if (!await Dialog.ShowAsync(content, title, new CopyDialog() 
+            if (!await Dialog.ShowAsync(MainWindow.Content, title, new CopyDialog() 
             {
                 Description = $"Möchtest du {dirAndFileText} {titleAction}?",
                 FromRight = fromRight
@@ -274,12 +274,12 @@ class DirectoryController : Controller
         }
     }
 
-    public override async Task<bool> Rename(UIElement content, int pos, bool asCopy)
+    public override async Task<bool> Rename(int pos, bool asCopy)
     {
         try
         {
             var item = viewItems[pos];
-            var newName = await Dialog.ShowAsync(content, asCopy ? "Kopie anlegen" : "Umbenennen",
+            var newName = await Dialog.ShowAsync(MainWindow.Content, asCopy ? "Kopie anlegen" : "Umbenennen",
                 d => (d.Content as RenameDialog)?.FileName ?? "",
                 new RenameDialog()
                 {

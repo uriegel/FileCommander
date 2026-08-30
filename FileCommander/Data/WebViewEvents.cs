@@ -1,6 +1,4 @@
-﻿using static ABI.System.Windows.Input.ICommand_Delegates;
-
-namespace FileCommander.Data;
+﻿namespace FileCommander.Data;
 
 record Event(
     Refresh? Refresh = null,
@@ -20,7 +18,8 @@ record Event(
     AdaptPath? AdaptPath = null,
     Execute? Execute = null,
     ShowProperties? ShowProperties = null,
-    OpenWith? OpenWith = null
+    OpenWith? OpenWith = null,
+    ShowFavorites? ShowFavorites = null
 );
 
 record Refresh();
@@ -41,3 +40,4 @@ record AdaptPath();
 record Execute();
 record ShowProperties();
 record OpenWith();
+record ShowFavorites();

@@ -25,9 +25,10 @@ using Windows.Storage;
 namespace FileCommander.Controls;
 
 // TODO Favorites
+// TODO Icon
 // TODO Home
-
 // TODO Connect remote drives
+
 // TODO exif dark mode
 
 // TODO Viewers
@@ -49,7 +50,7 @@ public sealed partial class VirtualTable : UserControl
     public void SelectAllBeneath() => SendEvent(new(SelectAllBeneath: new()));
     public void SelectAll() => SendEvent(new(SelectAll: new()));
     public void SelectNone() => SendEvent(new(SelectNone: new()));
-    public async void CreateFolder() => Controller.CreateFolder(Content);
+    public async void CreateFolder() => Controller.CreateFolder();
     public async void DeleteItems() => SendEvent(new(DeleteItems: new()));
     public async void Rename() => SendEvent(new(Rename: new()));
     public async void RenameAsCopy() => SendEvent(new(RenameAsCopy: new()));
@@ -59,7 +60,8 @@ public sealed partial class VirtualTable : UserControl
     public async void Execute() => SendEvent(new(Execute: new()));
     public async void ShowProperties() => SendEvent(new(ShowProperties: new()));
     public async void OpenWith() => SendEvent(new(OpenWith: new()));
-
+    public async void ShowFavorites() => SendEvent(new(ShowFavorites: new()));
+    
     public void SetContext(FolderContext context)
     {
         this.Context = context;
@@ -218,7 +220,7 @@ public sealed partial class VirtualTable : UserControl
                     var items = JsonSerializer.Deserialize<int[]>(stream);
                     if (items != null)
                     {
-                        var res = await Controller.DeleteItems(Content, items);
+                        var res = await Controller.DeleteItems(items);
                         SendResult(args, new RequestResult(res));
                     }
                     else
@@ -240,7 +242,7 @@ public sealed partial class VirtualTable : UserControl
                     var otherSide = OnOtherVirtualTable?.Invoke();
                     if (items != null && otherSide != null)
                     {
-                        var res = await Controller.Copy(Content, items, otherSide.Other, otherSide.IsRight);
+                        var res = await Controller.Copy(items, otherSide.Other, otherSide.IsRight);
                         SendResult(args, new RequestResult(res));
                         otherSide.Other.Refresh();
                     }
@@ -260,7 +262,7 @@ public sealed partial class VirtualTable : UserControl
                 {
                     var stream = args.Request.Content.AsStreamForRead();
                     var item = JsonSerializer.Deserialize<RenameItem>(stream, Json.Defaults);
-                    var res = await Controller.Rename(Content, item?.Item ?? -1, item?.AsCopy == true);
+                    var res = await Controller.Rename(item?.Item ?? -1, item?.AsCopy == true);
                     SendResult(args, new RequestResult(res));
                 }
                 finally

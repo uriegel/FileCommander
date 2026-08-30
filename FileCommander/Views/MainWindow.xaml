@@ -121,6 +121,12 @@
                         <KeyboardAccelerator Key="Enter" Modifiers="Menu" />
                     </XamlUICommand.KeyboardAccelerators>
                 </XamlUICommand>
+                <XamlUICommand x:Name="FavoritesCommand" Label="Favoriten" Description="Zu Favoriten wechsen" 
+                               ExecuteRequested="FavoritesCommand_ExecuteRequested">
+                    <XamlUICommand.KeyboardAccelerators>
+                        <KeyboardAccelerator Key="F1" />
+                    </XamlUICommand.KeyboardAccelerators>
+                </XamlUICommand>
                 <converters:InfoValueConverter x:Key="InfoValueConverter" />
             </ResourceDictionary>
         </Grid.Resources>
@@ -167,6 +173,7 @@
                             <MenuFlyoutItem Command="{StaticResource ShowPropertiesCommand}" />
                         </MenuFlyoutSubItem>
                         <MenuFlyoutSubItem Text="Navigation">
+                            <MenuFlyoutItem Command="{StaticResource FavoritesCommand}" />
                             <MenuFlyoutItem Command="{StaticResource AdaptPathCommand}" />
                         </MenuFlyoutSubItem>
                         <MenuFlyoutSubItem Text="Selektion">

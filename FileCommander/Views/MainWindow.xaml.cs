@@ -18,6 +18,7 @@ using System.Threading.Tasks;
 using Windows.ApplicationModel;
 using Windows.Graphics;
 using Windows.Storage;
+using Windows.UI.ViewManagement;
 
 namespace FileCommander;
 
@@ -56,7 +57,8 @@ public sealed partial class MainWindow : Window
         MainContext.Instance.RenameCommand = RenameCommand;
         MainContext.Instance.RenameAsCopyCommand = RenameAsCopyCommand;
         MainContext.Instance.AdaptPathCommand = AdaptPathCommand;
-
+        MainContext.Instance.FavoritesCommand = FavoritesCommand;
+        
         // Assumes "this" is a XAML Window. In projects that don't use 
         // WinUI 1.3 or later, use interop APIs to get the AppWindow.
         AppWindow.Changed += AppWindow_Changed;
@@ -104,6 +106,13 @@ public sealed partial class MainWindow : Window
         => mainWindow.LeftView == thisView ? mainWindow.RightView : mainWindow.LeftView;
 
     public static bool IsRightView(FolderView thisView) => mainWindow.RightView == thisView;
+
+    public static new UIElement Content { get => mainWindow.MainGrid; }
+
+    public static FolderContext GetOtherContext(FolderContext context) 
+        => mainWindow.LeftView.Context == context 
+            ? mainWindow.RightView.Context 
+            : mainWindow.LeftView.Context;
 
     void AppTitleBar_Loaded(object sender, RoutedEventArgs e)
     {
@@ -221,6 +230,8 @@ public sealed partial class MainWindow : Window
         => activeView?.ShowProperties();
     void OpenWithCommand_ExecuteRequested(XamlUICommand sender, ExecuteRequestedEventArgs args)
         => activeView?.OpenWith();
+    void FavoritesCommand_ExecuteRequested(XamlUICommand sender, ExecuteRequestedEventArgs args)
+        => activeView?.ShowFavorites();
 
     FolderView GetOtherView() => activeView == LeftView ? RightView : LeftView;
 
