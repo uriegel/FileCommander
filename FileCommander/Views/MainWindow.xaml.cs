@@ -110,6 +110,8 @@ public sealed partial class MainWindow : Window
             ? mainWindow.RightView.Context 
             : mainWindow.LeftView.Context;
 
+    public static void Refresh() => mainWindow.activeView?.Refresh();
+
     void AppTitleBar_Loaded(object sender, RoutedEventArgs e)
     {
         if (ExtendsContentIntoTitleBar == true)

@@ -70,6 +70,31 @@ class FavoriteController : Controller
             var settings = ApplicationData.Current.LocalSettings.Values;
             var favs = settings["Favorites"] is string favstr ? JsonSerializer.Deserialize<Favorite[]>(favstr) ?? [] : [];
             settings["Favorites"] = JsonSerializer.Serialize<Favorite[]>([.. favs.Where(n => !toDelete.Any(m => m.Values[0] == n.Path))]);
+            MainWindow.Refresh();
+            return true;
+        }
+        else
+            return false;
+    }
+
+    public override async Task<bool> Rename(int pos, bool asCopy)
+    {
+        var item = items[pos];
+        var newName = await Dialog.ShowAsync(MainWindow.Content, "Umbenennen",
+            d => (d.Content as RenameDialog)?.FileName ?? "",
+            new RenameDialog()
+            {
+                Description = "Möchtest du den Favoriten umbenennen?",
+                FileName = item.Text
+            });
+        if (newName != null)
+        {
+            var settings = ApplicationData.Current.LocalSettings.Values;
+            var favs = settings["Favorites"] is string favstr ? JsonSerializer.Deserialize<Favorite[]>(favstr) ?? [] : [];
+            settings["Favorites"] = JsonSerializer.Serialize<Favorite[]>(
+                [.. favs.Select(n => n.Path == item.Values[0] ? new Favorite(newName, item.Values[0]) : n)]
+            );
+            MainWindow.Refresh();
             return true;
         }
         else
@@ -93,6 +118,7 @@ class FavoriteController : Controller
             var settings = ApplicationData.Current.LocalSettings.Values;
             var favs = settings["Favorites"] is string favstr ? JsonSerializer.Deserialize<Favorite[]>(favstr) ?? [] : [];
             settings["Favorites"] = JsonSerializer.Serialize<Favorite[]>([ ..favs, res ]);
+            MainWindow.Refresh();
         }
     }
 

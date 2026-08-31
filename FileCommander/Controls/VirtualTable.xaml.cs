@@ -24,8 +24,6 @@ using Windows.Storage;
 
 namespace FileCommander.Controls;
 
-// TODO Favorites: After create and DeleteItems, refresh
-// TODO Favorites: Rename
 // TODO Icon
 // TODO Home
 // TODO Connect remote drives
