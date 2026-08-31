@@ -34,14 +34,14 @@ class FavoriteController : Controller
         var favs = settings["Favorites"] is string favstr ? JsonSerializer.Deserialize<Favorite[]>(favstr) ?? [] : [];
         items = [ 
             new Item("..", "iconFromRes/GoUp", [ "" ]),
-            .. favs.Select(n => new Item(n.Name, "iconFromRes/Starred", [ n.Path ], IsSelectable: true)),
+            .. favs.Select(n => new Item(n.Name, "iconFromRes/Starred", [ n.Path ], IsSelectable: true)).OrderBy(n => n.Text),
             new Item("Hinzufügen...", "iconFromRes/Plus", [ "" ])
         ];
         SetNewPath(Name, fromHistory);
         return (items, 0, items.Length - 2, 0);
     }
 
-    public override string OnPosition(int pos) => items[pos].Text;
+    public override string OnPosition(int pos) => items[pos].Values[0];
     
     public override (Item[] Items, int newPos, int dirs, int files) Reload(int pos)
     {
@@ -55,9 +55,9 @@ class FavoriteController : Controller
             ? new RootController(Context)
             : pos == items.Length - 1
             ? this.SideEffect(_ => AddFavorite())
-            : new RootController(Context);
+            : items[pos].Values[0] == RootController.NAME ? new RootController(Context) : new DirectoryController(Context);
         var columns = controller.GetColumns();
-        return (controller, columns, items[pos].Text, Name);
+        return (controller, columns, items[pos].Values[0], Name);
     }
 
     public override async Task<bool> DeleteItems(int[] itemsPos)

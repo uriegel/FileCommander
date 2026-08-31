@@ -219,8 +219,10 @@ async function onEvent(evt) {
         stopRestriction()
         const response = await fetch(`request/changePath?path=${evt.changePath.path}`)
         const res = await response.json()
-        if (res.itemsResult) 
+        if (res.itemsResult) {
+            checkColumns(res.itemsResult.columns)
             setItems(res.itemsResult.items)
+        }
     }
     if (evt.toggleSelection) {
         const items = tableView.getItems()
@@ -478,8 +480,10 @@ async function showFavorites() {
     stopRestriction()
     const response = await fetch("request/changePath?path=fav")
     const res = await response.json()
-    if (res.itemsResult)
+    if (res.itemsResult) {
+        checkColumns(res.itemsResult.columns)
         setItems(res.itemsResult.items)
+    }
 }
 
 async function rename(asCopy) {

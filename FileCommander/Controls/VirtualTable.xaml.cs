@@ -26,8 +26,6 @@ namespace FileCommander.Controls;
 
 // TODO Favorites: After create and DeleteItems, refresh
 // TODO Favorites: Rename
-// TODO Favorites: Sort items
-// TODO Favorites: changePath
 // TODO Icon
 // TODO Home
 // TODO Connect remote drives
@@ -90,7 +88,7 @@ public sealed partial class VirtualTable : UserControl
         {
             var path = new Uri(args.Request.Uri).AbsolutePath[1..];
             if (path.StartsWith("request"))
-            await ServeRequest(path[8..], args);
+                await ServeRequest(path[8..], args);
             else if (path.StartsWith("iconFromRes"))
                 ServeIconFromRes(path[12..], args);
             else if (path.StartsWith("icon"))
@@ -176,11 +174,13 @@ public sealed partial class VirtualTable : UserControl
             {
                 var query = MakeQuery(args.Request.Uri);
                 var newpath = query.TryGetValue("path", out var res) ? res ?? "" : "";
-                Controller = Controller.GetFromPath(newpath, Controller, Context);
+                    var oldController = Controller;
+                Controller = Controller.GetFromPath(newpath, oldController, Context);
+                var cols = oldController != Controller ? Controller.GetColumns() : null;
                 var (items, newPos, dirs, files) = Controller.GetItems(newpath, false);
                 Context.CurrentFileCount = files;
                 Context.CurrentDirectoryCount = dirs;
-                var itemsResult = items != null ? new ItemsResult(null, items, newPos) : null;
+                var itemsResult = items != null ? new ItemsResult(cols, items, newPos) : null;
                 SendResult(args, new ProcessResult(ItemsResult: itemsResult));
                 break;
             }
@@ -205,11 +205,13 @@ public sealed partial class VirtualTable : UserControl
                 ItemsResult? itemsResult = null;
                 if (newPath != null)
                 {
-                    Controller = Controller.GetFromPath(newPath, Controller, Context);
+                    var oldController = Controller;
+                    Controller = Controller.GetFromPath(newPath, oldController, Context);
+                    var cols = Controller != oldController ? Controller.GetColumns() : null;
                     var (items, newPos, dirs, files) = Controller.GetItems(newPath, false, true);
                     Context.CurrentFileCount = files;
                     Context.CurrentDirectoryCount = dirs;
-                    itemsResult = items != null ? new ItemsResult(null, items, newPos) : null;
+                    itemsResult = items != null ? new ItemsResult(cols, items, newPos) : null;
                 }
                 SendResult(args, itemsResult);
                 break;
