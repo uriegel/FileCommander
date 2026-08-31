@@ -24,7 +24,7 @@ using Windows.Storage;
 
 namespace FileCommander.Controls;
 
-// TODO Favorites: DeleteItems
+// TODO Favorites: After create and DeleteItems, refresh
 // TODO Favorites: Rename
 // TODO Favorites: Sort items
 // TODO Favorites: changePath

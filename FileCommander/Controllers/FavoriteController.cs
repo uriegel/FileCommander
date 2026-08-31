@@ -60,9 +60,20 @@ class FavoriteController : Controller
         return (controller, columns, items[pos].Text, Name);
     }
 
-    public override async Task<bool> DeleteItems(int[] items)
+    public override async Task<bool> DeleteItems(int[] itemsPos)
     {
-        return false;
+        var toDelete = items.Where((n, i) => itemsPos.Contains(i)).ToArray();
+        if (await Dialog.ShowAsync(MainWindow.Content,
+            "Favoriten löschen",
+            textContent: $"Möchtest du {(toDelete.Length == 1 ? "den" : "die")} Favoriten löschen?"))
+        {
+            var settings = ApplicationData.Current.LocalSettings.Values;
+            var favs = settings["Favorites"] is string favstr ? JsonSerializer.Deserialize<Favorite[]>(favstr) ?? [] : [];
+            settings["Favorites"] = JsonSerializer.Serialize<Favorite[]>([.. favs.Where(n => !toDelete.Any(m => m.Values[0] == n.Path))]);
+            return true;
+        }
+        else
+            return false;
     }
 
     public FavoriteController(FolderContext context) : base(context) { }
@@ -81,7 +92,6 @@ class FavoriteController : Controller
         {
             var settings = ApplicationData.Current.LocalSettings.Values;
             var favs = settings["Favorites"] is string favstr ? JsonSerializer.Deserialize<Favorite[]>(favstr) ?? [] : [];
-
             settings["Favorites"] = JsonSerializer.Serialize<Favorite[]>([ ..favs, res ]);
         }
     }

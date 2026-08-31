@@ -517,10 +517,9 @@ function getSelectedItems() {
         : tableViewItems
             .map((n, i) => n.selected ? i : -1)
             .filter(n => n != -1)
-    console.log("selectedItems", selectedItems)
     return selectedItems = selectedItems.length > 0
         ? selectedItems
-        : pos > 0
+        : pos > 0 && (unrestrictedItems ? itemsMap.get(pos).isSelectable : tableViewItems[pos].isSelectable)
         ? [pos]
         : []
 }
