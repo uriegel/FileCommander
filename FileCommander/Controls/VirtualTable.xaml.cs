@@ -24,7 +24,6 @@ using Windows.Storage;
 
 namespace FileCommander.Controls;
 
-// TODO Icon
 // TODO Home
 // TODO Connect remote drives
 

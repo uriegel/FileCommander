@@ -146,12 +146,12 @@
                 <ColumnDefinition x:Name="RightDragColumn" Width="*" MinWidth="48"/>
                 <ColumnDefinition x:Name="RightPaddingColumn" Width="0"/>
             </Grid.ColumnDefinitions>
-            <!--<Image x:Name="TitleBarIcon" Source="ms-appx:///Assets/StoreLogo.png" Grid.Column="1"
-                   Width="16" Height="16" Margin="8,0,4,0"/>-->
+            <Image x:Name="TitleBarIcon" Source="/Assets/Square44x44Logo.targetsize-24_altform-unplated.png" Grid.Column="1"
+                   Width="24" Height="24" Margin="8,0,4,0"/>
 
             <AppBarButton x:Name="HamburgerButton" Grid.Column="2"  >
                 <AppBarButton.Icon>
-                    <FontIcon FontFamily="Segoe Fluent Icons" Glyph="&#xE700;"/>
+                    <FontIcon Margin="0, -5, 0, 0" FontFamily="Segoe Fluent Icons" Glyph="&#xE700;"/>
                 </AppBarButton.Icon>
                 <AppBarButton.Flyout>
                     <MenuFlyout Placement="BottomEdgeAlignedLeft" >
