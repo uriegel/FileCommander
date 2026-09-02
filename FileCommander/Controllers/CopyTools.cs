@@ -17,8 +17,8 @@ static class CopyTools
         var targetDirs = target.OfType<DirectoryItem>();
         var sourceFiles = source.OfType<FileItem>();
         var targetFiles = target.OfType<FileItem>();
-        var targetDirsDictionary = targetDirs.ToDictionary(n => n.Name);
-        var targetFilesDictionary = targetFiles.ToDictionary(n => n.Name);
+        var targetDirsDictionary = targetDirs.ToDictionary(n => n.Name, StringComparer.OrdinalIgnoreCase);
+        var targetFilesDictionary = targetFiles.ToDictionary(n => n.Name, StringComparer.OrdinalIgnoreCase);
         var conflictDirs = sourceDirs.SelectFilterNull(RetrieveDirConflict);
         var conflictFiles = sourceFiles.SelectFilterNull(RetrieveFileConflict);
         return [.. conflictDirs, .. conflictFiles];
