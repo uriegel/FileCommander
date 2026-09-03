@@ -32,6 +32,7 @@
 		<None Remove="Resources\Plus.png" />
 		<None Remove="Resources\QuestionMark.ico" />
 		<None Remove="Resources\starred.png" />
+		<None Remove="Resources\user-home.png" />
 		<None Remove="Resources\Warning.ico" />
 		<None Remove="Resources\WindowsDrive.ico" />
 		<None Remove="Views\ConflictDialog.xaml" />
@@ -69,6 +70,9 @@
 		</EmbeddedResource>
 		<EmbeddedResource Include="./Resources/Plus.png">
 			<LogicalName>Plus</LogicalName>
+		</EmbeddedResource>
+		<EmbeddedResource Include="Resources\user-home.png" >
+			<LogicalName>Home</LogicalName>
 		</EmbeddedResource>
     </ItemGroup>
 

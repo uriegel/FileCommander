@@ -24,7 +24,6 @@ using Windows.Storage;
 
 namespace FileCommander.Controls;
 
-// TODO Home
 // TODO Connect remote drives
 
 // TODO exif dark mode

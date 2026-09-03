@@ -1,9 +1,9 @@
-﻿using CsTools;
-using CsTools.Extensions;
+﻿using CsTools.Extensions;
 
 using FileCommander.Contexts;
 using FileCommander.Data;
 
+using System;
 using System.IO;
 using System.Linq;
 
@@ -33,13 +33,15 @@ class RootController : Controller
         string path, bool controllerChanged, bool fromHistory = false)
     {
         items =
-           [.. DriveInfo
+           [ new RootItem(System.IO.Directory.GetParent(Environment.GetFolderPath(Environment.SpecialFolder.Personal))?.FullName ?? "",
+                "Start",0, true, false),
+            .. DriveInfo
                .GetDrives()
                .Select(RootItem.Create)
                .OrderByDescending(n => n.IsMounted)
                .ThenBy(n => n.Name)];
         SetNewPath(Name, fromHistory);
-        return ([.. items.Select(n => new Item(n.Name, n.GetIcon(), [
+        return ([.. items.Select((n, i) => new Item(n.Name, i == 0 ? "iconFromRes/Home" : n.GetIcon(), [
             n.Description,
             n.Size.FormatSize().EmptyWhen0()
           ], null, !n.IsMounted)), new(FavoriteController.NAME, "iconFromRes/Starred", ["Favoriten"])], 0, items.Length, 0);
@@ -47,7 +49,9 @@ class RootController : Controller
 
     public override (Controller Controller, Column[]? Columns, string Path, string OldPath) CheckPath(int pos)
     {
-        var controller = pos == items.Length 
+        var controller = pos == 0
+            ? new DirectoryController(Context)
+            : pos == items.Length
             ? (Controller)new FavoriteController(Context)
             : new DirectoryController(Context);
         var columns = controller.GetColumns();
