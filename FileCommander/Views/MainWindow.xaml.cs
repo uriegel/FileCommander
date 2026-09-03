@@ -27,7 +27,13 @@ public sealed partial class MainWindow : Window
         this.InitializeComponent();
         mainWindow = this;
 
-        MainGrid.DataContext = MainContext.Instance;
+
+        var kontext = MainContext.Instance;
+
+
+        var test = "Test";
+
+        MainGrid.DataContext = kontext;
         MainContext.Instance.ShowHiddenCommand = ShowHiddenCommand;
         MainContext.Instance.RefreshCommand = RefreshCommand;
         MainContext.Instance.ToggleSelectionCommand = ToggleSelectionCommand;
