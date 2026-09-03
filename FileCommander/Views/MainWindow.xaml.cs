@@ -27,20 +27,6 @@ public sealed partial class MainWindow : Window
         this.InitializeComponent();
         mainWindow = this;
 
-        var settings = ApplicationData.Current.LocalSettings.Values;
-        if (settings?.ContainsKey("WindowX") == true && (int)settings["WindowWidth"] > 10)
-        {
-            if (IsWindowVisible())
-                AppWindow.MoveAndResize(new RectInt32(
-                    (int)settings["WindowX"],
-                    (int)settings["WindowY"],
-                    (int)settings["WindowWidth"],
-                    (int)settings["WindowHeight"]));
-
-            if ((bool)settings["WindowMaximized"])
-                ((OverlappedPresenter)AppWindow.Presenter).Maximize();
-        }
-
         MainGrid.DataContext = MainContext.Instance;
         MainContext.Instance.ShowHiddenCommand = ShowHiddenCommand;
         MainContext.Instance.RefreshCommand = RefreshCommand;
@@ -82,6 +68,31 @@ public sealed partial class MainWindow : Window
             activeView?.Focus(FocusState.Keyboard);
             await Task.Delay(100);
             activeView?.Focus(FocusState.Keyboard);
+        }
+    }
+
+    public void RestoreWindowSettings()
+    {
+        var settings = ApplicationData.Current.LocalSettings.Values;
+        if (settings != null
+            && settings.ContainsKey("WindowX") 
+            && settings.ContainsKey("WindowY") 
+            && settings.ContainsKey("WindowWidth") 
+            && settings.ContainsKey("WindowHeight")
+            && settings.ContainsKey("WindowMaximized")
+            && (int)settings["WindowWidth"] > 10)
+        {
+            if (IsWindowVisible())
+                AppWindow.MoveAndResize(new RectInt32(
+                    (int)settings["WindowX"],
+                    (int)settings["WindowY"],
+                    (int)settings["WindowWidth"],
+                    (int)settings["WindowHeight"]));
+
+            if ((bool)settings["WindowMaximized"]
+                    && AppWindow.Presenter is OverlappedPresenter presenter
+                    && !presenter.State.HasFlag(OverlappedPresenterState.Maximized))
+                ((OverlappedPresenter)AppWindow.Presenter).Maximize();
         }
     }
 

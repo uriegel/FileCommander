@@ -1,13 +1,15 @@
 ﻿using Microsoft.UI.Xaml;
 using Microsoft.Windows.Globalization;
 
+using System.Threading.Tasks;
+
 namespace FileCommander;
 /// <summary>
 /// Provides application-specific behavior to supplement the default Application class.
 /// </summary>
 public partial class App : Application
 {
-    private Window? _window;
+    private MainWindow? _window;
 
     /// <summary>
     /// Initializes the singleton application object.  This is the first line of authored code
@@ -23,9 +25,11 @@ public partial class App : Application
     /// Invoked when the application is launched.
     /// </summary>
     /// <param name="args">Details about the launch request and process.</param>
-    protected override void OnLaunched(Microsoft.UI.Xaml.LaunchActivatedEventArgs args)
+    protected override async void OnLaunched(Microsoft.UI.Xaml.LaunchActivatedEventArgs args)
     {
         _window = new MainWindow();
         _window.Activate();
+        await Task.Yield();
+        _window.RestoreWindowSettings();
     }
 }
