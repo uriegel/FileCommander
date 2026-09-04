@@ -95,10 +95,10 @@ public sealed partial class MainWindow : Window
                     (int)settings["WindowWidth"],
                     (int)settings["WindowHeight"]));
 
-            //if ((bool)settings["WindowMaximized"]
-            //        && AppWindow.Presenter is OverlappedPresenter presenter
-            //        && !presenter.State.HasFlag(OverlappedPresenterState.Maximized))
-            //    ((OverlappedPresenter)AppWindow.Presenter).Maximize();
+            if ((bool)settings["WindowMaximized"]
+                    && AppWindow.Presenter is OverlappedPresenter presenter
+                    && !presenter.State.HasFlag(OverlappedPresenterState.Maximized))
+                ((OverlappedPresenter)AppWindow.Presenter).Maximize();
         }
     }
 
