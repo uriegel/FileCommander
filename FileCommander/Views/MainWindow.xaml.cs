@@ -88,12 +88,12 @@ public sealed partial class MainWindow : Window
             && settings.ContainsKey("WindowMaximized")
             && (int)settings["WindowWidth"] > 10)
         {
-            //if (IsWindowVisible())
-            //    AppWindow.MoveAndResize(new RectInt32(
-            //        (int)settings["WindowX"],
-            //        (int)settings["WindowY"],
-            //        (int)settings["WindowWidth"],
-            //        (int)settings["WindowHeight"]));
+            if (IsWindowVisible())
+                AppWindow.MoveAndResize(new RectInt32(
+                    (int)settings["WindowX"],
+                    (int)settings["WindowY"],
+                    (int)settings["WindowWidth"],
+                    (int)settings["WindowHeight"]));
 
             //if ((bool)settings["WindowMaximized"]
             //        && AppWindow.Presenter is OverlappedPresenter presenter
