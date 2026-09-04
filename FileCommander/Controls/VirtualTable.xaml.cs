@@ -137,15 +137,23 @@ public sealed partial class VirtualTable : UserControl
         {
             case "init":
             {
-                var settings = ApplicationData.Current.LocalSettings.Values;
-                var key = $"{Context.Id}-latestPath";
-                var initpath = settings.TryGetValue(key, out var value) ? (string)value : "";
-                var columns = Controller.GetColumns();
-                (var items, _, var dirs, var files) = Controller.GetItems(initpath, true);
-                Context.CurrentFileCount = files;
-                Context.CurrentDirectoryCount = dirs;
-                var itemsResult = new ItemsResult(columns, items, 0);
-                SendResult(args, itemsResult);
+                var deferral = args.GetDeferral();
+                try
+                {
+                    var settings = ApplicationData.Current.LocalSettings.Values;
+                    var key = $"{Context.Id}-latestPath";
+                    var initpath = settings.TryGetValue(key, out var value) ? (string)value : "";
+                    var columns = Controller.GetColumns();
+                    (var items, _, var dirs, var files) = await Controller.GetItemsAsync(initpath, true);
+                    Context.CurrentFileCount = files;
+                    Context.CurrentDirectoryCount = dirs;
+                    var itemsResult = new ItemsResult(columns, items, 0);
+                    SendResult(args, itemsResult);
+                }
+                finally
+                {
+                    deferral.Complete();
+                }
                 break;
             }
             case "sort":
@@ -168,16 +176,24 @@ public sealed partial class VirtualTable : UserControl
             }
             case "changePath":
             {
-                var query = MakeQuery(args.Request.Uri);
-                var newpath = query.TryGetValue("path", out var res) ? res ?? "" : "";
+                var deferral = args.GetDeferral();
+                try
+                {
+                    var query = MakeQuery(args.Request.Uri);
+                    var newpath = query.TryGetValue("path", out var res) ? res ?? "" : "";
                     var oldController = Controller;
-                Controller = Controller.GetFromPath(newpath, oldController, Context);
-                var cols = oldController != Controller ? Controller.GetColumns() : null;
-                var (items, newPos, dirs, files) = Controller.GetItems(newpath, false);
-                Context.CurrentFileCount = files;
-                Context.CurrentDirectoryCount = dirs;
-                var itemsResult = items != null ? new ItemsResult(cols, items, newPos) : null;
-                SendResult(args, new ProcessResult(ItemsResult: itemsResult));
+                    Controller = Controller.GetFromPath(newpath, oldController, Context);
+                    var cols = oldController != Controller ? Controller.GetColumns() : null;
+                    var (items, newPos, dirs, files) = await Controller.GetItemsAsync(newpath, false);
+                    Context.CurrentFileCount = files;
+                    Context.CurrentDirectoryCount = dirs;
+                    var itemsResult = items != null ? new ItemsResult(cols, items, newPos) : null;
+                    SendResult(args, new ProcessResult(ItemsResult: itemsResult));
+                }
+                finally
+                {
+                    deferral.Complete();
+                }
                 break;
             }
             case "getFileChanges":
@@ -196,20 +212,29 @@ public sealed partial class VirtualTable : UserControl
             }
             case "history":
             {
-                var query = MakeQuery(args.Request.Uri);
-                var newPath = Context.GetHistory(query.TryGetValue("forward", out var val) && val == "true");
-                ItemsResult? itemsResult = null;
-                if (newPath != null)
+                var deferral = args.GetDeferral();
+                try
                 {
-                    var oldController = Controller;
-                    Controller = Controller.GetFromPath(newPath, oldController, Context);
-                    var cols = Controller != oldController ? Controller.GetColumns() : null;
-                    var (items, newPos, dirs, files) = Controller.GetItems(newPath, false, true);
-                    Context.CurrentFileCount = files;
-                    Context.CurrentDirectoryCount = dirs;
-                    itemsResult = items != null ? new ItemsResult(cols, items, newPos) : null;
+
+                    var query = MakeQuery(args.Request.Uri);
+                    var newPath = Context.GetHistory(query.TryGetValue("forward", out var val) && val == "true");
+                    ItemsResult? itemsResult = null;
+                    if (newPath != null)
+                    {
+                        var oldController = Controller;
+                        Controller = Controller.GetFromPath(newPath, oldController, Context);
+                        var cols = Controller != oldController ? Controller.GetColumns() : null;
+                        var (items, newPos, dirs, files) = await Controller.GetItemsAsync(newPath, false, true);
+                        Context.CurrentFileCount = files;
+                        Context.CurrentDirectoryCount = dirs;
+                        itemsResult = items != null ? new ItemsResult(cols, items, newPos) : null;
+                    }
+                    SendResult(args, itemsResult);
                 }
-                SendResult(args, itemsResult);
+                finally
+                {
+                    deferral.Complete();
+                }
                 break;
             }
             case "deleteItems":
@@ -282,22 +307,30 @@ public sealed partial class VirtualTable : UserControl
             {
                 if (path.StartsWith("process"))
                 {
-                    var pos = int.Parse(path[8..]);
-                    if (Controller.Process(pos))
-                        SendResult(args, new ProcessResult());
-                    else
+                    var deferral = args.GetDeferral();
+                    try
                     {
-                        var (controller, cols, newPath, _) = this.Controller.CheckPath(pos);
-                        var (items, oldPos, dirCount, fileCount) = controller.GetItems(newPath, controller != this.Controller);
-                        if (this.Controller != controller)
+                        var pos = int.Parse(path[8..]);
+                        if (Controller.Process(pos))
+                            SendResult(args, new ProcessResult());
+                        else
                         {
-                            this.Controller.Dispose();
-                            this.Controller = controller;
+                            var (controller, cols, newPath, _) = this.Controller.CheckPath(pos);
+                            var (items, oldPos, dirCount, fileCount) = await controller.GetItemsAsync(newPath, controller != this.Controller);
+                            if (this.Controller != controller)
+                            {
+                                this.Controller.Dispose();
+                                this.Controller = controller;
+                            }
+                            Context.CurrentFileCount = fileCount;
+                            Context.CurrentDirectoryCount = dirCount;
+                            var itemsResult = new ItemsResult(cols, items, oldPos);
+                            SendResult(args, new ProcessResult(ItemsResult: itemsResult));
                         }
-                        Context.CurrentFileCount = fileCount;
-                        Context.CurrentDirectoryCount = dirCount;
-                        var itemsResult = new ItemsResult(cols, items, oldPos);
-                        SendResult(args, new ProcessResult(ItemsResult: itemsResult));
+                    }
+                    finally
+                    {
+                        deferral.Complete();
                     }
                 }
                 if (path.StartsWith("onposition"))
@@ -320,12 +353,20 @@ public sealed partial class VirtualTable : UserControl
                 }
                 else if (path.StartsWith("reload"))
                 {
-                    var pos = int.Parse(path[7..]);
-                    var (items, newPos, dirs, files) = Controller.Reload(pos);
-                    Context.CurrentFileCount = files;
-                    Context.CurrentDirectoryCount = dirs;
-                    var itemsResult = items != null ? new ItemsResult(null, items, newPos) : null;
-                    SendResult(args, new ProcessResult(ItemsResult: itemsResult));
+                    var deferral = args.GetDeferral();
+                    try
+                    {
+                        var pos = int.Parse(path[7..]);
+                        var (items, newPos, dirs, files) = await Controller.ReloadAsync(pos);
+                        Context.CurrentFileCount = files;
+                        Context.CurrentDirectoryCount = dirs;
+                        var itemsResult = items != null ? new ItemsResult(null, items, newPos) : null;
+                        SendResult(args, new ProcessResult(ItemsResult: itemsResult));
+                    }
+                    finally
+                    {
+                        deferral.Complete();
+                    }
                 }
                 else if (path.StartsWith("execute"))
                 {

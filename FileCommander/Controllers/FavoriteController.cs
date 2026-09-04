@@ -4,6 +4,7 @@ using FileCommander.Contexts;
 using FileCommander.Controls;
 using FileCommander.Data;
 
+using System;
 using System.Linq;
 using System.Text.Json;
 using System.Threading.Tasks;
@@ -28,7 +29,7 @@ class FavoriteController : Controller
             new("Pfad"),
         ];
 
-    public override (Item[] Items, int oldPos, int dirCount, int fileCount) GetItems(string path, bool controllerChanged, bool fromHistory = false)
+    public override async Task<(Item[] Items, int oldPos, int dirCount, int fileCount)> GetItemsAsync(string path, bool controllerChanged, bool fromHistory = false)
     {
         var settings = ApplicationData.Current.LocalSettings.Values;
         var favs = settings["Favorites"] is string favstr ? JsonSerializer.Deserialize<Favorite[]>(favstr) ?? [] : [];
@@ -43,9 +44,9 @@ class FavoriteController : Controller
 
     public override string OnPosition(int pos) => items[pos].Values[0];
     
-    public override (Item[] Items, int newPos, int dirs, int files) Reload(int pos)
+    public override async Task<(Item[] Items, int newPos, int dirs, int files)> ReloadAsync(int pos)
     {
-        var (items, _, _, _) = GetItems("", false);
+        var (items, _, _, _) = await GetItemsAsync("", false);
         return (items, 0, items.Length - 2, 0);
     }
     

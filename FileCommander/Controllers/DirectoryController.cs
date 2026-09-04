@@ -45,7 +45,7 @@ class DirectoryController : Controller
             new("Version", Sortable: true)
         ];
 
-    public override (Item[] Items, int oldPos, int dirCount, int fileCount) GetItems(
+    public override async Task<(Item[] Items, int oldPos, int dirCount, int fileCount)> GetItemsAsync(
         string path, bool controllerChanged, bool fromHistory = false)
     {
         var dirInfo = new DirectoryInfo(path);
@@ -115,10 +115,10 @@ class DirectoryController : Controller
         return (MapItems(), newPos < viewItems.Length ? newPos : 0, viewItems.Count(n => n is DirectoryItem), viewItems.Count(n => n is FileItem));
     }
 
-    public override (Item[] Items, int newPos, int dirs, int files) Reload(int pos)
+    public override async Task<(Item[] Items, int newPos, int dirs, int files)> ReloadAsync(int pos)
     {
         var recentItem = viewItems[pos].Name;
-        var (items, _, dirs, files) = GetItems(Context.CurrentPath, false);
+        var (items, _, dirs, files) = await GetItemsAsync(Context.CurrentPath, false);
         var newPos = items.TakeWhile(n => n.Text != recentItem).Count();
         return (items, newPos < items.Length ? newPos : 0, dirs, files);
     }

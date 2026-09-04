@@ -6,6 +6,7 @@ using FileCommander.Data;
 using System;
 using System.IO;
 using System.Linq;
+using System.Threading.Tasks;
 
 namespace FileCommander.Controllers;
 
@@ -29,7 +30,7 @@ class RootController : Controller
             new("Größe", true)
         ];
 
-    public override (Item[] Items, int oldPos, int dirCount, int fileCount) GetItems(
+    public override async Task<(Item[] Items, int oldPos, int dirCount, int fileCount)> GetItemsAsync(
         string path, bool controllerChanged, bool fromHistory = false)
     {
         items =
@@ -60,9 +61,9 @@ class RootController : Controller
     
     public override string OnPosition(int pos) => items[pos].Name;
     
-    public override (Item[] Items, int newPos, int dirs, int files) Reload(int pos)
+    public override async Task<(Item[] Items, int newPos, int dirs, int files)> ReloadAsync(int pos)
     {
-        var (items, _, dirs, files) = GetItems("", false);
+        var (items, _, dirs, files) = await GetItemsAsync("", false);
         return (items, pos, dirs, files);
     }
 

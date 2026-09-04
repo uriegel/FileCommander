@@ -43,11 +43,11 @@ abstract class Controller : IDisposable
     public virtual Task<Change[]?> GetItemChangesAsync() => Task.FromResult<Change[]?>(null);
 
     public abstract Column[] GetColumns();
-    public abstract (Item[] Items, int oldPos, int dirCount, int fileCount) GetItems(
+    public abstract Task<(Item[] Items, int oldPos, int dirCount, int fileCount)> GetItemsAsync(
         string path, bool controllerChanged, bool fromHistory = false);
     public abstract string OnPosition(int pos);
     public virtual (Item[]? Items, int newPos, int dirs, int files) Refresh(int pos) => (null, 0, 0, 0);
-    public abstract (Item[] Items, int newPos, int dirs, int files) Reload(int pos);
+    public abstract Task<(Item[] Items, int newPos, int dirs, int files)> ReloadAsync(int pos);
     public virtual (Item[]? Items, int newPos) Sort(int index, bool descending, bool subcolumn, int pos) => (null, 0);
     public abstract (Controller Controller, Column[]? Columns, string Path, string OldPath) CheckPath(int pos);
     public virtual bool Process(int pos) => false;
