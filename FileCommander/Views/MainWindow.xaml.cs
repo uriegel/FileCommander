@@ -88,17 +88,17 @@ public sealed partial class MainWindow : Window
             && settings.ContainsKey("WindowMaximized")
             && (int)settings["WindowWidth"] > 10)
         {
-            if (IsWindowVisible())
-                AppWindow.MoveAndResize(new RectInt32(
-                    (int)settings["WindowX"],
-                    (int)settings["WindowY"],
-                    (int)settings["WindowWidth"],
-                    (int)settings["WindowHeight"]));
+            //if (IsWindowVisible())
+            //    AppWindow.MoveAndResize(new RectInt32(
+            //        (int)settings["WindowX"],
+            //        (int)settings["WindowY"],
+            //        (int)settings["WindowWidth"],
+            //        (int)settings["WindowHeight"]));
 
-            if ((bool)settings["WindowMaximized"]
-                    && AppWindow.Presenter is OverlappedPresenter presenter
-                    && !presenter.State.HasFlag(OverlappedPresenterState.Maximized))
-                ((OverlappedPresenter)AppWindow.Presenter).Maximize();
+            //if ((bool)settings["WindowMaximized"]
+            //        && AppWindow.Presenter is OverlappedPresenter presenter
+            //        && !presenter.State.HasFlag(OverlappedPresenterState.Maximized))
+            //    ((OverlappedPresenter)AppWindow.Presenter).Maximize();
         }
     }
 
@@ -369,6 +369,9 @@ public sealed partial class MainWindow : Window
 
     async void Window_Activated(object sender, WindowActivatedEventArgs args)
     {
+        if (args.WindowActivationState == WindowActivationState.CodeActivated)
+            RestoreWindowSettings();
+
         if (args.WindowActivationState == WindowActivationState.CodeActivated || args.WindowActivationState == WindowActivationState.PointerActivated)
             DispatcherQueue.TryEnqueue(Microsoft.UI.Dispatching.DispatcherQueuePriority.Low, () =>
             {
