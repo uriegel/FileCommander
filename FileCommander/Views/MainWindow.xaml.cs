@@ -73,6 +73,9 @@ public sealed partial class MainWindow : Window
 
     public void RestoreWindowSettings()
     {
+        if (windowsSettingsRestored)
+            return;
+        windowsSettingsRestored = true;
         var settings = ApplicationData.Current.LocalSettings.Values;
         if (settings != null
             && settings.ContainsKey("WindowX") 
@@ -387,6 +390,7 @@ public sealed partial class MainWindow : Window
     double leftStartWidth;
     double rightStartWidth;
     bool IsPointerCaptured;
+    bool windowsSettingsRestored;
 }
 
 record Favorite(string Name, string Path);
