@@ -47,9 +47,9 @@ class DirectoryController : Controller
 
     public override Task<(Item[] Items, int oldPos, int dirCount, int fileCount)> GetItemsAsync(
         string path, bool controllerChanged, bool fromHistory = false)
-        => NetworkShare.ExecuteAsync(path, () => RunGetItemsAsync(path, controllerChanged, fromHistory));
+        => NetworkShare.ExecuteAsync(path, () => RunGetItems(path, controllerChanged, fromHistory));
     
-    async Task<(Item[] Items, int oldPos, int dirCount, int fileCount)> RunGetItemsAsync(
+    (Item[] Items, int oldPos, int dirCount, int fileCount) RunGetItems(
         string path, bool controllerChanged, bool fromHistory = false)
     {
         var dirInfo = new DirectoryInfo(path);

@@ -26,13 +26,7 @@ using Windows.Storage;
 
 namespace FileCommander.Controls;
 
-// TODO Connect remote drives
-// TODO Requests complete async
-// TODO AddConnection with ref
-// TODO AddConnection in a loop till cancel or connected
-
 // TODO exif dark mode
-
 // TODO Viewers
 // TODO Drag n drop
 

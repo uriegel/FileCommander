@@ -1,14 +1,14 @@
-﻿using ClrWinApi;
-
-using FileCommander.Exceptions;
-
-using System;
+﻿using System;
 using System.ComponentModel;
 using System.IO;
 using System.Runtime.InteropServices;
 using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
+
+using ClrWinApi;
+
+using FileCommander.Exceptions;
 
 using WinRT.Interop;
 
@@ -21,7 +21,7 @@ static class NetworkShare
     /// fails because credentials are required, the native Windows
     /// credential dialog is displayed and the operation is retried.
     /// </summary>
-    public static async Task<T> ExecuteAsync<T>(string path, Func<Task<T>> operation, CancellationToken cancellationToken = default)
+    public static async Task<T> ExecuteAsync<T>(string path, Func<T> operation, CancellationToken cancellationToken = default)
     {
         while (true)
         {
@@ -33,7 +33,7 @@ static class NetworkShare
             // First attempt: completely normal .NET file-system operation.
             try
             {
-                return await operation();
+                return operation();
             }
             catch (Exception ex) when (IsAuthenticationFailure(path, ex))
             {
@@ -44,26 +44,20 @@ static class NetworkShare
 
             // Only UNC paths can be handled here.
             if (!TryGetShareRoot(path, out var share))
-                throw new UnauthorizedAccessException(
-                    $"Access to '{path}' was denied.");
+                throw new UnauthorizedAccessException($"Access to '{path}' was denied.");
 
             // Display the native Windows credential dialog.
-            if (!PromptForCredentials(share, out var username, out var password, out var save))
-                // User pressed Cancel.
-                throw new OperationCanceledException(cancellationToken);
-
-            try
+            var res = await Task.Run(() => PromptForCredentials(share));
+            if (res != null)
             {
                 cancellationToken.ThrowIfCancellationRequested();
 
                 // Establish the SMB connection.
-                Connect(share, username, password, save);
+                Connect(share, res.Username, res.Password, res.Save);
             }
-            finally
-            {
-                // Don't retain the password any longer than necessary.
-                password = null;
-            }
+            else
+                // User pressed Cancel.
+                throw new OperationCanceledException(cancellationToken);
         }
     }
 
@@ -143,18 +137,18 @@ static class NetworkShare
                 "mit unterschiedlicher Anmeldeinformation.", new Win32Exception(result));
         }
 
-        throw new Win32Exception(result, $"'{share}' konnte nicht verbunden werden.");
+        // try with other credential // throw new Win32Exception(result, $"'{share}' konnte nicht verbunden werden.");
     }
 
 
     // --------------------------------------------------------------------
     // Windows credential dialog
     // --------------------------------------------------------------------
-    static bool PromptForCredentials(string target, out string username, out string password, out bool save)
+    static Credential? PromptForCredentials(string target)
     {
-        username = string.Empty;
-        password = string.Empty;
-        save = false;
+        var username = string.Empty;
+        var password = string.Empty;
+        var save = false;
 
         var uiInfo = new CredUIInfo
         {
@@ -187,7 +181,7 @@ static class NetworkShare
 
             // User pressed Cancel.
             if (result == ERROR_CANCELLED)
-                return false;
+                return null;
 
             if (result != NO_ERROR)
                 throw new Win32Exception(result);
@@ -243,7 +237,7 @@ static class NetworkShare
                     domainBuffer + "\\" + username;
             }
 
-            return true;
+            return new(username, password, save);
         }
         finally
         {
@@ -313,3 +307,5 @@ static class NetworkShare
     const int ERROR_ACCOUNT_LOCKED_OUT = 1909;
     const int ERROR_SESSION_CREDENTIAL_CONFLICT = 1219;
 }
+
+record Credential(string Username, string Password, bool Save);
