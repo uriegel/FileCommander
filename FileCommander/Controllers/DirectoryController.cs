@@ -45,7 +45,11 @@ class DirectoryController : Controller
             new("Version", Sortable: true)
         ];
 
-    public override async Task<(Item[] Items, int oldPos, int dirCount, int fileCount)> GetItemsAsync(
+    public override Task<(Item[] Items, int oldPos, int dirCount, int fileCount)> GetItemsAsync(
+        string path, bool controllerChanged, bool fromHistory = false)
+        => NetworkShare.ExecuteAsync(path, () => RunGetItemsAsync(path, controllerChanged, fromHistory));
+    
+    async Task<(Item[] Items, int oldPos, int dirCount, int fileCount)> RunGetItemsAsync(
         string path, bool controllerChanged, bool fromHistory = false)
     {
         var dirInfo = new DirectoryInfo(path);

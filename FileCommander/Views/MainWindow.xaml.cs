@@ -123,6 +123,8 @@ public sealed partial class MainWindow : Window
 
     public static void Refresh() => mainWindow.activeView?.Refresh();
 
+    public static Window GetWindow() => mainWindow;
+
     void AppTitleBar_Loaded(object sender, RoutedEventArgs e)
     {
         if (ExtendsContentIntoTitleBar == true)

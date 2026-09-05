@@ -4,6 +4,7 @@ using CsTools.Extensions;
 using FileCommander.Contexts;
 using FileCommander.Controllers;
 using FileCommander.Data;
+using FileCommander.Exceptions;
 using FileCommander.Icon;
 
 using Microsoft.UI.Xaml;
@@ -13,6 +14,7 @@ using Microsoft.Web.WebView2.Core;
 using System;
 using System.Collections.Generic;
 using System.Collections.Immutable;
+using System.ComponentModel;
 using System.Diagnostics;
 using System.IO;
 using System.Linq;
@@ -25,6 +27,9 @@ using Windows.Storage;
 namespace FileCommander.Controls;
 
 // TODO Connect remote drives
+// TODO Requests complete async
+// TODO AddConnection with ref
+// TODO AddConnection in a loop till cancel or connected
 
 // TODO exif dark mode
 
@@ -112,6 +117,21 @@ public sealed partial class VirtualTable : UserControl
         {
             Debug.WriteLine($"Fehler aufgetreten: {uae}");
             MainWindow.ShowError(uae.Message);
+            args.Response = WebView.CoreWebView2.Environment.CreateWebResourceResponse(null, 500, "Handler Error", null);
+        }
+        catch (Win32Exception w32e)
+        {
+            MainWindow.ShowError(w32e.Message);
+            args.Response = WebView.CoreWebView2.Environment.CreateWebResourceResponse(null, 500, "Handler Error", null);
+        }
+        catch (CredentialException ce)
+        {
+            MainWindow.ShowError(ce.Message);
+            args.Response = WebView.CoreWebView2.Environment.CreateWebResourceResponse(null, 500, "Handler Error", null);
+        }
+        catch (IOException ioe)
+        {
+            MainWindow.ShowError(ioe.Message);
             args.Response = WebView.CoreWebView2.Environment.CreateWebResourceResponse(null, 500, "Handler Error", null);
         }
         catch (Exception e)
