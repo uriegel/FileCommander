@@ -27,7 +27,14 @@ public sealed partial class MainWindow : Window
         this.InitializeComponent();
         mainWindow = this;
 
-        MainGrid.DataContext = MainContext.Instance;
+        var kontext = MainContext.Instance;
+
+
+        var test = "Test";
+
+        MainGrid.DataContext = kontext;
+
+
         MainContext.Instance.ShowHiddenCommand = ShowHiddenCommand;
         MainContext.Instance.RefreshCommand = RefreshCommand;
         MainContext.Instance.ToggleSelectionCommand = ToggleSelectionCommand;
@@ -92,10 +99,10 @@ public sealed partial class MainWindow : Window
                     (int)settings["WindowWidth"],
                     (int)settings["WindowHeight"]));
 
-            if ((bool)settings["WindowMaximized"]
-                    && AppWindow.Presenter is OverlappedPresenter presenter
-                    && !presenter.State.HasFlag(OverlappedPresenterState.Maximized))
-                ((OverlappedPresenter)AppWindow.Presenter).Maximize();
+            //if ((bool)settings["WindowMaximized"]
+            //        && AppWindow.Presenter is OverlappedPresenter presenter
+            //        && !presenter.State.HasFlag(OverlappedPresenterState.Maximized))
+            //    ((OverlappedPresenter)AppWindow.Presenter).Maximize();
         }
     }
 
