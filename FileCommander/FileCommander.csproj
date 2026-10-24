@@ -159,6 +159,9 @@
 	</ItemGroup>
 
 	<ItemGroup>
+	  <Content Update="Assets\FileCommander.ico">
+	    <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+	  </Content>
 	  <Content Update="Assets\Folder.png">
 	    <LogicalName>Folder</LogicalName>
 	  </Content>

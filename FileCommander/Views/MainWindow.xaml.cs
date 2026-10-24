@@ -12,6 +12,7 @@ using Microsoft.UI.Xaml.Media;
 using Microsoft.UI.Xaml.Media.Animation;
 
 using System;
+using System.IO;
 using System.Threading.Tasks;
 
 using Windows.ApplicationModel;
@@ -30,7 +31,12 @@ public sealed partial class MainWindow : Window
         var kontext = MainContext.Instance;
 
 
-        var test = "Test";
+        Title = "File Commander";
+
+        AppWindow.SetIcon(
+            Path.Combine(AppContext.BaseDirectory,
+                         "Assets",
+                         "FileCommander.ico"));
 
         MainGrid.DataContext = kontext;
 
