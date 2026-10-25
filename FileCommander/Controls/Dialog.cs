@@ -17,6 +17,7 @@ static class Dialog
         UserControl? xamlContent = null, 
         string? textContent = null) where TResult: class
     {
+        var root = (FrameworkElement)content.XamlRoot.Content;
         IsOpen = true;
         var dialog = new ContentDialog
         {
@@ -26,7 +27,8 @@ static class Dialog
             PrimaryButtonText = "Ok",
             CloseButtonText = "Abbrechen",
             DefaultButton = ContentDialogButton.Primary,
-            XamlRoot = content.XamlRoot
+            XamlRoot = root.XamlRoot,
+            RequestedTheme = root.ActualTheme
         };
         var res = await dialog.ShowAsync() == ContentDialogResult.Primary
                ? getResult(dialog)
