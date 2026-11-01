@@ -7,3 +7,9 @@ tr.exif > td:nth-child(2) {
 tr.selected > td {
     background-color: lightblue;
 }
+
+@media (prefers-color-scheme: dark) {
+    tr.selected > td {
+        background-color: darkblue;
+    }
+}

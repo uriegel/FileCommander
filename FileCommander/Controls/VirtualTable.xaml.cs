@@ -26,6 +26,7 @@ using Windows.Storage;
 
 namespace FileCommander.Controls;
 
+// TODO setColumns with colId: left-dir, right-root
 // TODO exif dark mode
 // TODO Viewers
 // TODO Drag n drop
