@@ -19,6 +19,8 @@ namespace FileCommander.Controllers;
 
 class DirectoryController : Controller
 {
+    public override string Name { get; } = "File";
+    
     public static DirectoryController Get(Controller? current, FolderContext context)
     => current is DirectoryController dirController
         ? dirController
@@ -37,13 +39,13 @@ class DirectoryController : Controller
                     | NotifyFilters.Size;
     }
 
-    public override Column[] GetColumns()
-        => [
+    public override Columns GetColumns()
+        => new(GetColumnId(), [
             new("Name", SubColumn: "Erw.", Sortable: true),
             new("Datum", Sortable: true),
             new("Größe", true, Sortable: true),
             new("Version", Sortable: true)
-        ];
+        ]);
 
     public override Task<(Item[] Items, int oldPos, int dirCount, int fileCount)> GetItemsAsync(
         string path, bool controllerChanged, bool fromHistory = false)
@@ -78,7 +80,7 @@ class DirectoryController : Controller
         return (MapItems(), oldPos, viewItems.Count(n => n is DirectoryItem), viewItems.Count(n => n is FileItem));  
     }
 
-    public override (Controller Controller, Column[]? Columns, string Path, string OldPath) CheckPath(int pos)
+    public override (Controller Controller, Columns? Columns, string Path, string OldPath) CheckPath(int pos)
     {
         return pos != 0
             ? (this, null, Context.CurrentPath.AppendPath(viewItems[pos].Name), "")
@@ -86,7 +88,7 @@ class DirectoryController : Controller
             ? (this, null, newPath, Context.CurrentPath)
             : NewRootController(); 
 
-        (Controller, Column[]?, string, string) NewRootController()
+        (Controller, Columns?, string, string) NewRootController()
         {
             var controller = new RootController(Context);
             return (controller, controller.GetColumns(), "", Context.CurrentPath);

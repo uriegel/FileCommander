@@ -300,14 +300,18 @@ async function init() {
 
 function checkColumns(columns) {
     if (columns) {
-        columnCount = columns.length
-        tableView.setColumns(columns)
+        colId = columns.id
+        columnCount = columns.values.length
+        tableView.setColumns(columns.values)
+        const widthsStr = localStorage.getItem(`columnWidths-${colId}`)
+        if (widthsStr)  
+            tableView.setColumnWidths(JSON.parse(widthsStr) )
     }
 }
 
 function onColumnWidthChange(cols) {
     console.log("On width change", cols)
-    //localStorage.setItem("columnWidths", JSON.stringify(cols))
+    localStorage.setItem(`columnWidths-${colId}`, JSON.stringify(cols))
 }
 
 function getPosition(pos) {
@@ -528,6 +532,7 @@ function getSelectedItems() {
         : []
 }
 
+var colId
 var itemsMap
 var columnCount = 0
 var unrestrictedItems

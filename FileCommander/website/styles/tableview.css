@@ -12,4 +12,7 @@ tr.selected > td {
     tr.selected > td {
         background-color: darkblue;
     }
+    tr.exif > td:nth-child(2) {
+        color: #ffff96;
+    }
 }

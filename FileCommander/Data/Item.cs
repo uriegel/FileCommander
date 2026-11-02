@@ -26,7 +26,7 @@ record ExifValue(string? Date, double? Latitude, double? Longitude)
 }
 
 record ItemsResult(
-    Column[]? Columns,
+    Columns? Columns,
     Item[] Items, 
     int Pos);
 

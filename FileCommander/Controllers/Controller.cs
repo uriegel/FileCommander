@@ -11,6 +11,8 @@ namespace FileCommander.Controllers;
 
 abstract class Controller : IDisposable
 {
+    public abstract string Name { get; }
+    
     public FolderContext Context { get; } = null!;
 
     public static Controller GetInitial(FolderContext context)
@@ -42,14 +44,14 @@ abstract class Controller : IDisposable
 
     public virtual Task<Change[]?> GetItemChangesAsync() => Task.FromResult<Change[]?>(null);
 
-    public abstract Column[] GetColumns();
+    public abstract Columns GetColumns();
     public abstract Task<(Item[] Items, int oldPos, int dirCount, int fileCount)> GetItemsAsync(
         string path, bool controllerChanged, bool fromHistory = false);
     public abstract string OnPosition(int pos);
     public virtual (Item[]? Items, int newPos, int dirs, int files) Refresh(int pos) => (null, 0, 0, 0);
     public abstract Task<(Item[] Items, int newPos, int dirs, int files)> ReloadAsync(int pos);
     public virtual (Item[]? Items, int newPos) Sort(int index, bool descending, bool subcolumn, int pos) => (null, 0);
-    public abstract (Controller Controller, Column[]? Columns, string Path, string OldPath) CheckPath(int pos);
+    public abstract (Controller Controller, Columns? Columns, string Path, string OldPath) CheckPath(int pos);
     public virtual bool Process(int pos) => false;
     public virtual void CreateFolder() { }
     public virtual Task<bool> DeleteItems(int[] items) => Task.FromResult(false);
@@ -58,6 +60,8 @@ abstract class Controller : IDisposable
     public virtual ItemBase[] GetViewItems() => [];
     public virtual void Execute(int pos) { }
     public virtual void OnEnter(int pos, bool openWith) { }
+
+    protected string GetColumnId() => Context.Id + "-" + Name;  
 
     #region IDisposable
 

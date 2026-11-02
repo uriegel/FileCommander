@@ -14,7 +14,7 @@ class RootController : Controller
 {
     public static string NAME { get => "root"; }
     
-    public string Name { get; } = NAME;
+    public override  string Name { get; } = NAME;
 
     public static RootController Get(Controller? current, FolderContext context)
         => current is RootController rootController
@@ -23,12 +23,12 @@ class RootController : Controller
 
     public RootController(FolderContext context) : base(context) { }
 
-    public override Column[] GetColumns()
-        => [
+    public override Columns GetColumns()
+        => new(GetColumnId(), [
             new("Name"),
             new("Bezeichnung"),
             new("Größe", true)
-        ];
+        ]);
 
     public override async Task<(Item[] Items, int oldPos, int dirCount, int fileCount)> GetItemsAsync(
         string path, bool controllerChanged, bool fromHistory = false)
@@ -48,7 +48,7 @@ class RootController : Controller
           ], null, !n.IsMounted)), new(FavoriteController.NAME, "iconFromRes/Starred", ["Favoriten"])], 0, items.Length, 0);
     }
 
-    public override (Controller Controller, Column[]? Columns, string Path, string OldPath) CheckPath(int pos)
+    public override (Controller Controller, Columns? Columns, string Path, string OldPath) CheckPath(int pos)
     {
         var controller = pos == 0
             ? new DirectoryController(Context)

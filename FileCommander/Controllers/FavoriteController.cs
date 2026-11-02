@@ -17,17 +17,17 @@ class FavoriteController : Controller
 {
     public static string NAME { get => "fav"; }
 
-    public string Name { get; } = NAME;
+    public override string Name { get; } = NAME;
 
     public static FavoriteController Get(Controller? current, FolderContext context)
         => current is FavoriteController favController
             ? favController
             : new FavoriteController(context).SideEffect(_ => current?.Dispose());
 
-    public override Column[] GetColumns() => [
+    public override Columns GetColumns() => new(GetColumnId(), [
             new("Name"),
             new("Pfad"),
-        ];
+        ]);
 
     public override async Task<(Item[] Items, int oldPos, int dirCount, int fileCount)> GetItemsAsync(string path, bool controllerChanged, bool fromHistory = false)
     {
@@ -50,7 +50,7 @@ class FavoriteController : Controller
         return (items, 0, items.Length - 2, 0);
     }
     
-    public override (Controller Controller, Column[]? Columns, string Path, string OldPath) CheckPath(int pos)
+    public override (Controller Controller, Columns? Columns, string Path, string OldPath) CheckPath(int pos)
     {
         Controller controller = pos == 0
             ? new RootController(Context)
