@@ -61,9 +61,18 @@ xport const TableRows = <TItem extends object>({ renderRow, position, items, ite
 )
 
 
+ member this.StartDragFiles (fileList: string) = 
+            this.DoDragDrop(DataObject(DataFormats.FileDrop, (TextJson.deserialize<DragFiles> fileList).Files), DragDropEffects.All)
 
-
-
+ member this.onDrop (e: QueryContinueDragEventArgs) = 
+        if e.Action = DragAction.Drop then
+            webView.ExecuteScriptAsync "WebView.setDroppedEvent(true)"
+            |> Async.AwaitTask
+            |> ignore
+        else if e.Action = DragAction.Cancel then
+            webView.ExecuteScriptAsync "WebView.setDroppedEvent(false)"
+            |> Async.AwaitTask
+            |> ignore
 
 
 
