@@ -559,11 +559,14 @@ function getSelectedItems() {
 }
 
 function onDragStart(evt) {
-    console.log("Dräg start", evt)   
-    chrome.webview.postMessage({
-        msg: 2
-    })
     evt.preventDefault()
+    const itemIndexes = getSelectedItems()
+    if (itemIndexes.length == 0)
+        return
+    chrome.webview.postMessage({
+        msg: 2,
+        itemIndexes
+    })
 }
 
 var colId

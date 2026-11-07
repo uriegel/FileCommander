@@ -61,6 +61,7 @@ abstract class Controller : IDisposable
     public virtual ItemBase[] GetViewItems() => [];
     public virtual void Execute(int pos) { }
     public virtual void OnEnter(int pos, bool openWith) { }
+    public virtual string[] GetFilesFromIndexes(int[] indexes) => [];
 
     protected string GetColumnId() => Context.Id + "-" + Name;  
 

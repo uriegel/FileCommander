@@ -410,6 +410,9 @@ class DirectoryController : Controller
 
     public override ItemBase[] GetViewItems() => viewItems;
 
+    public override string[] GetFilesFromIndexes(int[] items)
+        => [.. items.Select(n => Context.CurrentPath.AppendPath(viewItems[n].Name))];
+
     static bool ProcessResult(int res)
     {
         if (res == 0)
