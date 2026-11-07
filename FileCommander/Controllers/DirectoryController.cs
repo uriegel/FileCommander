@@ -278,7 +278,7 @@ class DirectoryController : Controller
         }
     }
 
-    public override async Task CopyFrom(string[] items, bool move)
+    public override async Task CopyFrom(string[] items, bool move, bool fromRight)
     {
         var itemsToCopy = items
             .Select(GetItem)
@@ -307,7 +307,7 @@ class DirectoryController : Controller
         bool noConfirmation = false;
         if (conflicts.Length > 0)
         {
-            var conflictResult = await ConflictDialog.ShowAsync([.. conflicts], titleAction.CapitalizeFirst(), false);
+            var conflictResult = await ConflictDialog.ShowAsync([.. conflicts], titleAction.CapitalizeFirst(), fromRight);
             if (conflictResult == ConflictDialogResult.Canceled)
                 return;
             if (conflictResult == ConflictDialogResult.DoNotOverwrite)
@@ -320,7 +320,7 @@ class DirectoryController : Controller
             if (!await Dialog.ShowAsync(MainWindow.Content, title, new CopyDialog()
             {
                 Description = $"Möchtest du {dirAndFileText} {titleAction}?",
-                FromRight = false
+                FromRight = fromRight
             }))
                 return;
         }

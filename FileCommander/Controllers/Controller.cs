@@ -56,7 +56,7 @@ abstract class Controller : IDisposable
     public virtual void CreateFolder() { }
     public virtual Task<bool> DeleteItems(int[] items) => Task.FromResult(false);
     public virtual Task<bool> Copy(CopyItems items, VirtualTable otherSide, bool fromRight) => Task.FromResult(false);
-    public virtual Task CopyFrom(string[] items, bool move) => Task.CompletedTask;
+    public virtual Task CopyFrom(string[] items, bool move, bool fromRight) => Task.CompletedTask;
     public virtual Task<bool> Rename(int pos, bool asCopy) => Task.FromResult(false);
     public virtual ItemBase[] GetViewItems() => [];
     public virtual void Execute(int pos) { }

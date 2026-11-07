@@ -26,7 +26,6 @@ using Windows.Storage;
 
 namespace FileCommander.Controls;
 
-// TODO Drop: fromLeft
 // TODO Drop: prevent drop in root folder
 
 // TODO Drag: drag to external apps (Explorer, Desktop, etc.) -> use WebView2DragDrop API 
@@ -560,7 +559,7 @@ public sealed partial class VirtualTable : UserControl
                             .OfType<CoreWebView2File>()
                             .Select(n => n.Path)
                             .ToArray();
-            Controller.CopyFrom(files, msg.Move);
+            Controller.CopyFrom(files, msg.Move, OnOtherVirtualTable?.Invoke().IsRight == false);
         }
     }
 
