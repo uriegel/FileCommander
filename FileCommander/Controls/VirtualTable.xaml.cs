@@ -7,6 +7,7 @@ using FileCommander.Data;
 using FileCommander.Exceptions;
 using FileCommander.Icon;
 
+using Microsoft.UI.Input;
 using Microsoft.UI.Xaml;
 using Microsoft.UI.Xaml.Controls;
 using Microsoft.Web.WebView2.Core;
@@ -20,12 +21,18 @@ using System.IO;
 using System.Linq;
 using System.Reflection;
 using System.Text.Json;
+using System.Threading;
 using System.Threading.Tasks;
 
+using Windows.ApplicationModel.DataTransfer;
+using Windows.Graphics.Imaging;
+using Windows.Security.Cryptography;
 using Windows.Storage;
+using Windows.UI.WebUI;
 
 namespace FileCommander.Controls;
 
+// TODO Drag: start Drag on items in VirtualTable 
 // TODO Drag: drag to external apps (Explorer, Desktop, etc.) -> use WebView2DragDrop API 
 // TODO Drag: drag to other side of FileCommander -> use WebView2DragDrop API
 // TODO Drag: Favorites: drag to Favorites -> use WebView2DragDrop API
@@ -38,9 +45,6 @@ namespace FileCommander.Controls;
     WebWindowNetCore MASTER 18.8.2024
     Commander CSHARP 
 
-    <VirtualTable ref={virtualTable} items={items} onSort={onSort} onColumnWidths={onColumnWidths} onItemClick={onItemClick}
-        onDragStart={isWindows() ? onDragStart : undefined} onEnter={onEnter} onPosition={onPositionChanged} />
-
     const onDragStart = async (evt: React.DragEvent) => {
         const items = getSelectedItems().map(n => n.name)
         if (items.length > 0) {
@@ -52,19 +56,6 @@ namespace FileCommander.Controls;
             internalDrag = false
         } 
     }
-
-
-xport const TableRows = <TItem extends object>({ renderRow, position, items, itemsDisplayCount, startOffset,
-    draggable, onDragStart, onDrag, onDragEnd, columns, getRowClasses, click }: TableRowsProp<TItem>) => (
-    <>
-        {getDisplayItems(startOffset, itemsDisplayCount, items)
-            .map((n, i) => (
-                <tr key={i + startOffset} className={getClass(position, i + startOffset, n, getRowClasses)} draggable={draggable}
-                        onDragStart={draggable ? onDragStart : undefined} onDrag={draggable ? onDrag : undefined} onDragEnd={draggable ? onDragEnd : undefined}>
-                    {renderRow(n, click).map((e, i) => <td className={columns[i].isRightAligned ? "rightAligned" : ""} key={i}>{e}</td>)}
-                </tr>))}
-    </>
-)
 
 
  member this.StartDragFiles (fileList: string) = 
@@ -123,11 +114,127 @@ public sealed partial class VirtualTable : UserControl
         await WebView.EnsureCoreWebView2Async();
 
         WebView.AllowDrop = true;
+        WebView.DragStarting += WebView_DragStarting;
         WebView.CoreWebView2.AddWebResourceRequestedFilter("https:*", CoreWebView2WebResourceContext.All);
         WebView.CoreWebView2.WebResourceRequested += CoreWebView2_WebResourceRequested;
         WebView.CoreWebView2.WebMessageReceived += CoreWebView2_WebMessageReceived;
         WebView.Source = new Uri("https://localhost/index.html");
         MainContext.Instance.PropertyChanged += MainContext_PropertyChanged;
+    }
+
+    private async void WebView_DragStarting(UIElement sender, DragStartingEventArgs args)
+    {
+        var deferral = args.GetDeferral();
+        try
+        {
+            string[] filePaths = [@"C:\Users\urieg\OneDrive\Fitness\Fitness.txt", @"C:\Users\urieg\OneDrive\Fitness\Fitness-ghostface.txt"];
+            var files = await filePaths
+                .ToAsyncEnumerable()
+                .Select(async (string n, CancellationToken c) => await StorageFile.GetFileFromPathAsync(n))
+                .ToArrayAsync();
+
+
+            args.Data.SetStorageItems(files);
+            args.DragUI.SetContentFromSoftwareBitmap(CreateDragIcon(234));
+            args.Data.RequestedOperation = DataPackageOperation.Copy | DataPackageOperation.Move;
+
+            static SoftwareBitmap CreateDragIcon(int count)
+            {
+                const int size = 64;
+                var pixels = new byte[size * size * 4];
+
+                void Pixel(int x, int y, byte r, byte g, byte b)
+                {
+                    if (x < 0 || x >= size || y < 0 || y >= size)
+                        return;
+
+                    int i = (y * size + x) * 4;
+                    pixels[i] = b;
+                    pixels[i + 1] = g;
+                    pixels[i + 2] = r;
+                    pixels[i + 3] = 255;
+                }
+
+                void Rect(int x, int y, int w, int h,
+                    byte r, byte g, byte b)
+                {
+                    for (int py = y; py < y + h; py++)
+                        for (int px = x; px < x + w; px++)
+                            Pixel(px, py, r, g, b);
+                }
+
+                void Circle(int cx, int cy, int radius,
+                    byte r, byte g, byte b)
+                {
+                    for (int y = -radius; y <= radius; y++)
+                        for (int x = -radius; x <= radius; x++)
+                            if (x * x + y * y <= radius * radius)
+                                Pixel(cx + x, cy + y, r, g, b);
+                }
+
+                // Document
+                Rect(13, 6, 31, 43, 245, 245, 245);
+                Rect(34, 6, 10, 10, 190, 190, 190);
+                Rect(19, 22, 19, 2, 100, 100, 100);
+                Rect(19, 29, 19, 2, 100, 100, 100);
+                Rect(19, 36, 13, 2, 100, 100, 100);
+
+                // Blue count badge
+                Circle(44, 44, 16, 35, 115, 220);
+
+                // Simple 3x5 digit font
+                string[] digits =
+                [
+                    "111101101101111", // 0
+            "010110010010111", // 1
+            "111001111100111", // 2
+            "111001111001111", // 3
+            "101101111001001", // 4
+            "111100111001111", // 5
+            "111100111101111", // 6
+            "111001001001001", // 7
+            "111101111101111", // 8
+            "111101111001111"  // 9
+                ];
+
+                string number = Math.Clamp(count, 0, 99).ToString();
+                int scale = 2;
+                int width = number.Length * 3 * scale
+                          + (number.Length - 1) * scale;
+                int startX = 44 - width / 2;
+                int startY = 39;
+
+                for (int n = 0; n < number.Length; n++)
+                {
+                    string digit = digits[number[n] - '0'];
+
+                    for (int i = 0; i < 15; i++)
+                    {
+                        if (digit[i] != '1')
+                            continue;
+
+                        Rect(
+                            startX + n * 8 + (i % 3) * scale,
+                            startY + (i / 3) * scale,
+                            scale, scale,
+                            255, 255, 255);
+                    }
+                }
+
+                var buffer = CryptographicBuffer.CreateFromByteArray(pixels);
+
+                return SoftwareBitmap.CreateCopyFromBuffer(
+                    buffer,
+                    BitmapPixelFormat.Bgra8,
+                    size,
+                    size,
+                    BitmapAlphaMode.Premultiplied);
+            }
+        }
+        finally
+        {
+            deferral.Complete();
+        }
     }
 
     async void CoreWebView2_WebResourceRequested(CoreWebView2 sender, CoreWebView2WebResourceRequestedEventArgs args)
@@ -548,16 +655,22 @@ public sealed partial class VirtualTable : UserControl
             200, "OK", "Content-Type: application/json");
     }
 
-    void CoreWebView2_WebMessageReceived(CoreWebView2 sender, CoreWebView2WebMessageReceivedEventArgs e)
+    async void CoreWebView2_WebMessageReceived(CoreWebView2 sender, CoreWebView2WebMessageReceivedEventArgs e)
     {
-        var msg = JsonSerializer.Deserialize<DropEvent>(e.WebMessageAsJson, Json.Defaults);
+        var msg = JsonSerializer.Deserialize<MsgEvent>(e.WebMessageAsJson, Json.Defaults);
         if (msg?.Msg == 1)
         {
             var files = e.AdditionalObjects
                             .OfType<CoreWebView2File>()
                             .Select(n => n.Path)
                             .ToArray();
-            Controller.CopyFrom(files, msg.Move, OnOtherVirtualTable?.Invoke().IsRight == false);
+            await Controller.CopyFrom(files, msg.Move == true, OnOtherVirtualTable?.Invoke().IsRight == false);
+        }
+        else if (msg?.Msg == 2)
+        {
+            var point = PointerPoint.GetCurrentPoint(1);
+            if (point.Properties.IsLeftButtonPressed)
+                await WebView.StartDragAsync(point);
         }
     }
 
@@ -576,4 +689,5 @@ public sealed partial class VirtualTable : UserControl
 }
 
 record OtherSide(VirtualTable Other, bool IsRight);
-record DropEvent(int Msg, bool Move);
+record MsgEvent(int Msg, bool? Move, string[]? Items);
+

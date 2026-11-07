@@ -38,6 +38,7 @@ tableView.addEventListener("create-rowitem", evt => {
     for (let i = 0; i < columnCount - 1; i++) {
         const td = document.createElement("td")
         td.id = `item${i}`
+        tr.addEventListener("dragstart", onDragStart)
         tr.appendChild(td)
     }
     evt.detail.tr = tr
@@ -555,6 +556,14 @@ function getSelectedItems() {
         : pos > 0 && (unrestrictedItems ? itemsMap.get(pos).isSelectable : tableViewItems[pos].isSelectable)
         ? [pos]
         : []
+}
+
+function onDragStart(evt) {
+    console.log("Dräg start", evt)   
+    chrome.webview.postMessage({
+        msg: 2
+    })
+    evt.preventDefault()
 }
 
 var colId
