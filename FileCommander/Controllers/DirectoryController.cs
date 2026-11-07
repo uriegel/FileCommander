@@ -325,6 +325,8 @@ class DirectoryController : Controller
                 return;
         }
 
+        items = [.. items.Where(n => itemsToCopy.Any(i => i.Name == System.IO.Path.GetFileName(n)))];
+
         var res = await Task.Run(() => Api.SHFileOperation(new ShFileOPStruct
         {
             Func = move ? FileFuncFlags.MOVE : FileFuncFlags.COPY,
