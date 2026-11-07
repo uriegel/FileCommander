@@ -129,7 +129,7 @@ public sealed partial class MainWindow : Window
         => mainWindow.LeftView == thisView ? mainWindow.RightView : mainWindow.LeftView;
 
     public static bool IsRightView(FolderView thisView) => mainWindow.RightView == thisView;
-
+    
     public static new UIElement Content { get => mainWindow.MainGrid; }
 
     public static FolderContext GetOtherContext(FolderContext context) 

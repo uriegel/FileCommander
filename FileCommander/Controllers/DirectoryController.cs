@@ -20,13 +20,13 @@ namespace FileCommander.Controllers;
 class DirectoryController : Controller
 {
     public override string Name { get; } = "File";
-    
+
     public static DirectoryController Get(Controller? current, FolderContext context)
     => current is DirectoryController dirController
         ? dirController
         : new DirectoryController(context).SideEffect(_ => current?.Dispose());
 
-    public DirectoryController(FolderContext context) : base(context) 
+    public DirectoryController(FolderContext context) : base(context)
     {
         watcher.Created += WatchCreated;
         watcher.Deleted += WatchDeleted;
@@ -50,7 +50,7 @@ class DirectoryController : Controller
     public override Task<(Item[] Items, int oldPos, int dirCount, int fileCount)> GetItemsAsync(
         string path, bool controllerChanged, bool fromHistory = false)
         => NetworkShare.ExecuteAsync(path, () => RunGetItems(path, controllerChanged, fromHistory));
-    
+
     (Item[] Items, int oldPos, int dirCount, int fileCount) RunGetItems(
         string path, bool controllerChanged, bool fromHistory = false)
     {
@@ -77,7 +77,7 @@ class DirectoryController : Controller
         if (enableEvents)
             watcher.EnableRaisingEvents = true;
 
-        return (MapItems(), oldPos, viewItems.Count(n => n is DirectoryItem), viewItems.Count(n => n is FileItem));  
+        return (MapItems(), oldPos, viewItems.Count(n => n is DirectoryItem), viewItems.Count(n => n is FileItem));
     }
 
     public override (Controller Controller, Columns? Columns, string Path, string OldPath) CheckPath(int pos)
@@ -86,7 +86,7 @@ class DirectoryController : Controller
             ? (this, null, Context.CurrentPath.AppendPath(viewItems[pos].Name), "")
             : new DirectoryInfo(Context.CurrentPath).Parent?.FullName is string newPath
             ? (this, null, newPath, Context.CurrentPath)
-            : NewRootController(); 
+            : NewRootController();
 
         (Controller, Columns?, string, string) NewRootController()
         {
@@ -106,11 +106,11 @@ class DirectoryController : Controller
             return false;
     }
 
-    public override async Task<Change[]?> GetItemChangesAsync() 
-        => await (changes?.GetItemsAsync() 
+    public override async Task<Change[]?> GetItemChangesAsync()
+        => await (changes?.GetItemsAsync()
             ?? Task.FromResult<Change[]?>(null));
 
-    public override string OnPosition(int pos) 
+    public override string OnPosition(int pos)
         => pos < viewItems.Length ? Context.CurrentPath.AppendPath(viewItems[pos].Name) : Context.CurrentPath;
 
     public override (Item[] Items, int newPos, int dirs, int files) Refresh(int pos)
@@ -138,7 +138,7 @@ class DirectoryController : Controller
         return (items, newPos);
     }
 
-    public override async void CreateFolder() 
+    public override async void CreateFolder()
     {
         var newName = await Dialog.ShowAsync(MainWindow.Content,
             "Ordner anlegen",
@@ -148,7 +148,7 @@ class DirectoryController : Controller
                 FolderName = Context.SelectedPath.EndsWith("..") == false ? Context.SelectedPath.SubstringAfterLast('\\') : ""
             });
         if (newName != null)
-        { 
+        {
             try
             {
                 System.IO.Directory.CreateDirectory(Context.CurrentPath.AppendPath(newName));
@@ -180,7 +180,7 @@ class DirectoryController : Controller
         }
     }
 
-    public override async Task<bool> DeleteItems(int[] items) 
+    public override async Task<bool> DeleteItems(int[] items)
     {
         var itemsToDelete = items
             .Select(n => (viewItems[n] as ItemBase))
@@ -205,8 +205,8 @@ class DirectoryController : Controller
             return false;
     }
 
-    public override async Task<bool> Copy(CopyItems items, VirtualTable otherSide, bool fromRight) 
-    { 
+    public override async Task<bool> Copy(CopyItems items, VirtualTable otherSide, bool fromRight)
+    {
         if (otherSide.Controller is not DirectoryController)
             return false;
 
@@ -242,12 +242,12 @@ class DirectoryController : Controller
                 return false;
             if (conflictResult == ConflictDialogResult.DoNotOverwrite)
                 itemsToCopy = ExceptConflicts(itemsToCopy, conflicts);
-            else 
+            else
                 noConfirmation = true;
-        } 
+        }
         else
         {
-            if (!await Dialog.ShowAsync(MainWindow.Content, title, new CopyDialog() 
+            if (!await Dialog.ShowAsync(MainWindow.Content, title, new CopyDialog()
             {
                 Description = $"Möchtest du {dirAndFileText} {titleAction}?",
                 FromRight = fromRight
@@ -276,6 +276,79 @@ class DirectoryController : Controller
                     .Where(n => !conflictNames.Contains(n.Name))
             ];
         }
+    }
+
+    public override async Task CopyFrom(string[] items, bool move)
+    {
+        var itemsToCopy = items
+            .Select(GetItem)
+            .ToArray();
+        var (dirs, files) = GetDirAndFileCount(itemsToCopy);
+        var titleAction = move ? "verschieben" : "kopieren";
+        var title = (dirs, files) switch
+        {
+            (0, 1) => $"Datei {titleAction}",
+            (1, 0) => $"Verzeichnis {titleAction}",
+            (_, 0) => $"Verzeichnisse {titleAction}",
+            (0, _) => $"Dateien {titleAction}",
+            _ => $"Verzeichnisse und Dateien {titleAction}"
+        };
+        var dirAndFileText = (dirs, files) switch
+        {
+            (0, 1) => "die Datei",
+            (1, 0) => "das Verzeichnis",
+            (_, 0) => "die Verzeichnisse",
+            (0, _) => "die Dateien",
+            _ => "die Verzeichnisse und Dateien"
+        };
+
+        var targets = GetViewItems();
+        var conflicts = CopyTools.GetConflicts(itemsToCopy, targets, Context.CurrentPath).ToArray();
+        bool noConfirmation = false;
+        if (conflicts.Length > 0)
+        {
+            var conflictResult = await ConflictDialog.ShowAsync([.. conflicts], titleAction.CapitalizeFirst(), false);
+            if (conflictResult == ConflictDialogResult.Canceled)
+                return;
+            if (conflictResult == ConflictDialogResult.DoNotOverwrite)
+                itemsToCopy = ExceptConflicts(itemsToCopy, conflicts);
+            else
+                noConfirmation = true;
+        }
+        else
+        {
+            if (!await Dialog.ShowAsync(MainWindow.Content, title, new CopyDialog()
+            {
+                Description = $"Möchtest du {dirAndFileText} {titleAction}?",
+                FromRight = false
+            }))
+                return;
+        }
+
+        var res = await Task.Run(() => Api.SHFileOperation(new ShFileOPStruct
+        {
+            Func = move ? FileFuncFlags.MOVE : FileFuncFlags.COPY,
+            From = string.Join("\U00000000", items) + "\U00000000\U00000000",
+            To = string.Join("\U00000000", itemsToCopy.Select(n => Context.CurrentPath.AppendPath(n.Name))) + "\U00000000\U00000000",
+            Flags = (noConfirmation ? FileOpFlags.NOCONFIRMATION : FileOpFlags.NOCONFIRMMKDIR) | FileOpFlags.NOCONFIRMMKDIR | FileOpFlags.MULTIDESTFILES,
+        }));
+        ProcessResult(res);
+
+        ItemBase[] ExceptConflicts(ItemBase[] items, ConflictItem[] conflicts)
+        {
+            var conflictNames = conflicts
+                .Select(c => c.Name)
+                .ToHashSet();
+            return itemsToCopy = [
+                .. items
+                    .Where(n => !conflictNames.Contains(n.Name))
+            ];
+        }
+
+        ItemBase GetItem(string path)
+            => Directory.Exists(path)
+                ? DirectoryItem.Create(new DirectoryInfo(path))
+                :FileItem.Create(new FileInfo(path));
     }
 
     public override async Task<bool> Rename(int pos, bool asCopy)

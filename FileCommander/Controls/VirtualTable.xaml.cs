@@ -26,8 +26,7 @@ using Windows.Storage;
 
 namespace FileCommander.Controls;
 
-// TODO Drop: dark mode
-// TODO Drop: copy/move files with Controller
+// TODO Drop: fromLeft
 // TODO Drop: prevent drop in root folder
 
 // TODO Drag: drag to external apps (Explorer, Desktop, etc.) -> use WebView2DragDrop API 
@@ -557,10 +556,11 @@ public sealed partial class VirtualTable : UserControl
         var msg = JsonSerializer.Deserialize<DropEvent>(e.WebMessageAsJson, Json.Defaults);
         if (msg?.Msg == 1)
         {
-            var addies = e.AdditionalObjects
+            var files = e.AdditionalObjects
                             .OfType<CoreWebView2File>()
                             .Select(n => n.Path)
                             .ToArray();
+            Controller.CopyFrom(files, msg.Move);
         }
     }
 

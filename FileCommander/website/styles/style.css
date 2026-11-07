@@ -6,6 +6,18 @@ body {
     --vtr-caption-color: gray;
     --drag-highlight: rgb(185, 255, 255);
 }
+@media (prefers-color-scheme: dark) {
+    body {
+        color: lightgray;
+        background-color: #2f2f2f;
+        --restriction-background-color: #222;
+        --vtc-caption-background-color: #2f2f2f;
+        --vtc-caption-background-hover-color: #222;
+        --vtc-caption-separator-color: darkgray;
+        --vtr-caption-color: darkgray;
+        --drag-highlight: rgb(42 55 71);
+    }
+}
 
 body {
     font-family: 'arial';
@@ -33,18 +45,6 @@ body {
 .icon {
     width: 16px;
     vertical-align: bottom;
-}
-
-@media (prefers-color-scheme: dark) {
-    body {
-        color: lightgray;
-        background-color: #2f2f2f;
-        --restriction-background-color: #222;
-        --vtc-caption-background-color: #2f2f2f;
-        --vtc-caption-background-hover-color: #222;
-        --vtc-caption-separator-color: darkgray;
-        --vtr-caption-color: darkgray;
-    }
 }
 
 #restriction {
