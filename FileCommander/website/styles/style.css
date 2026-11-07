@@ -4,6 +4,7 @@ body {
     --vtc-caption-background-hover-color: #f7f7f0;
     --vtc-caption-separator-color: lightgray;
     --vtr-caption-color: gray;
+    --drag-highlight: rgb(185, 255, 255);
 }
 
 body {
@@ -19,6 +20,11 @@ body {
 .tableContainer {
     flex-grow: 1;
     position: relative;
+    transition: background-color ease-in-out 0.4s;
+}
+
+.tableContainer.dragging {
+    background-color: var(--drag-highlight);
 }
 
 .hidden {

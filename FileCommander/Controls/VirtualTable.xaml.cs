@@ -26,14 +26,23 @@ using Windows.Storage;
 
 namespace FileCommander.Controls;
 
+// TODO Drop: copy/move files with Controller
+// TODO Drop: prevent drop in root folder
+
+// TODO Drag: drag to external apps (Explorer, Desktop, etc.) -> use WebView2DragDrop API 
+// TODO Drag: drag to other side of FileCommander -> use WebView2DragDrop API
+// TODO Drag: Favorites: drag to Favorites -> use WebView2DragDrop API
 // TODO Viewers
-// TODO Drag n drop
+
+
 
 // TODO Drag:
-// TODO Drop:
 /*
     WebWindowNetCore MASTER 18.8.2024
     Commander CSHARP 
+
+    <VirtualTable ref={virtualTable} items={items} onSort={onSort} onColumnWidths={onColumnWidths} onItemClick={onItemClick}
+        onDragStart={isWindows() ? onDragStart : undefined} onEnter={onEnter} onPosition={onPositionChanged} />
 
     const onDragStart = async (evt: React.DragEvent) => {
         const items = getSelectedItems().map(n => n.name)
@@ -73,110 +82,6 @@ xport const TableRows = <TItem extends object>({ renderRow, position, items, ite
             webView.ExecuteScriptAsync "WebView.setDroppedEvent(false)"
             |> Async.AwaitTask
             |> ignore
-
-
-
-
-
-
-
-
-
-
-    WebView.CoreWebView2.WebMessageReceived += WebMessageReceived;
-
-
-    async void WebMessageReceived(object? _, CoreWebView2WebMessageReceivedEventArgs e)
-    {
-        var msg = e.TryGetWebMessageAsString();
-        if (msg == "ondrop")
-        {
-            var fileList = e.AdditionalObjects.SelectFilterNull(n => (n as CoreWebView2File)?.Path).Serialize();
-            WebView.CoreWebView2.PostWebMessageAsJson(fileList);
-        }
-    }
-
-    static string GetOnFilesDropScript(bool activate) =>
-        activate
-        ? $@"
-    function dropFiles(id, move, droppedFiles) {{
-        chrome.webview.postMessageWithAdditionalObjects({{
-            msg: 1,
-            text: id,
-            move
-        }}, droppedFiles)
-    }}"
-        : $@"
-        function dropFiles() {{}}
-    ";
-
-    Builder.OnFilesDrop((id, move, files) => WebView.RunJavascript("alert(`Id: ${id}, move: ${move}, files: ${files}`)"))    
-
-
-dropZone.addEventListener("dragover", e => {
-    e.preventDefault()
-    e.stopPropagation()
-    e.dataTransfer.dropEffect = e.shiftKey ? "move" : "copy"
-})
-
-dropZone.addEventListener("drop", e => {
-    e.preventDefault()
-    e.stopPropagation()
-    WebView.dropFiles("dropZone", e.shiftKey, e.dataTransfer.files)
-})
-
-} 
-
-body {
-    --drag-highlight: rgb(185, 255, 255);
-}
-.dragging {
-    background-color: var(--drag-highlight);
-}
-
- const onDragEnter = () => {
-        if (!dragStarted) {
-            dragEnterRefs.current++
-            setDragging(true)
-        }
-    }
-
-    const onDragLeave = () => {
-        if (!dragStarted && --dragEnterRefs.current == 0)
-            setDragging(false)
-    }        
-
-    const onDragOver = (evt: React.DragEvent) => {
-        evt.preventDefault()
-        evt.stopPropagation()
-        if (internalDrag) 
-            evt.dataTransfer.dropEffect = evt.shiftKey ? "move" : "copy"
-    }
-
-    const onDrop = (evt: React.DragEvent) => {
-        setDragging(false)
-        const internal = internalDrag
-        internalDrag = false
-        dragEnterRefs.current = 0
-        evt.preventDefault()
-        if (internal) {
-            if (!dragStarted)
-                onCopy(evt.shiftKey)
-        }
-        else
-            webViewDropFiles(id, evt.shiftKey, evt.dataTransfer.files)
-    }
-
-<div className={`folder${dragging ? " dragging" : ""}`} onFocus={onFocusChanged}
-            onDragEnter={isWindows() ? onDragEnter : undefined} onDragOver={isWindows() ? onDragOver : undefined}
-            onDragLeave={isWindows() ? onDragLeave : undefined} onDrop={isWindows() ? onDrop : undefined}>
-            <input ref={input} className="pathInput" spellCheck={false} value={path} onChange={onInputChange} onKeyDown={onInputKeyDown} onFocus={onInputFocus} />
-            <div className={`tableContainer${dragStarted ? " dragStarted" : ""}`} onKeyDown={onKeyDown} >
-                <VirtualTable ref={virtualTable} items={items} onSort={onSort} onColumnWidths={onColumnWidths} onItemClick={onItemClick}
-                    onDragStart={isWindows() ? onDragStart : undefined} onEnter={onEnter} onPosition={onPositionChanged} />
-            </div>
-            <RestrictionView items={items} ref={restrictionView} />
-        </div>
 */
 
 public sealed partial class VirtualTable : UserControl
@@ -220,8 +125,10 @@ public sealed partial class VirtualTable : UserControl
     {
         await WebView.EnsureCoreWebView2Async();
 
+        WebView.AllowDrop = true;
         WebView.CoreWebView2.AddWebResourceRequestedFilter("https:*", CoreWebView2WebResourceContext.All);
         WebView.CoreWebView2.WebResourceRequested += CoreWebView2_WebResourceRequested;
+        WebView.CoreWebView2.WebMessageReceived += CoreWebView2_WebMessageReceived;
         WebView.Source = new Uri("https://localhost/index.html");
         MainContext.Instance.PropertyChanged += MainContext_PropertyChanged;
     }
@@ -644,6 +551,18 @@ public sealed partial class VirtualTable : UserControl
             200, "OK", "Content-Type: application/json");
     }
 
+    void CoreWebView2_WebMessageReceived(CoreWebView2 sender, CoreWebView2WebMessageReceivedEventArgs e)
+    {
+        var msg = JsonSerializer.Deserialize<DropEvent>(e.WebMessageAsJson, Json.Defaults);
+        if (msg?.Msg == 1)
+        {
+            var addies = e.AdditionalObjects
+                            .OfType<CoreWebView2File>()
+                            .Select(n => n.Path)
+                            .ToArray();
+        }
+    }
+
     // TODO to CsTools
     static ImmutableDictionary<string, string> MakeQuery(string url)
         => url.SubstringAfter('?')
@@ -659,3 +578,4 @@ public sealed partial class VirtualTable : UserControl
 }
 
 record OtherSide(VirtualTable Other, bool IsRight);
+record DropEvent(int Msg, bool Move);

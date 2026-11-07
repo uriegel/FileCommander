@@ -8,6 +8,27 @@ tableView.setOnColumnWidthChange(onColumnWidthChange)
 tableView.setOnSort(onSort)
 tableView.focus()
 
+const tableViewContainer = document.getElementsByClassName("tableContainer")[0]
+tableViewContainer.addEventListener("dragenter", () => {
+    // prevent drop of started drag in this control
+    tableViewContainer.classList.add("dragging")
+})
+tableViewContainer.addEventListener("dragover", evt => {
+    evt.dataTransfer.dropEffect = evt.shiftKey ? "move" : "copy"
+    evt.preventDefault()
+})
+tableViewContainer.addEventListener("drop", evt => {
+    evt.preventDefault()
+    chrome.webview.postMessageWithAdditionalObjects({
+        msg: 1,
+        move: evt.shiftKey
+    }, evt.dataTransfer.files)
+    tableViewContainer.classList.remove("dragging")
+})
+tableViewContainer.addEventListener("dragleave", () => {
+    tableViewContainer.classList.remove("dragging")
+})
+
 tableView.addEventListener("create-rowitem", evt => {
     const template = document.getElementById('item')
     const tr = template.content.cloneNode(true).firstElementChild
