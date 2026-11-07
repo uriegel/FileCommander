@@ -26,6 +26,7 @@ using Windows.Storage;
 
 namespace FileCommander.Controls;
 
+// TODO Drop: dark mode
 // TODO Drop: copy/move files with Controller
 // TODO Drop: prevent drop in root folder
 
