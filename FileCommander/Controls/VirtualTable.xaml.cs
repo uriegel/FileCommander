@@ -26,8 +26,6 @@ using Windows.Storage;
 
 namespace FileCommander.Controls;
 
-// TODO Drop: prevent drop in root folder
-
 // TODO Drag: drag to external apps (Explorer, Desktop, etc.) -> use WebView2DragDrop API 
 // TODO Drag: drag to other side of FileCommander -> use WebView2DragDrop API
 // TODO Drag: Favorites: drag to Favorites -> use WebView2DragDrop API

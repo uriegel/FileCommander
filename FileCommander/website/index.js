@@ -10,11 +10,14 @@ tableView.focus()
 
 const tableViewContainer = document.getElementsByClassName("tableContainer")[0]
 tableViewContainer.addEventListener("dragenter", () => {
-    // prevent drop of started drag in this control
-    tableViewContainer.classList.add("dragging")
+    if (allowDrop)
+        tableViewContainer.classList.add("dragging")
 })
 tableViewContainer.addEventListener("dragover", evt => {
-    evt.dataTransfer.dropEffect = evt.shiftKey ? "move" : "copy"
+    evt.dataTransfer.dropEffect =
+        tableViewContainer.classList.contains("dragging")
+        ? evt.shiftKey ? "move" : "copy"
+        : "none"
     evt.preventDefault()
 })
 tableViewContainer.addEventListener("drop", evt => {
@@ -322,6 +325,7 @@ async function init() {
 function checkColumns(columns) {
     if (columns) {
         colId = columns.id
+        allowDrop = columns.allowDrop
         columnCount = columns.values.length
         tableView.setColumns(columns.values)
         const widthsStr = localStorage.getItem(`columnWidths-${colId}`)
@@ -558,3 +562,4 @@ var itemsMap
 var columnCount = 0
 var unrestrictedItems
 var changeDetectionCancellation = false
+var allowDrop = false

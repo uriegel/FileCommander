@@ -24,7 +24,7 @@ class FavoriteController : Controller
             ? favController
             : new FavoriteController(context).SideEffect(_ => current?.Dispose());
 
-    public override Columns GetColumns() => new(GetColumnId(), [
+    public override Columns GetColumns() => new(GetColumnId(), true, [
             new("Name"),
             new("Pfad"),
         ]);

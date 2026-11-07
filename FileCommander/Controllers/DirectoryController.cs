@@ -40,7 +40,7 @@ class DirectoryController : Controller
     }
 
     public override Columns GetColumns()
-        => new(GetColumnId(), [
+        => new(GetColumnId(), true, [
             new("Name", SubColumn: "Erw.", Sortable: true),
             new("Datum", Sortable: true),
             new("Größe", true, Sortable: true),

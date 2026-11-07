@@ -24,7 +24,7 @@ class RootController : Controller
     public RootController(FolderContext context) : base(context) { }
 
     public override Columns GetColumns()
-        => new(GetColumnId(), [
+        => new(GetColumnId(), false, [
             new("Name"),
             new("Bezeichnung"),
             new("Größe", true)
