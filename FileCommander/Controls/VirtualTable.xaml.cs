@@ -553,6 +553,7 @@ public sealed partial class VirtualTable : UserControl
             SetNativeDataObject(args.Data, shellDataObject);
 
             args.DragUI.SetContentFromSoftwareBitmap(CreateDragIcon(filePaths.Length), new Windows.Foundation.Point(-20, -20));
+            args.AllowedOperations =DataPackageOperation.Copy | DataPackageOperation.Move;
             args.Data.RequestedOperation = DataPackageOperation.Copy; // | DataPackageOperation.Move;
 
             static SoftwareBitmap CreateDragIcon(int count)
@@ -696,4 +697,3 @@ public sealed partial class VirtualTable : UserControl
 
 record OtherSide(VirtualTable Other, bool IsRight);
 record MsgEvent(int Msg, bool? Move, string[]? Items, int[]? itemIndexes);
-
