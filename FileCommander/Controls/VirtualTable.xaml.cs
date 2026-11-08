@@ -1,5 +1,3 @@
-using ClrWinApi;
-
 using CsTools;
 using CsTools.Extensions;
 
@@ -9,7 +7,6 @@ using FileCommander.Data;
 using FileCommander.Exceptions;
 using FileCommander.Icon;
 
-using Microsoft.UI.Input;
 using Microsoft.UI.Xaml;
 using Microsoft.UI.Xaml.Controls;
 using Microsoft.Web.WebView2.Core;
@@ -22,23 +19,19 @@ using System.Diagnostics;
 using System.IO;
 using System.Linq;
 using System.Reflection;
-using System.Runtime.InteropServices;
-using System.Runtime.InteropServices.Marshalling;
 using System.Text.Json;
 using System.Threading.Tasks;
 
-using Windows.ApplicationModel.DataTransfer;
-using Windows.Graphics.Imaging;
-using Windows.Security.Cryptography;
 using Windows.Storage;
 
-using WinRT;
+using WinUITools.ElementExtensions;
 
 namespace FileCommander.Controls;
 
-// TODO Drag: select a folder -> Exception
 // TODO Drag: Favorites: drag to Favorites -> use WebView2DragDrop API
+// TODO Drag over: more than ~500 files the Commander hangs
 // TODO Viewers
+// TODO Zip folder
 
 public sealed partial class VirtualTable : UserControl
 {
@@ -49,7 +42,11 @@ public sealed partial class VirtualTable : UserControl
     internal Controller Controller { get; private set; } = null!;
     internal FolderContext Context { get; private set; } = null!;
 
-    public VirtualTable() => InitializeComponent();
+    public VirtualTable()
+    {
+        InitializeComponent();
+        dragDrop = new(WebView);
+    }
     public void Refresh() => SendEvent(new(Reload: new()));
     public void ToggleSelection() => SendEvent(new(ToggleSelection: new()));
     public void SelectAllAbove() => SendEvent(new(SelectAllAbove: new()));
@@ -81,8 +78,6 @@ public sealed partial class VirtualTable : UserControl
     {
         await WebView.EnsureCoreWebView2Async();
 
-        WebView.AllowDrop = true;
-        WebView.DragStarting += WebView_DragStarting;
         WebView.CoreWebView2.AddWebResourceRequestedFilter("https:*", CoreWebView2WebResourceContext.All);
         WebView.CoreWebView2.WebResourceRequested += CoreWebView2_WebResourceRequested;
         WebView.CoreWebView2.WebMessageReceived += CoreWebView2_WebMessageReceived;
@@ -520,163 +515,7 @@ public sealed partial class VirtualTable : UserControl
             await Controller.CopyFrom(files, msg.Move == true, OnOtherVirtualTable?.Invoke().IsRight == false);
         }
         else if (msg?.Msg == 2)
-        {
-            var point = PointerPoint.GetCurrentPoint(1);
-            if (point.Properties.IsLeftButtonPressed)
-            {
-                filesToDrag = Controller.GetFilesFromIndexes(msg.itemIndexes ?? []);
-                try
-                {
-                    await WebView.StartDragAsync(point);
-                }
-                finally
-                {
-                    _shellDataObject = null;
-                    _comWrappers = null;
-                }
-            }
-        }
-    }
-
-    async void WebView_DragStarting(UIElement sender, DragStartingEventArgs args)
-    {
-        if (filesToDrag == null)
-            return;
-        var deferral = args.GetDeferral();
-        try
-        {
-            string[] filePaths = filesToDrag;
-            filesToDrag = null;
-
-
-            var shellDataObject = new ShellDataObject(filePaths);
-            SetNativeDataObject(args.Data, shellDataObject);
-
-            args.DragUI.SetContentFromSoftwareBitmap(CreateDragIcon(filePaths.Length), new Windows.Foundation.Point(-20, -20));
-            args.AllowedOperations =DataPackageOperation.Copy | DataPackageOperation.Move;
-            args.Data.RequestedOperation = DataPackageOperation.Copy; // | DataPackageOperation.Move;
-
-            static SoftwareBitmap CreateDragIcon(int count)
-            {
-                const int size = 64;
-                var pixels = new byte[size * size * 4];
-
-                void Pixel(int x, int y, byte r, byte g, byte b)
-                {
-                    if (x < 0 || x >= size || y < 0 || y >= size)
-                        return;
-
-                    int i = (y * size + x) * 4;
-                    pixels[i] = b;
-                    pixels[i + 1] = g;
-                    pixels[i + 2] = r;
-                    pixels[i + 3] = 255;
-                }
-
-                void Rect(int x, int y, int w, int h,
-                    byte r, byte g, byte b)
-                {
-                    for (int py = y; py < y + h; py++)
-                        for (int px = x; px < x + w; px++)
-                            Pixel(px, py, r, g, b);
-                }
-
-                void Circle(int cx, int cy, int radius,
-                    byte r, byte g, byte b)
-                {
-                    for (int y = -radius; y <= radius; y++)
-                        for (int x = -radius; x <= radius; x++)
-                            if (x * x + y * y <= radius * radius)
-                                Pixel(cx + x, cy + y, r, g, b);
-                }
-
-                // Document
-                Rect(13, 6, 31, 43, 245, 245, 245);
-                Rect(34, 6, 10, 10, 190, 190, 190);
-                Rect(19, 22, 19, 2, 100, 100, 100);
-                Rect(19, 29, 19, 2, 100, 100, 100);
-                Rect(19, 36, 13, 2, 100, 100, 100);
-
-                // Blue count badge
-                Circle(44, 44, 16, 35, 115, 220);
-
-                // Simple 3x5 digit font
-                string[] digits =
-                [
-                    "111101101101111", // 0
-            "010110010010111", // 1
-            "111001111100111", // 2
-            "111001111001111", // 3
-            "101101111001001", // 4
-            "111100111001111", // 5
-            "111100111101111", // 6
-            "111001001001001", // 7
-            "111101111101111", // 8
-            "111101111001111"  // 9
-                ];
-
-                string number = Math.Clamp(count, 0, 99).ToString();
-                int scale = 2;
-                int width = number.Length * 3 * scale
-                          + (number.Length - 1) * scale;
-                int startX = 44 - width / 2;
-                int startY = 39;
-
-                for (int n = 0; n < number.Length; n++)
-                {
-                    string digit = digits[number[n] - '0'];
-
-                    for (int i = 0; i < 15; i++)
-                    {
-                        if (digit[i] != '1')
-                            continue;
-
-                        Rect(
-                            startX + n * 8 + (i % 3) * scale,
-                            startY + (i / 3) * scale,
-                            scale, scale,
-                            255, 255, 255);
-                    }
-                }
-
-                var buffer = CryptographicBuffer.CreateFromByteArray(pixels);
-
-                return SoftwareBitmap.CreateCopyFromBuffer(
-                    buffer,
-                    BitmapPixelFormat.Bgra8,
-                    size,
-                    size,
-                    BitmapAlphaMode.Premultiplied);
-            }
-        }
-        finally
-        {
-            deferral.Complete();
-        }
-    }
-    private ShellDataObject? _shellDataObject;
-
-    private StrategyBasedComWrappers? _comWrappers;
-    void SetNativeDataObject(DataPackage dataPackage, ShellDataObject shellDataObject)
-    {
-        var provider = dataPackage.As<IDataObjectProvider>();
-
-        var wrappers = new StrategyBasedComWrappers();
-
-        nint dataObjectPtr = wrappers.GetOrCreateComInterfaceForObject( shellDataObject, CreateComInterfaceFlags.None);
-        var iid = new Guid("0000010E-0000-0000-C000-000000000046");
-
-        try
-        {
-            _shellDataObject = shellDataObject;
-            _comWrappers = wrappers;
-
-            Marshal.ThrowExceptionForHR(provider.SetDataObject(dataObjectPtr));
-        }
-        finally
-        {
-            Marshal.Release(dataObjectPtr);
-        }
+            await dragDrop.StartDragAsync(Controller.GetFilesFromIndexes(msg.itemIndexes ?? []));
     }
 
     // TODO to CsTools
@@ -691,8 +530,7 @@ public sealed partial class VirtualTable : UserControl
             line.SubstringUntil('='),
             Uri.UnescapeDataString(line.SubstringAfter('=').Trim())
         );
-
-    string[]? filesToDrag;
+    readonly DragDrop dragDrop;
 }
 
 record OtherSide(VirtualTable Other, bool IsRight);
