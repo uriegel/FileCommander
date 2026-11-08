@@ -4,6 +4,7 @@ using CsTools.Extensions;
 using FileCommander.Contexts;
 using FileCommander.Controllers;
 using FileCommander.Data;
+using FileCommander.DragDrop;
 using FileCommander.Exceptions;
 using FileCommander.Icon;
 
@@ -20,20 +21,21 @@ using System.Diagnostics;
 using System.IO;
 using System.Linq;
 using System.Reflection;
+using System.Runtime.InteropServices;
+using System.Runtime.InteropServices.Marshalling;
 using System.Text.Json;
-using System.Threading;
 using System.Threading.Tasks;
 
 using Windows.ApplicationModel.DataTransfer;
 using Windows.Graphics.Imaging;
 using Windows.Security.Cryptography;
 using Windows.Storage;
-using Windows.Storage.Streams;
+
+using WinRT;
 
 namespace FileCommander.Controls;
 
 // TODO Drag: select a folder -> Exception
-// TODO Drag: select multiple files -> hangs
 // TODO Drag: Favorites: drag to Favorites -> use WebView2DragDrop API
 // TODO Viewers
 
@@ -522,7 +524,15 @@ public sealed partial class VirtualTable : UserControl
             if (point.Properties.IsLeftButtonPressed)
             {
                 filesToDrag = Controller.GetFilesFromIndexes(msg.itemIndexes ?? []);
-                await WebView.StartDragAsync(point);
+                try
+                {
+                    await WebView.StartDragAsync(point);
+                }
+                finally
+                {
+                    _shellDataObject = null;
+                    _comWrappers = null;
+                }
             }
         }
     }
@@ -536,47 +546,13 @@ public sealed partial class VirtualTable : UserControl
         {
             string[] filePaths = filesToDrag;
             filesToDrag = null;
-            var files = await filePaths
-                .ToAsyncEnumerable()
-                .Select(async (string n, CancellationToken c) => await StorageFile.GetFileFromPathAsync(n))
-                .ToArrayAsync();
 
 
-            args.Data.SetStorageItems(files);
+            var shellDataObject = new ShellDataObject(filePaths);
+            SetNativeDataObject(args.Data, shellDataObject);
+
             args.DragUI.SetContentFromSoftwareBitmap(CreateDragIcon(filePaths.Length), new Windows.Foundation.Point(-20, -20));
-            args.Data.RequestedOperation = DataPackageOperation.Copy | DataPackageOperation.Move;
-            SetPreferredDropEffect(args.Data);
-
-            void SetPreferredDropEffect(DataPackage data)
-            {
-                const string format = "Preferred DropEffect";
-
-                data.SetDataProvider(format, async request =>
-                {
-                    var deferral = request.GetDeferral();
-
-                    try
-                    {
-                        var stream = new InMemoryRandomAccessStream();
-
-                        using (var writer = new DataWriter(stream))
-                        {
-                            writer.WriteUInt32(1); // DROPEFFECT_COPY
-                            await writer.StoreAsync();
-                            writer.DetachStream();
-                        }
-
-                        stream.Seek(0);
-
-                        //request.SetData(
-                        //    RandomAccessStreamReference.CreateFromStream(stream));
-                    }
-                    finally
-                    {
-                        deferral.Complete();
-                    }
-                });
-            }
+            args.Data.RequestedOperation = DataPackageOperation.Copy; // | DataPackageOperation.Move;
 
             static SoftwareBitmap CreateDragIcon(int count)
             {
@@ -674,6 +650,30 @@ public sealed partial class VirtualTable : UserControl
         finally
         {
             deferral.Complete();
+        }
+    }
+    private ShellDataObject? _shellDataObject;
+
+    private StrategyBasedComWrappers? _comWrappers;
+    void SetNativeDataObject(DataPackage dataPackage, ShellDataObject shellDataObject)
+    {
+        var provider = dataPackage.As<IDataObjectProvider>();
+
+        var wrappers = new StrategyBasedComWrappers();
+
+        nint dataObjectPtr = wrappers.GetOrCreateComInterfaceForObject( shellDataObject, CreateComInterfaceFlags.None);
+        var iid = new Guid("0000010E-0000-0000-C000-000000000046");
+
+        try
+        {
+            _shellDataObject = shellDataObject;
+            _comWrappers = wrappers;
+
+            Marshal.ThrowExceptionForHR(provider.SetDataObject(dataObjectPtr));
+        }
+        finally
+        {
+            Marshal.Release(dataObjectPtr);
         }
     }
 
